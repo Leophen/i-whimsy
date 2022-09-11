@@ -3,6 +3,7 @@ import { Button, Checkbox, Input, Modal } from '@arco-design/web-react';
 import type { NextPage } from 'next';
 import styles from './index.module.scss';
 import { ChangeEvent, useEffect, useState } from 'react';
+import request from 'service/fetch';
 
 interface LoginModalProps {
   visible: boolean;
@@ -13,7 +14,7 @@ interface LoginOtherProps {
   checked: boolean;
 }
 
-interface PinCountBtnProps {
+interface VerifyCountBtnProps {
   time: number;
   onEnd: () => void;
 }
@@ -60,23 +61,23 @@ const LoginOther: NextPage<LoginOtherProps> = (props) => {
   );
 };
 
-const PinCountBtn: NextPage<PinCountBtnProps> = (props) => {
+const VerifyCountBtn: NextPage<VerifyCountBtnProps> = (props) => {
   const { time = 60, onEnd } = props;
 
   const [curTime, setCurTime] = useState(time);
 
   useEffect(() => {
-    const pinT = setInterval(() => {
+    const verifyT = setInterval(() => {
       setCurTime((lastTime) => {
         if (lastTime === 1) {
-          clearInterval(pinT);
+          clearInterval(verifyT);
           onEnd?.();
           return lastTime;
         }
         return lastTime - 1;
       });
       return () => {
-        clearInterval(pinT);
+        clearInterval(verifyT);
       };
     }, 1000);
   }, [onEnd, time]);
@@ -85,7 +86,7 @@ const PinCountBtn: NextPage<PinCountBtnProps> = (props) => {
 };
 
 const phoneReg = /^[1][3,4,5,6,7,8,9][0-9]{9}$/;
-const pinReg = /^[0-9]{6}$/;
+const verifyReg = /^[0-9]{6}$/;
 
 const LoginModal: NextPage<LoginModalProps> = (props) => {
   const { visible = false, onClose } = props;
@@ -95,7 +96,7 @@ const LoginModal: NextPage<LoginModalProps> = (props) => {
     ifNull: false,
     ifCorrect: true,
   });
-  const [pin, setPin] = useState({
+  const [verify, setVerify] = useState({
     value: '',
     ifNull: false,
     ifCorrect: true,
@@ -105,19 +106,19 @@ const LoginModal: NextPage<LoginModalProps> = (props) => {
     phone.value = val;
     setPhone({ ...phone });
   };
-  const handleChangePin = (val: string) => {
-    pin.value = val;
-    setPin({ ...pin });
+  const handleChangeVerify = (val: string) => {
+    verify.value = val;
+    setVerify({ ...verify });
   };
 
   const handleUsualBlur = (
     e: ChangeEvent<HTMLInputElement>,
-    type: 'phone' | 'pin'
+    type: 'phone' | 'verify'
   ) => {
     const val = e.target.value;
     const ifPhone = type === 'phone';
-    const state = ifPhone ? phone : pin;
-    const reg = ifPhone ? phoneReg : pinReg;
+    const state = ifPhone ? phone : verify;
+    const reg = ifPhone ? phoneReg : verifyReg;
     if (val === '') {
       state.ifNull = true;
     } else {
@@ -128,7 +129,7 @@ const LoginModal: NextPage<LoginModalProps> = (props) => {
         state.ifCorrect = false;
       }
     }
-    ifPhone ? setPhone({ ...state }) : setPin({ ...state });
+    ifPhone ? setPhone({ ...state }) : setVerify({ ...state });
   };
 
   const [agreeTerms, setAgreeTerms] = useState(false);
@@ -141,10 +142,10 @@ const LoginModal: NextPage<LoginModalProps> = (props) => {
     phone.ifCorrect = true;
     setPhone({ ...phone });
 
-    pin.value = '';
-    pin.ifNull = false;
-    pin.ifCorrect = true;
-    setPin({ ...pin });
+    verify.value = '';
+    verify.ifNull = false;
+    verify.ifCorrect = true;
+    setVerify({ ...verify });
 
     setAgreeTerms(false);
   };
@@ -155,10 +156,10 @@ const LoginModal: NextPage<LoginModalProps> = (props) => {
   };
 
   const phonePass = () => !phone.ifNull && phone.ifCorrect;
-  const pinPass = () => !pin.ifNull && pin.ifCorrect;
+  const verifyPass = () => !verify.ifNull && verify.ifCorrect;
 
   const ifCanLogin = () => {
-    return phonePass() && pinPass() && agreeTerms;
+    return phonePass() && verifyPass() && agreeTerms;
   };
 
   const curRegTxt = () => {
@@ -166,21 +167,28 @@ const LoginModal: NextPage<LoginModalProps> = (props) => {
       return <span className={styles.regErrorTxt}>手机号不能为空</span>;
     } else if (!phone.ifCorrect) {
       return <span className={styles.regErrorTxt}>请输入正确的手机号</span>;
-    } else if (pin.ifNull) {
+    } else if (verify.ifNull) {
       return <span className={styles.regErrorTxt}>验证码不能为空</span>;
-    } else if (!pin.ifCorrect) {
+    } else if (!verify.ifCorrect) {
       return <span className={styles.regErrorTxt}>请输入6位数的验证码</span>;
     } else {
       return '';
     }
   };
 
-  const [pinActive, setPinActive] = useState(false);
-  const getPin = () => {
-    phonePass() && setPinActive(true);
+  const [verifyActive, setVerifyActive] = useState(false);
+  // 获取验证码
+  const handleGetVerify = () => {
+    if (phonePass()) {
+      setVerifyActive(true);
+
+      request.post('/api/user/sendVerifyCode');
+    } else {
+      return;
+    }
   };
-  const handleEndPinActive = () => {
-    setPinActive(false);
+  const handleEndVerifyActive = () => {
+    setVerifyActive(false);
   };
 
   const handleLogin = () => {
@@ -208,21 +216,21 @@ const LoginModal: NextPage<LoginModalProps> = (props) => {
           addAfter={
             <Button
               type="text"
-              onClick={getPin}
-              className={pinActive ? styles.btnActive : ''}
+              onClick={handleGetVerify}
+              className={verifyActive ? styles.btnActive : ''}
             >
-              {pinActive ? (
-                <PinCountBtn time={3} onEnd={handleEndPinActive} />
+              {verifyActive ? (
+                <VerifyCountBtn time={3} onEnd={handleEndVerifyActive} />
               ) : (
                 `获取验证码`
               )}
             </Button>
           }
           placeholder="验证码"
-          value={pin.value}
-          error={!pinPass()}
-          onChange={handleChangePin}
-          onBlur={(e) => handleUsualBlur(e, 'pin')}
+          value={verify.value}
+          error={!verifyPass()}
+          onChange={handleChangeVerify}
+          onBlur={(e) => handleUsualBlur(e, 'verify')}
         />
         <div className={styles.regTxt}>{curRegTxt()}</div>
         <Checkbox
