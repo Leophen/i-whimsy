@@ -1,5 +1,5 @@
 import '../styles/globals.scss';
-import '@arco-design/web-react/dist/css/arco.css';
+import '@arco-themes/react-i-theme/css/arco.css';
 import type { AppProps } from 'next/app';
 import Layout from 'components/Layout';
 

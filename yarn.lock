@@ -28,6 +28,11 @@
     scroll-into-view-if-needed "2.2.20"
     shallowequal "^1.1.0"
 
+"@arco-themes/react-i-theme@^0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@arco-themes/react-i-theme/-/react-i-theme-0.0.1.tgz#fcba771017f8fa30de49f30df24e842360c4c71a"
+  integrity sha512-3jm4R/1sH2WkUOZLirtt/0exEU49s+VzTiAfxbtdYucQhtDO8uSYTxvGcBq1YXd/4i1TCLD6dOITuDBFm06Www==
+
 "@babel/code-frame@^7.0.0":
   version "7.18.6"
   resolved "https://registry.npmmirror.com/@babel/code-frame/-/code-frame-7.18.6.tgz#3b25d38c89600baa2dcc219edfa88a74eb2c427a"

@@ -2,7 +2,7 @@
   /* 
    * 主题色
    */
-  --i-primary: #3033ab;
+  --i-primary: #5e62ea;
 
   /* 
    * 顶部栏
@@ -20,4 +20,60 @@
    * 背景
    */
   --i-bg: #f7f8fc;
+}
+
+a {
+  color: var(--i-primary);
+  position: relative;
+  text-decoration: none;
+  &::after {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 0;
+    height: 1px;
+    background-color: var(--i-primary);
+    transition: all 0.2s ease-out;
+  }
+  &:hover {
+    &::after {
+      width: 100%;
+    }
+  }
+}
+
+div[class*='loginModal'] {
+  .arco-modal-header {
+    border-bottom: none;
+    padding: 32px;
+    height: auto;
+  }
+  .arco-modal-content {
+    padding: 0 32px 32px;
+  }
+  div[class*='loginContent'] {
+    .arco-input-group-wrapper {
+      height: 48px;
+      &:first-of-type {
+        margin-bottom: 16px;
+      }
+    }
+    .arco-input-inner-wrapper {
+      padding: 0 16px;
+    }
+    .arco-input-group-addafter {
+      padding: 0;
+      button {
+        height: 100%;
+        &:active {
+          background: transparent;
+        }
+      }
+    }
+    .arco-checkbox {
+      padding-left: 0;
+    }
+  }
 }
