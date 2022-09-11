@@ -1,5 +1,11 @@
 /* eslint-disable react/no-unknown-property */
-import { Button, Checkbox, Input, Modal } from '@arco-design/web-react';
+import {
+  Button,
+  Checkbox,
+  Input,
+  Message,
+  Modal,
+} from '@arco-design/web-react';
 import type { NextPage } from 'next';
 import styles from './index.module.scss';
 import { ChangeEvent, useEffect, useState } from 'react';
@@ -180,9 +186,18 @@ const LoginModal: NextPage<LoginModalProps> = (props) => {
   // 获取验证码
   const handleGetVerify = () => {
     if (phonePass()) {
-      setVerifyActive(true);
-
-      request.post('/api/user/sendVerifyCode');
+      request
+        .post('/api/user/sendVerifyCode', {
+          to: phone.value,
+          templateId: 1,
+        })
+        .then((res: any) => {
+          if (res?.code === 0) {
+            setVerifyActive(true);
+          } else {
+            Message.error(res?.msg || '未知错误');
+          }
+        });
     } else {
       return;
     }
