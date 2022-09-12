@@ -5,7 +5,7 @@ import { encode } from 'js-base64';
 import request from 'service/fetch';
 import { withIronSessionApiRoute } from 'iron-session/next';
 import { ironOptions } from 'config';
-import {ISession } from 'pages/api/index'
+import { ISession } from 'pages/api/index';
 
 async function sendVerifyCode(req: NextApiRequest, res: NextApiResponse) {
   const session: ISession = req.session;
@@ -42,7 +42,7 @@ async function sendVerifyCode(req: NextApiRequest, res: NextApiResponse) {
   );
 
   const { statusCode, TemplateSMS, statusMsg } = response as any;
-
+  
   if (statusCode === '000000') {
     session.verifyCode = verifyCode;
     await session.save();

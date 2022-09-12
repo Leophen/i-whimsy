@@ -207,7 +207,19 @@ const LoginModal: NextPage<LoginModalProps> = (props) => {
   };
 
   const handleLogin = () => {
-    alert('login xx');
+    request
+      .post('/api/user/login', {
+        phone: phone.value,
+        verify: verify.value,
+      })
+      .then((res: any) => {
+        if (res?.code === 0) {
+          Message.success('success');
+          onClose?.();
+        } else {
+          Message.error(res?.msg || '未知错误');
+        }
+      });
   };
 
   return (
