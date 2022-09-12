@@ -64,55 +64,107 @@ const LoginOther: NextPage<LoginOtherProps> = (props) => {
   );
 };
 
+const usualReg = /^\w+$/;
+
 const LoginModal: NextPage<LoginModalProps> = (props) => {
   const { visible = false, onClose } = props;
 
   const [form, setForm] = useState({
     account: '',
-    accountError: false,
+    accountNull: false,
     accountLess4: false,
     accountGreater16: false,
+    accountIllegal: false,
+
     password: '',
-    passwordError: false,
+    passwordNull: false,
+    passwordLess6: false,
+    passwordGreater18: false,
+    passwordIllegal: false,
+
     confirmPassword: '',
     confirmPasswordError: false,
   });
 
   const handleChangeAccount = (val: string) => {
     form.account = val;
-    form.accountError = false;
-    form.accountLess4 = false;
-    form.accountGreater16 = false;
+    val !== '' ? (form.accountNull = false) : (form.accountNull = true);
+    if (mode === 'register') {
+      val.length >= 4
+        ? (form.accountLess4 = false)
+        : (form.accountLess4 = true);
+      val.length <= 16
+        ? (form.accountGreater16 = false)
+        : (form.accountGreater16 = true);
+      usualReg.test(val)
+        ? (form.accountIllegal = false)
+        : (form.accountIllegal = true);
+    }
     setForm({ ...form });
   };
   const handleBlurAccount = (e: ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     if (val === '') {
-      form.accountError = true;
+      form.accountNull = true;
     }
     if (mode === 'register') {
       val.length < 4 && (form.accountLess4 = true);
       val.length > 16 && (form.accountGreater16 = true);
+      !usualReg.test(val) && (form.accountIllegal = true);
     }
     setForm({ ...form });
+  };
+  const accountPass = () => {
+    return !(
+      form.accountNull ||
+      form.accountLess4 ||
+      form.accountGreater16 ||
+      form.accountIllegal
+    );
   };
 
   const handleChangePassword = (val: string) => {
     form.password = val;
-    form.passwordError = false;
+    val !== '' && (form.passwordNull = false);
+    if (mode === 'register') {
+      val.length >= 6
+        ? (form.passwordLess6 = false)
+        : (form.passwordLess6 = true);
+      val.length <= 18
+        ? (form.passwordGreater18 = false)
+        : (form.passwordGreater18 = true);
+      usualReg.test(val)
+        ? (form.passwordIllegal = false)
+        : (form.passwordIllegal = true);
+    }
     setForm({ ...form });
   };
   const handleBlurPassword = (e: ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     if (val === '') {
-      form.passwordError = true;
-      setForm({ ...form });
+      form.passwordNull = true;
     }
+    if (mode === 'register') {
+      val.length < 6 && (form.passwordLess6 = true);
+      val.length > 18 && (form.passwordGreater18 = true);
+      !usualReg.test(val) && (form.passwordIllegal = true);
+    }
+    setForm({ ...form });
+  };
+  const passwordPass = () => {
+    return !(
+      form.passwordNull ||
+      form.passwordLess6 ||
+      form.passwordGreater18 ||
+      form.passwordIllegal
+    );
   };
 
   const handleChangeConfirmPassword = (val: string) => {
     form.confirmPassword = val;
-    form.confirmPasswordError = false;
+    val === form.password
+      ? (form.confirmPasswordError = false)
+      : (form.confirmPasswordError = true);
     setForm({ ...form });
   };
   const handleBlurConfirmPassword = (e: ChangeEvent<HTMLInputElement>) => {
@@ -127,11 +179,17 @@ const LoginModal: NextPage<LoginModalProps> = (props) => {
 
   const resetData = () => {
     form.account = '';
-    form.accountError = false;
+    form.accountNull = false;
     form.accountLess4 = false;
     form.accountGreater16 = false;
+    form.accountIllegal = false;
+
     form.password = '';
-    form.passwordError = false;
+    form.passwordNull = false;
+    form.passwordLess6 = false;
+    form.passwordGreater18 = false;
+    form.passwordIllegal = false;
+
     form.confirmPassword = '';
     form.confirmPasswordError = false;
     setForm({ ...form });
@@ -149,14 +207,30 @@ const LoginModal: NextPage<LoginModalProps> = (props) => {
   };
 
   const curRegTxt = () => {
-    if (form.accountError) {
+    if (form.accountNull) {
       return <span className={styles.regErrorTxt}>账号不能为空</span>;
     } else if (form.accountLess4) {
       return <span className={styles.regErrorTxt}>账号不能少于4位</span>;
     } else if (form.accountGreater16) {
       return <span className={styles.regErrorTxt}>账号不能多于16位</span>;
-    } else if (form.passwordError) {
+    } else if (form.accountIllegal) {
+      return (
+        <span className={styles.regErrorTxt}>
+          账号只能由字母、数字、下划线组成
+        </span>
+      );
+    } else if (form.passwordNull) {
       return <span className={styles.regErrorTxt}>密码不能为空</span>;
+    } else if (form.passwordLess6) {
+      return <span className={styles.regErrorTxt}>密码不能少于6位</span>;
+    } else if (form.passwordGreater18) {
+      return <span className={styles.regErrorTxt}>密码不能多于18位</span>;
+    } else if (form.passwordIllegal) {
+      return (
+        <span className={styles.regErrorTxt}>
+          密码只能由字母、数字、下划线组成
+        </span>
+      );
     } else if (form.confirmPasswordError) {
       return <span className={styles.regErrorTxt}>两次密码输入不一致</span>;
     } else {
@@ -220,14 +294,14 @@ const LoginModal: NextPage<LoginModalProps> = (props) => {
           placeholder="账号"
           prefix={<IconUser />}
           value={form.account}
-          error={form.accountError}
+          error={!accountPass()}
           onChange={handleChangeAccount}
           onBlur={handleBlurAccount}
         />
         <Input.Password
           placeholder="密码"
           value={form.password}
-          error={form.passwordError}
+          error={!passwordPass()}
           onChange={handleChangePassword}
           onBlur={handleBlurPassword}
         />
@@ -255,8 +329,8 @@ const LoginModal: NextPage<LoginModalProps> = (props) => {
         <footer className={styles.submitFooter}>
           <Button
             disabled={
-              form.accountError ||
-              form.passwordError ||
+              !accountPass() ||
+              !passwordPass() ||
               form.confirmPasswordError ||
               !agreeTerms
             }
