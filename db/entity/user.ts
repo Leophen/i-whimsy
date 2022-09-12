@@ -4,7 +4,13 @@ import { Entity, BaseEntity, PrimaryGeneratedColumn, Column } from 'typeorm'
 
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
-  readonly id!: number;
+  readonly key!: number;
+
+  @Column()
+  account!: string;
+
+  @Column()
+  password!: string;
 
   @Column()
   nickname!: string;

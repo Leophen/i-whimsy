@@ -5,17 +5,31 @@ import { prepareConnection } from 'db/index';
 import { User } from 'db/entity/index';
 
 async function login(req: NextApiRequest, res: NextApiResponse) {
-  const { phone = '', verify = '' } = req.body;
+  const { account = '', password = '' } = req.body;
 
   const db = await prepareConnection();
   const userDB = db.getRepository(User);
 
-  const users = await userDB.find();
+  const currentAccount = await userDB
+    .createQueryBuilder('user')
+    .where('user.account = :account', { account })
+    .getOne();
 
-  console.log(phone, verify, users);
+  let status = 0;
+  const loginMsg = () => {
+    if (!currentAccount) {
+      return '账号不存在';
+    }
+    if (!!currentAccount && currentAccount.password !== password) {
+      return '密码不正确';
+    }
+    status = 1;
+    return '';
+  };
+
   res?.status(200).json({
-    phone,
-    verify,
+    msg: loginMsg(),
+    status,
   });
 }
 

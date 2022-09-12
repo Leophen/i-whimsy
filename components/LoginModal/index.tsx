@@ -6,9 +6,10 @@ import {
   Message,
   Modal,
 } from '@arco-design/web-react';
+import { IconUser } from '@arco-design/web-react/icon';
 import type { NextPage } from 'next';
 import styles from './index.module.scss';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import request from 'service/fetch';
 
 interface LoginModalProps {
@@ -18,11 +19,6 @@ interface LoginModalProps {
 
 interface LoginOtherProps {
   checked: boolean;
-}
-
-interface VerifyCountBtnProps {
-  time: number;
-  onEnd: () => void;
 }
 
 const LoginOther: NextPage<LoginOtherProps> = (props) => {
@@ -67,75 +63,40 @@ const LoginOther: NextPage<LoginOtherProps> = (props) => {
   );
 };
 
-const VerifyCountBtn: NextPage<VerifyCountBtnProps> = (props) => {
-  const { time = 60, onEnd } = props;
-
-  const [curTime, setCurTime] = useState(time);
-
-  useEffect(() => {
-    const verifyT = setInterval(() => {
-      setCurTime((lastTime) => {
-        if (lastTime === 1) {
-          clearInterval(verifyT);
-          onEnd?.();
-          return lastTime;
-        }
-        return lastTime - 1;
-      });
-      return () => {
-        clearInterval(verifyT);
-      };
-    }, 1000);
-  }, [onEnd, time]);
-
-  return <div>{curTime}s后重新发送</div>;
-};
-
-const phoneReg = /^[1][3,4,5,6,7,8,9][0-9]{9}$/;
-const verifyReg = /^[0-9]{6}$/;
-
 const LoginModal: NextPage<LoginModalProps> = (props) => {
   const { visible = false, onClose } = props;
 
-  const [phone, setPhone] = useState({
-    value: '',
-    ifNull: false,
-    ifCorrect: true,
-  });
-  const [verify, setVerify] = useState({
-    value: '',
-    ifNull: false,
-    ifCorrect: true,
+  const [form, setForm] = useState({
+    account: '',
+    accountError: false,
+    password: '',
+    passwordError: false,
   });
 
-  const handleChangePhone = (val: string) => {
-    phone.value = val;
-    setPhone({ ...phone });
+  const handleChangeAccount = (val: string) => {
+    form.account = val;
+    form.accountError = false;
+    setForm({ ...form });
   };
-  const handleChangeVerify = (val: string) => {
-    verify.value = val;
-    setVerify({ ...verify });
-  };
-
-  const handleUsualBlur = (
-    e: ChangeEvent<HTMLInputElement>,
-    type: 'phone' | 'verify'
-  ) => {
+  const handleBlurAccount = (e: ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-    const ifPhone = type === 'phone';
-    const state = ifPhone ? phone : verify;
-    const reg = ifPhone ? phoneReg : verifyReg;
     if (val === '') {
-      state.ifNull = true;
-    } else {
-      state.ifNull = false;
-      if (reg.test(val)) {
-        state.ifCorrect = true;
-      } else {
-        state.ifCorrect = false;
-      }
+      form.accountError = true;
+      setForm({ ...form });
     }
-    ifPhone ? setPhone({ ...state }) : setVerify({ ...state });
+  };
+
+  const handleChangePassword = (val: string) => {
+    form.password = val;
+    form.passwordError = false;
+    setForm({ ...form });
+  };
+  const handleBlurPassword = (e: ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    if (val === '') {
+      form.passwordError = true;
+      setForm({ ...form });
+    }
   };
 
   const [agreeTerms, setAgreeTerms] = useState(false);
@@ -143,15 +104,11 @@ const LoginModal: NextPage<LoginModalProps> = (props) => {
   const closeModal = () => {
     onClose?.();
 
-    phone.value = '';
-    phone.ifNull = false;
-    phone.ifCorrect = true;
-    setPhone({ ...phone });
-
-    verify.value = '';
-    verify.ifNull = false;
-    verify.ifCorrect = true;
-    setVerify({ ...verify });
+    form.account = '';
+    form.accountError = false;
+    form.password = '';
+    form.passwordError = false;
+    setForm({ ...form });
 
     setAgreeTerms(false);
   };
@@ -161,63 +118,27 @@ const LoginModal: NextPage<LoginModalProps> = (props) => {
     closeModal();
   };
 
-  const phonePass = () => !phone.ifNull && phone.ifCorrect;
-  const verifyPass = () => !verify.ifNull && verify.ifCorrect;
-
-  const ifCanLogin = () => {
-    return phonePass() && verifyPass() && agreeTerms;
-  };
-
   const curRegTxt = () => {
-    if (phone.ifNull) {
-      return <span className={styles.regErrorTxt}>手机号不能为空</span>;
-    } else if (!phone.ifCorrect) {
-      return <span className={styles.regErrorTxt}>请输入正确的手机号</span>;
-    } else if (verify.ifNull) {
-      return <span className={styles.regErrorTxt}>验证码不能为空</span>;
-    } else if (!verify.ifCorrect) {
-      return <span className={styles.regErrorTxt}>请输入6位数的验证码</span>;
+    if (form.accountError) {
+      return <span className={styles.regErrorTxt}>账号不能为空</span>;
+    } else if (form.passwordError) {
+      return <span className={styles.regErrorTxt}>密码不能为空</span>;
     } else {
       return '';
     }
   };
 
-  const [verifyActive, setVerifyActive] = useState(false);
-  // 获取验证码
-  const handleGetVerify = () => {
-    if (phonePass()) {
-      request
-        .post('/api/user/sendVerifyCode', {
-          to: phone.value,
-          templateId: 1,
-        })
-        .then((res: any) => {
-          if (res?.code === 0) {
-            setVerifyActive(true);
-          } else {
-            Message.error(res?.msg || '未知错误');
-          }
-        });
-    } else {
-      return;
-    }
-  };
-  const handleEndVerifyActive = () => {
-    setVerifyActive(false);
-  };
-
   const handleLogin = () => {
     request
       .post('/api/user/login', {
-        phone: phone.value,
-        verify: verify.value,
+        account: form.account,
+        password: form.password,
       })
       .then((res: any) => {
-        if (res?.code === 0) {
-          Message.success('success');
-          onClose?.();
-        } else {
+        if (res?.status === 0) {
           Message.error(res?.msg || '未知错误');
+        } else {
+          onClose?.();
         }
       });
   };
@@ -225,39 +146,26 @@ const LoginModal: NextPage<LoginModalProps> = (props) => {
   return (
     <Modal
       className={styles.loginModal}
-      title={<header className={styles.loginHeader}>验证码登录</header>}
+      title={<header className={styles.loginHeader}>登录</header>}
       visible={visible}
       footer={null}
       onCancel={closeModal}
     >
       <div className={styles.loginContent}>
         <Input
-          addBefore="+86"
-          placeholder="手机号"
-          value={phone.value}
-          error={!phonePass()}
-          onChange={handleChangePhone}
-          onBlur={(e) => handleUsualBlur(e, 'phone')}
+          placeholder="账号"
+          prefix={<IconUser />}
+          value={form.account}
+          error={form.accountError}
+          onChange={handleChangeAccount}
+          onBlur={handleBlurAccount}
         />
-        <Input
-          addAfter={
-            <Button
-              type="text"
-              onClick={handleGetVerify}
-              className={verifyActive ? styles.btnActive : ''}
-            >
-              {verifyActive ? (
-                <VerifyCountBtn time={3} onEnd={handleEndVerifyActive} />
-              ) : (
-                `获取验证码`
-              )}
-            </Button>
-          }
-          placeholder="验证码"
-          value={verify.value}
-          error={!verifyPass()}
-          onChange={handleChangeVerify}
-          onBlur={(e) => handleUsualBlur(e, 'verify')}
+        <Input.Password
+          placeholder="密码"
+          value={form.password}
+          error={form.passwordError}
+          onChange={handleChangePassword}
+          onBlur={handleBlurPassword}
         />
         <div className={styles.regTxt}>{curRegTxt()}</div>
         <Checkbox
@@ -272,7 +180,11 @@ const LoginModal: NextPage<LoginModalProps> = (props) => {
         </div>
 
         <footer className={styles.loginFooter}>
-          <Button disabled={!ifCanLogin()} type="primary" onClick={handleLogin}>
+          <Button
+            disabled={form.accountError || form.passwordError || !agreeTerms}
+            type="primary"
+            onClick={handleLogin}
+          >
             登录
           </Button>
         </footer>
