@@ -250,7 +250,7 @@ const LoginModal: NextPage<LoginModalProps> = (props) => {
             Message.error(res?.msg || '未知错误');
           } else {
             Message.success('登录成功');
-            onClose?.();
+            closeModal?.();
           }
         });
     } else {
@@ -264,7 +264,7 @@ const LoginModal: NextPage<LoginModalProps> = (props) => {
             Message.error(res?.msg || '未知错误');
           } else {
             Message.success('注册成功');
-            onClose?.();
+            closeModal?.();
           }
         });
     }
