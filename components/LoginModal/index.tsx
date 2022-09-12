@@ -5,6 +5,7 @@ import {
   Input,
   Message,
   Modal,
+  Tabs,
 } from '@arco-design/web-react';
 import { IconUser } from '@arco-design/web-react/icon';
 import type { NextPage } from 'next';
@@ -69,21 +70,31 @@ const LoginModal: NextPage<LoginModalProps> = (props) => {
   const [form, setForm] = useState({
     account: '',
     accountError: false,
+    accountLess4: false,
+    accountGreater16: false,
     password: '',
     passwordError: false,
+    confirmPassword: '',
+    confirmPasswordError: false,
   });
 
   const handleChangeAccount = (val: string) => {
     form.account = val;
     form.accountError = false;
+    form.accountLess4 = false;
+    form.accountGreater16 = false;
     setForm({ ...form });
   };
   const handleBlurAccount = (e: ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     if (val === '') {
       form.accountError = true;
-      setForm({ ...form });
     }
+    if (mode === 'register') {
+      val.length < 4 && (form.accountLess4 = true);
+      val.length > 16 && (form.accountGreater16 = true);
+    }
+    setForm({ ...form });
   };
 
   const handleChangePassword = (val: string) => {
@@ -99,18 +110,37 @@ const LoginModal: NextPage<LoginModalProps> = (props) => {
     }
   };
 
+  const handleChangeConfirmPassword = (val: string) => {
+    form.confirmPassword = val;
+    form.confirmPasswordError = false;
+    setForm({ ...form });
+  };
+  const handleBlurConfirmPassword = (e: ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    if (val !== form.password) {
+      form.confirmPasswordError = true;
+      setForm({ ...form });
+    }
+  };
+
   const [agreeTerms, setAgreeTerms] = useState(false);
 
-  const closeModal = () => {
-    onClose?.();
-
+  const resetData = () => {
     form.account = '';
     form.accountError = false;
+    form.accountLess4 = false;
+    form.accountGreater16 = false;
     form.password = '';
     form.passwordError = false;
+    form.confirmPassword = '';
+    form.confirmPasswordError = false;
     setForm({ ...form });
-
     setAgreeTerms(false);
+  };
+  const closeModal = () => {
+    setMode('login');
+    resetData();
+    onClose?.();
   };
 
   const handleToTerms = () => {
@@ -121,32 +151,66 @@ const LoginModal: NextPage<LoginModalProps> = (props) => {
   const curRegTxt = () => {
     if (form.accountError) {
       return <span className={styles.regErrorTxt}>账号不能为空</span>;
+    } else if (form.accountLess4) {
+      return <span className={styles.regErrorTxt}>账号不能少于4位</span>;
+    } else if (form.accountGreater16) {
+      return <span className={styles.regErrorTxt}>账号不能多于16位</span>;
     } else if (form.passwordError) {
       return <span className={styles.regErrorTxt}>密码不能为空</span>;
+    } else if (form.confirmPasswordError) {
+      return <span className={styles.regErrorTxt}>两次密码输入不一致</span>;
     } else {
       return '';
     }
   };
 
-  const handleLogin = () => {
-    request
-      .post('/api/user/login', {
-        account: form.account,
-        password: form.password,
-      })
-      .then((res: any) => {
-        if (res?.status === 0) {
-          Message.error(res?.msg || '未知错误');
-        } else {
-          onClose?.();
-        }
-      });
+  const handleSubmit = () => {
+    if (mode === 'login') {
+      request
+        .post('/api/user/login', {
+          account: form.account,
+          password: form.password,
+        })
+        .then((res: any) => {
+          if (res?.status === 0) {
+            Message.error(res?.msg || '未知错误');
+          } else {
+            Message.success('登录成功');
+            onClose?.();
+          }
+        });
+    } else {
+      request
+        .post('/api/user/register', {
+          account: form.account,
+          password: form.password,
+        })
+        .then((res: any) => {
+          if (res?.status === 0) {
+            Message.error(res?.msg || '未知错误');
+          } else {
+            Message.success('注册成功');
+            onClose?.();
+          }
+        });
+    }
+  };
+
+  const [mode, setMode] = useState('login');
+  const handleSwitchTabs = (val: string) => {
+    setMode(val);
+    resetData();
   };
 
   return (
     <Modal
       className={styles.loginModal}
-      title={<header className={styles.loginHeader}>登录</header>}
+      title={
+        <Tabs activeTab={mode} onChange={handleSwitchTabs}>
+          <Tabs.TabPane key="login" title="登录"></Tabs.TabPane>
+          <Tabs.TabPane key="register" title="注册"></Tabs.TabPane>
+        </Tabs>
+      }
       visible={visible}
       footer={null}
       onCancel={closeModal}
@@ -167,6 +231,15 @@ const LoginModal: NextPage<LoginModalProps> = (props) => {
           onChange={handleChangePassword}
           onBlur={handleBlurPassword}
         />
+        {mode === 'register' && (
+          <Input.Password
+            placeholder="确认密码"
+            value={form.confirmPassword}
+            error={form.confirmPasswordError}
+            onChange={handleChangeConfirmPassword}
+            onBlur={handleBlurConfirmPassword}
+          />
+        )}
         <div className={styles.regTxt}>{curRegTxt()}</div>
         <Checkbox
           checked={agreeTerms}
@@ -179,13 +252,18 @@ const LoginModal: NextPage<LoginModalProps> = (props) => {
           </span>
         </div>
 
-        <footer className={styles.loginFooter}>
+        <footer className={styles.submitFooter}>
           <Button
-            disabled={form.accountError || form.passwordError || !agreeTerms}
+            disabled={
+              form.accountError ||
+              form.passwordError ||
+              form.confirmPasswordError ||
+              !agreeTerms
+            }
             type="primary"
-            onClick={handleLogin}
+            onClick={handleSubmit}
           >
-            登录
+            {mode === 'login' ? '登录' : '注册'}
           </Button>
         </footer>
 

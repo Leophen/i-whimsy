@@ -20,6 +20,11 @@
    * 背景
    */
   --i-bg: #f7f8fc;
+
+  body {
+    --border-radius-small: 4px;
+    --border-radius-medium: 12px;
+  }
 }
 
 a {
@@ -47,8 +52,25 @@ a {
 div[class*='loginModal'] {
   .arco-modal-header {
     border-bottom: none;
-    padding: 32px;
+    padding: 16px 0 24px;
     height: auto;
+  }
+  .arco-tabs-header-nav::before,
+  .arco-tabs-header-title-text::before {
+    display: none;
+  }
+  .arco-tabs-header-title {
+    padding-bottom: 4px;
+  }
+  .arco-tabs-header-title-text {
+    font-weight: 600;
+    font-size: 18px;
+  }
+  .arco-tabs-header-ink {
+    transform: scaleX(1.1);
+  }
+  .arco-tabs-header-wrapper {
+    justify-content: center;
   }
   .arco-modal-content {
     padding: 0 32px 32px;
@@ -56,8 +78,8 @@ div[class*='loginModal'] {
   div[class*='loginContent'] {
     .arco-input-group-wrapper {
       height: 48px;
-      &:first-of-type {
-        margin-bottom: 16px;
+      &:not(:first-of-type) {
+        margin-top: 16px;
       }
     }
     .arco-input-inner-wrapper {
