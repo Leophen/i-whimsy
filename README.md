@@ -1,34 +1,45 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# iWhimsy
 
-## Getting Started
+## front-end-project 启动
 
-First, run the development server:
+直接安装启动：
 
 ```bash
-npm run dev
-# or
-yarn dev
+npm i
+
+npm run start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## server-project 启动
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+- 1、[安装 MySQL](https://dev.mysql.com/downloads/mysql/)
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+- 2、连接 MySQL
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+表结构如下：
 
-## Learn More
+<img src="https://cdn.staticaly.com/gh/Leophen/all_assets@main/assets/image.7d1rozoo0zk0.png" width="1000" referrerPolicy="no-referrer" />
 
-To learn more about Next.js, take a look at the following resources:
+<img src="https://cdn.staticaly.com/gh/Leophen/all_assets@main/assets/image.5mozj1j97po0.png" width="1000" referrerPolicy="no-referrer" />
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- 3、安装 Redis
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+```bash
+brew install redis
+```
 
-## Deploy on Vercel
+- 4、启动 Redis 服务
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+redis-server
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- 5、启动 Server
+
+server-project 下运行：
+
+```bash
+npm i
+
+npm run dev
+```

@@ -1,0 +1,258 @@
+.blog-wrapper {
+  margin: auto;
+  width: 1300px;
+}
+
+.blog-header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  height: 72px;
+  border-bottom: 1px solid #e0e6f1;
+  background: rgba(255, 255, 255, 0.8);
+  font-weight: bold;
+  font-size: 24px;
+  backdrop-filter: blur(8px);
+}
+
+.blog-logo-wrap {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.blog-logo-icon {
+  width: 36px;
+  margin-right: 12px;
+}
+
+.blog-header-txt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: auto;
+  width: 1300px;
+}
+
+.blog-header-user {
+  display: flex;
+  align-items: center;
+  .arco-avatar {
+    margin-left: 16px;
+    cursor: pointer;
+  }
+}
+
+.login-username {
+  margin-left: 8px;
+  font-size: 16px;
+}
+
+.blog-content {
+  margin: 72px 0 20px;
+}
+
+.blog-list-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.blog-list-item {
+  padding: 20px 0;
+  border-bottom: 1px solid #e0e6f1;
+}
+
+.blog-item-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  width: fit-content;
+  height: 32px;
+  font-weight: bold;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.1s ease-out;
+  &:hover {
+    color: rgb(var(--primary-6));
+  }
+}
+
+.blog-item-content {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  margin: 12px 0;
+  text-overflow: ellipsis;
+  font-size: 16px;
+
+  -webkit-line-clamp: 2;
+}
+
+.blog-item-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.blog-item-type {
+  .arco-tag {
+    margin-right: 8px;
+  }
+}
+
+.blog-item-info {
+  display: flex;
+  align-items: center;
+  opacity: 0.8;
+}
+
+.blog-list-footer {
+  margin: 36px 0 24px;
+  width: 100%;
+  .arco-pagination {
+    .arco-pagination-option {
+      margin-left: auto;
+    }
+  }
+}
+
+.blog-error-wrapper {
+  display: flex;
+  align-items: center;
+  height: calc(100vh - 72px);
+  .arco-result {
+    transform: translateY(-100px);
+  }
+  .arco-result-title {
+    font-size: 18px;
+  }
+  .arco-result-subtitle {
+    font-size: 16px;
+  }
+}
+
+.blog-detail-wrapper {
+  padding: 20px 0;
+  .blog-back-home {
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: #F6F8FC;
+    &:hover {
+      background-color: #ecf0f9;
+    }
+  }
+  .arco-typography {
+    margin-top: 20px;
+  }
+}
+
+.blog-detail-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.blog-detail-change {
+  svg {
+    margin-right: 8px;
+  }
+  span {
+    cursor: pointer;
+    transition: all 0.1s ease-out;
+    &:hover {
+      color: rgb(var(--primary-6));
+    }
+  }
+  .blog-detail-delete {
+    margin-left: 20px;
+  }
+}
+
+.blog-edit-item {
+  margin-bottom: 20px;
+}
+
+.blog-edit-item-title {
+  margin-bottom: 12px;
+}
+
+.login-modal {
+  width: 372px !important;
+  .arco-modal-content {
+    padding: 16px 32px 32px;
+  }
+  .arco-modal-close-icon {
+    transform: scale(1.2);
+  }
+  .arco-tabs-header-nav {
+    margin: auto;
+    width: fit-content;
+    .arco-tabs-header-title-text {
+      font-size: 18px;
+    }
+    &::before {
+      display: none;
+    }
+  }
+  .arco-input-group-wrapper {
+    height: 48px;
+  }
+  .check-terms-wrap {
+    display: flex;
+    align-items: center;
+  }
+  .check-txt {
+    display: inline-block;
+    user-select: none;
+    margin-left: 8px;
+    font-size: 12px;
+    color: #999;
+  }
+  .check-terms {
+    cursor: pointer;
+    color: rgb(var(--primary-6));
+    margin-left: 2px;
+  }
+  .arco-btn {
+    height: 48px;
+  }
+}
+
+.login-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.terms-wrapper {
+  width: 100%;
+  background: #f6f6f6;
+}
+
+.terms-content {
+  width: 100%;
+  height: auto;
+  margin: auto;
+  background: #fff;
+  font-size: 16px;
+  line-height: 28px;
+  color: #333;
+  padding: 84px 0px 103px;
+  box-sizing: border-box;
+}
+
+.terms-title {
+  font-size: 24px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.terms-txt {
+  margin-bottom: 12px;
+}
