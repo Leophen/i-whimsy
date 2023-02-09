@@ -11,7 +11,6 @@ const { REDIS_CONFIG } = require('./config/db')
 const path = require('path')
 const fs = require('fs')
 const morgan = require('koa-morgan')
-const helmet = require('koa-helmet')
 
 const blog = require('./routes/blog')
 const user = require('./routes/user')
@@ -24,10 +23,6 @@ app.use(cors({
   },
   allowedHeaders: 'Content-Type',
   credentials: true
-}))
-
-app.use(helmet({
-  contentSecurityPolicy: false
 }))
 
 // error handler
