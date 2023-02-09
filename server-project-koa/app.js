@@ -62,9 +62,9 @@ app.use(session({
     maxAge: 24 * 60 * 60 * 1000 // 24小时后失效
   },
   // 配置 Redis
-  store: redisStore({
-    all: `${REDIS_CONFIG.host}:${REDIS_CONFIG.port}`
-  })
+  // store: redisStore({
+  //   all: `${REDIS_CONFIG.host}:${REDIS_CONFIG.port}`
+  // })
 }))
 
 // routes

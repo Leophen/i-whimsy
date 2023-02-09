@@ -20,18 +20,17 @@ if (env === 'dev') {
 }
 
 if (env === 'production') {
-  // 这里应为线上配置，暂时用本地替代
   MYSQL_CONFIG = {
-    host: 'localhost',
-    user: 'root',
+    host: 'db4free.net',
+    user: 'leophen',
     password: 'Ljh870040425',
     port: 3306,
-    database: 'myblog'
+    database: 'leophensql'
   }
 
   REDIS_CONFIG = {
-    port: 6379,
-    host: '127.0.0.1'
+    port: 18182,
+    host: 'redis-18182.c302.asia-northeast1-1.gce.cloud.redislabs.com'
   }
 }
 
