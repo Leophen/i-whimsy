@@ -15,7 +15,8 @@ if (env === 'dev') {
 
   REDIS_CONFIG = {
     port: 6379,
-    host: '127.0.0.1'
+    host: '127.0.0.1',
+    password: ''
   }
 }
 
@@ -30,7 +31,8 @@ if (env === 'production') {
 
   REDIS_CONFIG = {
     port: 18182,
-    host: 'redis-18182.c302.asia-northeast1-1.gce.cloud.redislabs.com'
+    host: 'redis-18182.c302.asia-northeast1-1.gce.cloud.redislabs.com',
+    password: '8zzkFEiavnBAKgR7vB0BAGReaVvutF1q'
   }
 }
 
