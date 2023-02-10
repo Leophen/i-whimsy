@@ -28,13 +28,7 @@ npm run start
 brew install redis
 ```
 
-- 4、启动 Redis 服务
-
-```bash
-redis-server
-```
-
-- 5、启动 Server
+- 4、启动 Server
 
 server-project 下运行：
 
