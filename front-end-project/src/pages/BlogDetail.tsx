@@ -45,26 +45,29 @@ const BlogDetail = () => {
   const [updateVal, setUpdateVal] = useState(0)
   const handleEditSuccess = (values) => {
     const { title = '', content = '', tag = [] } = values
-    updateBlog({
-      id: blogId,
-      title,
-      content,
-      author: blogData.author,
-      user: loginUsername,
-      tag: JSON.stringify(tag),
-    })
-      .then((res) => {
-        if (res.data.errno !== -1) {
-          Message.success('更新博客成功')
-          setUpdateVal(new Date().getTime())
-          setEditShow(false)
-        } else {
-          Message.error(res.data.message)
-        }
+    if (blogData.author !== loginUsername) {
+      Message.error('不能编辑他人的博客')
+    } else {
+      updateBlog({
+        id: blogId,
+        title,
+        content,
+        author: blogData.author,
+        tag: JSON.stringify(tag),
       })
-      .catch((err) => {
-        console.error(err)
-      })
+        .then((res) => {
+          if (res.data.errno !== -1) {
+            Message.success('更新博客成功')
+            setUpdateVal(new Date().getTime())
+            setEditShow(false)
+          } else {
+            Message.error(res.data.message)
+          }
+        })
+        .catch((err) => {
+          console.error(err)
+        })
+    }
   }
 
   useEffect(() => {
