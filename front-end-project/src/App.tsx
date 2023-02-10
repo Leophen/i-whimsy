@@ -1,7 +1,7 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { Avatar, Dropdown, Menu, Button, Message } from '@arco-design/web-react'
 import { IconUser, IconPlus } from '@arco-design/web-react/icon'
-import logo from '../public/logo.svg'
+import logo from './assets/logo.svg'
 import BlogDetail from './pages/BlogDetail'
 import BlogList from './pages/BlogList'
 import ErrorPage from './pages/ErrorPage'
