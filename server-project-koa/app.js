@@ -11,6 +11,7 @@ const { REDIS_CONFIG } = require('./config/db')
 const path = require('path')
 const fs = require('fs')
 const morgan = require('koa-morgan')
+const Session = require('koa-session')
 
 const blog = require('./routes/blog')
 const user = require('./routes/user')
@@ -23,9 +24,6 @@ app.use(cors({
   },
   allowedHeaders: 'Content-Type',
   credentials: true,
-  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],  // 设置所允许的 HTTP 请求方法
-  allowHeaders: ['Content-Type', 'Authorization', 'Accept'],  // 设置服务器支持的所有头信息字段
-  exposeHeaders: ['WWW-Authenticate', 'Server-Authorization'] // 设置获取其他自定义字段
 }))
 
 // error handler
@@ -60,20 +58,25 @@ if (ENV !== 'production') {
 
 // 操作 Session
 app.keys = ['leophen_0810#']
-app.use(session({
-  // 配置 Cookie
-  cookie: {
-    path: '/',
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 24小时后失效
-  },
-  // 配置 Redis
-  // store: redisStore({
-  //   host: REDIS_CONFIG.host,
-  //   port: REDIS_CONFIG.port,
-  //   password: REDIS_CONFIG.password
-  // })
-}))
+app.use(Session({
+  key: 'sessionId',
+  maxAge: 60 * 1000,
+  signed: true
+}, app))
+// app.use(session({
+//   // 配置 Cookie
+//   cookie: {
+//     path: '/',
+//     httpOnly: true,
+//     maxAge: 24 * 60 * 60 * 1000 // 24小时后失效
+//   },
+//   // 配置 Redis
+//   store: redisStore({
+//     host: REDIS_CONFIG.host,
+//     port: REDIS_CONFIG.port,
+//     password: REDIS_CONFIG.password
+//   })
+// }))
 
 // routes
 app.use(blog.routes(), blog.allowedMethods())
