@@ -22,7 +22,10 @@ app.use(cors({
     return allowCors.indexOf(ctx.header.origin) > -1 ? ctx.header.origin : '';
   },
   allowedHeaders: 'Content-Type',
-  credentials: true
+  credentials: true,
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],  // 设置所允许的 HTTP 请求方法
+  allowHeaders: ['Content-Type', 'Authorization', 'Accept'],  // 设置服务器支持的所有头信息字段
+  exposeHeaders: ['WWW-Authenticate', 'Server-Authorization'] // 设置获取其他自定义字段
 }))
 
 // error handler
@@ -62,7 +65,6 @@ app.use(session({
   cookie: {
     path: '/',
     httpOnly: true,
-    secure: true,
     maxAge: 24 * 60 * 60 * 1000 // 24小时后失效
   },
   // 配置 Redis
