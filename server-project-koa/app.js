@@ -62,7 +62,7 @@ app.use(session({
   cookie: {
     path: '/',
     httpOnly: true,
-    domain: '.leophen.com',
+    secure: true,
     maxAge: 24 * 60 * 60 * 1000 // 24小时后失效
   },
   // 配置 Redis
