@@ -11,7 +11,6 @@ const { REDIS_CONFIG } = require('./config/db')
 const path = require('path')
 const fs = require('fs')
 const morgan = require('koa-morgan')
-const Session = require('koa-session')
 
 const blog = require('./routes/blog')
 const user = require('./routes/user')
@@ -19,7 +18,7 @@ const user = require('./routes/user')
 // CORS 跨域
 app.use(cors({
   origin: (ctx) => {
-    const allowCors = ['http://localhost:8001', 'https://i-whimsy.leophen.top'];
+    const allowCors = ['http://localhost:8001', 'https://api.leophen.top'];
     return allowCors.indexOf(ctx.header.origin) > -1 ? ctx.header.origin : '';
   },
   allowedHeaders: 'Content-Type',
@@ -58,25 +57,20 @@ if (ENV !== 'production') {
 
 // 操作 Session
 app.keys = ['leophen_0810#']
-app.use(Session({
-  key: 'sessionId',
-  maxAge: 60 * 1000,
-  signed: true
-}, app))
-// app.use(session({
-//   // 配置 Cookie
-//   cookie: {
-//     path: '/',
-//     httpOnly: true,
-//     maxAge: 24 * 60 * 60 * 1000 // 24小时后失效
-//   },
-//   // 配置 Redis
-//   store: redisStore({
-//     host: REDIS_CONFIG.host,
-//     port: REDIS_CONFIG.port,
-//     password: REDIS_CONFIG.password
-//   })
-// }))
+app.use(session({
+  // 配置 Cookie
+  cookie: {
+    path: '/',
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000 // 24小时后失效
+  },
+  // 配置 Redis
+  store: redisStore({
+    host: REDIS_CONFIG.host,
+    port: REDIS_CONFIG.port,
+    password: REDIS_CONFIG.password
+  })
+}))
 
 // routes
 app.use(blog.routes(), blog.allowedMethods())
