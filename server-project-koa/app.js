@@ -64,8 +64,7 @@ app.use(session({
   // 配置 Cookie
   cookie: {
     path: '/',
-    // httpOnly: true,
-    httpOnly: false,
+    httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000 // 24小时后失效
   },
   // 配置 Redis
