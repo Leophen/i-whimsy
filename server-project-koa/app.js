@@ -60,20 +60,7 @@ if (ENV !== 'production') {
 
 // 操作 Session
 app.keys = ['leophen_0810#']
-app.use(session({
-  // 配置 Cookie
-  cookie: {
-    path: '/',
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 24小时后失效
-  },
-  // 配置 Redis
-  // store: redisStore({
-  //   host: REDIS_CONFIG.host,
-  //   port: REDIS_CONFIG.port,
-  //   password: REDIS_CONFIG.password
-  // })
-}))
+app.use(session())
 
 // routes
 app.use(blog.routes(), blog.allowedMethods())
