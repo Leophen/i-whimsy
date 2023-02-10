@@ -85,6 +85,7 @@ const updateBlog = async (blogData = {}, sessionAuthor) => {
     title,
     content,
     author,
+    user,
     tag
   } = blogData
   title = escape(title)
@@ -92,7 +93,7 @@ const updateBlog = async (blogData = {}, sessionAuthor) => {
   tag = escape(tag)
   const updateTime = Date.now()
 
-  if (author !== sessionAuthor) {
+  if (author !== user || author !== sessionAuthor) {
     return -1
   }
 

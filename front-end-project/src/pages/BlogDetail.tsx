@@ -17,6 +17,10 @@ const BlogDetail = () => {
   const loginStatus = useSelector<{
     loginReducer: LoginReducer
   }>((state) => state.loginReducer.status)
+  const loginUsername = useSelector<{
+    loginReducer: LoginReducer
+  }>((state) => state.loginReducer.username)
+
   const navigate = useNavigate()
   const params = useParams()
 
@@ -46,6 +50,7 @@ const BlogDetail = () => {
       title,
       content,
       author: blogData.author,
+      user: loginUsername,
       tag: JSON.stringify(tag),
     })
       .then((res) => {
