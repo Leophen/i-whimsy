@@ -92,15 +92,16 @@ const updateBlog = async (blogData = {}, sessionAuthor) => {
   tag = escape(tag)
   const updateTime = Date.now()
 
+  if (author !== sessionAuthor) {
+    return -1
+  }
+
   const sql = `
     update blogs set title = ${title}, content = ${content}, updatetime = ${updateTime}, author = '${author}', tag = ${tag}
     where id = ${id}
   `
 
   const updateData = await exec(sql)
-  if (author !== sessionAuthor) {
-    return -1
-  }
   if (updateData.affectedRows > 0) {
     return 0
   }

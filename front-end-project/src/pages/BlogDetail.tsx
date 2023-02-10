@@ -8,8 +8,9 @@ import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { getBlogDetail, updateBlog, deleteBlog } from '../http/api/blog'
 import { LoginReducer } from '../App'
+import { Avatar } from '@arco-design/web-react'
 
-const { Title, Paragraph } = Typography
+const { Title } = Typography
 const BreadcrumbItem = Breadcrumb.Item
 
 const BlogDetail = () => {
@@ -123,6 +124,13 @@ const BlogDetail = () => {
 
       <Typography>
         <Title heading={5}>{blogData.title}</Title>
+        <section className='blog-detail-info'>
+          <Avatar size={40}>{blogData.author.slice(0, 1)}</Avatar>
+          <div className="blog-detail-info-txt">
+            <span className="blog-detail-author">{blogData.author}</span>
+            <span className="blog-detail-time">修改于 {getTime(blogData.updatetime)}</span>
+          </div>
+        </section>
         <section className="blog-item-type">
           {blogData.tag &&
             blogData.tag.map((item, index) => (
@@ -131,16 +139,13 @@ const BlogDetail = () => {
               </Tag>
             ))}
         </section>
-        <Paragraph>{blogData.content}</Paragraph>
+        <Divider />
+        <div dangerouslySetInnerHTML={{ __html: blogData.content }} />
       </Typography>
 
-      <footer className="blog-detail-footer">
-        <section>
-          <span className="blog-detail-author">{blogData.author}</span>
-          <Divider type="vertical" />
-          <span className="blog-detail-time">修改于 {getTime(blogData.updatetime)}</span>
-        </section>
+      <Divider>End</Divider>
 
+      <footer className="blog-detail-footer">
         <section className="blog-detail-change">
           <span className="blog-detail-edit" onClick={handleEdit}>
             <IconEdit />

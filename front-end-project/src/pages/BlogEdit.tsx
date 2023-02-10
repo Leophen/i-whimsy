@@ -4,6 +4,7 @@ import { useFormik } from 'formik'
 import _ from 'lodash'
 import { useEffect } from 'react'
 import * as Yup from 'yup'
+import ComposeEditor from './components/ComposeEditor'
 
 interface BlogDetailType {
   mode: 'new' | 'update'
@@ -28,7 +29,7 @@ const BlogEdit = (props: BlogDetailType) => {
     },
     validationSchema: Yup.object({
       title: Yup.string().max(50, '博客标题不得超过50个字').required('请输入博客标题'),
-      content: Yup.string().max(500, '博客内容不得超过500个字').required('请输入博客内容'),
+      content: Yup.string().max(3000, '博客内容不得超过3000个字').required('请输入博客内容'),
     }),
     onSubmit: (values) => {
       onSuccess?.(values)
@@ -54,14 +55,15 @@ const BlogEdit = (props: BlogDetailType) => {
   }
 
   return (
-    <Drawer width={500} title={<span>{`${isNewMode ? '新建' : '编辑'}博客`}</span>} visible={visible} placement={isNewMode ? 'left' : 'right'} onOk={handleConfirm} onCancel={() => onClose?.()}>
+    <Drawer width={1000} title={<span>{`${isNewMode ? '新建' : '编辑'}博客`}</span>} visible={visible} placement={isNewMode ? 'left' : 'right'} onOk={handleConfirm} onCancel={() => onClose?.()}>
       <section className="blog-edit-item">
         <div className="blog-edit-item-title">博客标题</div>
         <Input value={values.title} maxLength={50} showWordLimit placeholder="请输入博客标题" onChange={(val: string) => setFieldValue('title', val)} />
       </section>
       <section className="blog-edit-item">
         <div className="blog-edit-item-title">博客内容</div>
-        <Input.TextArea value={values.content} maxLength={500} showWordLimit placeholder="请输入博客内容" autoSize onChange={(val: string) => setFieldValue('content', val)} />
+        {/* <Input.TextArea value={values.content} maxLength={3000} showWordLimit placeholder="请输入博客内容" autoSize onChange={(val: string) => setFieldValue('content', val)} /> */}
+        <ComposeEditor value={values.content} onChange={(val: string) => setFieldValue('content', val)} />
       </section>
       <section className="blog-edit-item">
         <div className="blog-edit-item-title">博客标签</div>

@@ -75,7 +75,7 @@ const BlogList = () => {
             {item.title}
           </div>
 
-          <article className="blog-item-content">{item.content}</article>
+          <article className="blog-item-content" dangerouslySetInnerHTML={{ __html: item.content.replace(/<.+?>/g, '') }} />
 
           <footer className="blog-item-footer">
             <section className="blog-item-type">
