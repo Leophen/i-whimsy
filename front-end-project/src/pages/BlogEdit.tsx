@@ -29,7 +29,7 @@ const BlogEdit = (props: BlogDetailType) => {
     },
     validationSchema: Yup.object({
       title: Yup.string().max(50, '博客标题不得超过50个字').required('请输入博客标题'),
-      content: Yup.string().max(3000, '博客内容不得超过3000个字').required('请输入博客内容'),
+      content: Yup.string().max(10000, '博客内容不得超过10000个字').required('请输入博客内容'),
     }),
     onSubmit: (values) => {
       onSuccess?.(values)
@@ -62,7 +62,7 @@ const BlogEdit = (props: BlogDetailType) => {
       </section>
       <section className="blog-edit-item">
         <div className="blog-edit-item-title">博客内容</div>
-        {/* <Input.TextArea value={values.content} maxLength={3000} showWordLimit placeholder="请输入博客内容" autoSize onChange={(val: string) => setFieldValue('content', val)} /> */}
+        {/* <Input.TextArea value={values.content} maxLength={10000} showWordLimit placeholder="请输入博客内容" autoSize onChange={(val: string) => setFieldValue('content', val)} /> */}
         <ComposeEditor value={values.content} onChange={(val: string) => setFieldValue('content', val)} />
       </section>
       <section className="blog-edit-item">
