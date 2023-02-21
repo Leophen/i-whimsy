@@ -18,7 +18,7 @@ const user = require('./routes/user')
 // CORS 跨域
 app.use(cors({
   origin: (ctx) => {
-    const allowCors = ['http://localhost:8001', 'https://i-whimsy.leophen.top'];
+    const allowCors = ['http://localhost:8001', 'https://iwhimsy.leophen.top'];
     return allowCors.indexOf(ctx.header.origin) > -1 ? ctx.header.origin : '';
   },
   allowedHeaders: 'Content-Type',
