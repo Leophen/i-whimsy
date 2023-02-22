@@ -9,6 +9,8 @@ import { useSelector } from 'react-redux'
 import { getBlogDetail, updateBlog, deleteBlog } from '../http/api/blog'
 import { LoginReducer } from '../App'
 import { Avatar } from '@arco-design/web-react'
+import { BackTop } from '@arco-design/web-react'
+import { Spin } from '@arco-design/web-react'
 
 const { Title } = Typography
 const BreadcrumbItem = Breadcrumb.Item
@@ -81,6 +83,7 @@ const BlogDetail = () => {
           blogData.author = author
           blogData.tag = tag ? JSON.parse(tag) : []
           setBlogData({ ...blogData })
+          setLoad(false)
         } else {
           Message.error('博客不存在')
           navigate('/')
@@ -121,6 +124,15 @@ const BlogDetail = () => {
     }
   }
 
+  const [load, setLoad] = useState(true)
+  const getStatus = () => {
+    if (load) {
+      return 'load'
+    } else {
+      return 'success'
+    }
+  }
+
   return (
     <div className="blog-detail-wrapper">
       <Breadcrumb>
@@ -130,26 +142,29 @@ const BlogDetail = () => {
         <BreadcrumbItem>博客详情</BreadcrumbItem>
       </Breadcrumb>
 
-      <Typography>
-        <Title heading={5}>{blogData.title}</Title>
-        <section className='blog-detail-info'>
-          <Avatar size={40}>{blogData.author.slice(0, 1)}</Avatar>
-          <div className="blog-detail-info-txt">
-            <span className="blog-detail-author">{blogData.author}</span>
-            <span className="blog-detail-time">修改于 {getTime(blogData.updatetime)}</span>
-          </div>
-        </section>
-        <section className="blog-item-type">
-          {blogData.tag &&
-            blogData.tag.map((item, index) => (
-              <Tag key={index} bordered>
-                {item}
-              </Tag>
-            ))}
-        </section>
-        <Divider />
-        <div dangerouslySetInnerHTML={{ __html: blogData.content }} />
-      </Typography>
+      {getStatus() === 'load' && <Spin dot />}
+      {getStatus() === 'success' && (
+        <Typography>
+          <Title heading={5}>{blogData.title}</Title>
+          <section className='blog-detail-info'>
+            <Avatar size={40}>{blogData.author.slice(0, 1)}</Avatar>
+            <div className="blog-detail-info-txt">
+              <span className="blog-detail-author">{blogData.author}</span>
+              <span className="blog-detail-time">修改于 {getTime(blogData.updatetime)}</span>
+            </div>
+          </section>
+          <section className="blog-item-type">
+            {blogData.tag &&
+              blogData.tag.map((item, index) => (
+                <Tag key={index} bordered>
+                  {item}
+                </Tag>
+              ))}
+          </section>
+          <Divider />
+          <div dangerouslySetInnerHTML={{ __html: blogData.content }} />
+        </Typography>
+      )}
 
       <Divider>End</Divider>
 
@@ -165,6 +180,10 @@ const BlogDetail = () => {
           </span>
         </section>
       </footer>
+
+      <BackTop
+        visibleHeight={30}
+      />
 
       <BlogEdit mode="update" visible={editShow} title={blogData.title} content={blogData.content} tag={blogData.tag} onSuccess={handleEditSuccess} onClose={() => setEditShow(false)} />
     </div>
