@@ -135,17 +135,19 @@ const BlogDetail = () => {
 
   return (
     <div className="blog-detail-wrapper">
-      <Breadcrumb>
-        <BreadcrumbItem className="blog-back-home" onClick={() => navigate(`/`)}>
-          <IconHome />
-        </BreadcrumbItem>
-        <BreadcrumbItem>博客详情</BreadcrumbItem>
-      </Breadcrumb>
+      <div className="blog-detail">
+        <Breadcrumb>
+          <BreadcrumbItem className="blog-back-home" onClick={() => navigate(`/`)}>
+            <IconHome />
+          </BreadcrumbItem>
+          <BreadcrumbItem>博客详情</BreadcrumbItem>
+        </Breadcrumb>
+      </div>
 
       {getStatus() === 'load' && <Spin dot />}
       {getStatus() === 'success' && (
-        <Typography>
-          <Title heading={5}>{blogData.title}</Title>
+        <Typography className="blog-detail">
+          <Title heading={3}>{blogData.title}</Title>
           <section className='blog-detail-info'>
             <Avatar size={40}>{blogData.author.slice(0, 1)}</Avatar>
             <div className="blog-detail-info-txt">
@@ -161,25 +163,27 @@ const BlogDetail = () => {
                 </Tag>
               ))}
           </section>
-          <Divider />
-          <div dangerouslySetInnerHTML={{ __html: blogData.content }} />
+          {/* <Divider /> */}
+          <article className="blog-detail-content" dangerouslySetInnerHTML={{ __html: blogData.content }} />
         </Typography>
       )}
 
-      <Divider>End</Divider>
+      <div className="blog-detail">
+        <Divider>End</Divider>
 
-      <footer className="blog-detail-footer">
-        <section className="blog-detail-change">
-          <span className="blog-detail-edit" onClick={handleEdit}>
-            <IconEdit />
-            编辑博客
-          </span>
-          <span className="blog-detail-delete" onClick={handleDelete}>
-            <IconDelete />
-            删除博客
-          </span>
-        </section>
-      </footer>
+        <footer className="blog-detail-footer">
+          <section className="blog-detail-change">
+            <span className="blog-detail-edit" onClick={handleEdit}>
+              <IconEdit />
+              编辑博客
+            </span>
+            <span className="blog-detail-delete" onClick={handleDelete}>
+              <IconDelete />
+              删除博客
+            </span>
+          </section>
+        </footer>
+      </div>
 
       <BackTop
         visibleHeight={30}

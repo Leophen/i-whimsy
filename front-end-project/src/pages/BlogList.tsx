@@ -9,6 +9,7 @@ import { Empty } from '@arco-design/web-react'
 import { IconExclamation } from '@arco-design/web-react/icon'
 import errorIcon from '../assets/error.svg'
 import { Spin } from '@arco-design/web-react'
+import { Button } from '@arco-design/web-react'
 
 export const getTime = (time: number) => dayjs(time).format('YYYY年MM月DD日 HH:mm:ss')
 
@@ -97,11 +98,16 @@ const BlogList = () => {
       {getStatus() === 'load' && <Spin dot />}
       {getStatus() === 'empty' && <Empty />}
       {getStatus() === 'error' && (
-        <Empty
-          className='blog-list-error'
-          icon={<img className='blog-list-error-icon' src={errorIcon} alt="error" />}
-          description={'加载列表失败，接口在当前网络环境下不可用，请更换网络环境重试!'}
-        />
+        <div className="blog-error-block">
+          <Empty
+            className='blog-list-error'
+            icon={<img className='blog-list-error-icon' src={errorIcon} alt="error" />}
+            description={'加载列表失败，接口在当前网络环境下不可用，请更换网络环境重试!'}
+          />
+          <Button shape="round" type="primary" onClick={() => updateBlogList(page.num)}>
+            重新加载
+          </Button>
+        </div>
       )}
       {getStatus() === 'success' && (
         blogList.map((item, index) => (
