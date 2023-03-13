@@ -4,7 +4,7 @@
 
 .blog-wrapper {
   margin: auto;
-  width: 1300px;
+  max-width: 1300px;
 }
 
 .blog-header {
@@ -40,7 +40,8 @@
   align-items: center;
   justify-content: space-between;
   margin: auto;
-  width: 1300px;
+  width: 100%;
+  max-width: 1300px;
 }
 
 .blog-header-user {
