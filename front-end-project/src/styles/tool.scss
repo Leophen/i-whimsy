@@ -1,0 +1,80 @@
+.tool-list {
+    display: grid;
+
+    padding: 24px 0;
+
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 24px;
+
+    .tool-item {
+        position: relative;
+
+        overflow: hidden;
+
+        height: 240px;
+
+        cursor: pointer;
+        user-select: none;
+
+        border-radius: 16px;
+
+        .arco-card-body {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+        }
+
+        &:hover {
+            .tool-item-title {
+                color: var(--primary);
+            }
+        }
+    }
+
+    .tool-item-bg {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: calc(100% - 48px);
+        height: calc(100% - 60px - 48px);
+        padding: 24px;
+
+        pointer-events: none;
+
+        background: #f7f8fc;
+
+        svg {
+            height: 100%;
+
+            opacity: 0.2;
+        }
+    }
+
+    .tool-item-title {
+        z-index: 1;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        width: calc(100% - 32px);
+        height: 60px;
+        padding: 0 16px;
+
+        transition: all 0.2s ease-in;
+
+        color: #fff;
+        background: #000;
+
+        .tool-item-title-cn {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .tool-item-title-en {
+            font-size: 16px;
+        }
+    }
+
+}
