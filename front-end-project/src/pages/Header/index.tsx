@@ -1,13 +1,13 @@
 import { Avatar, Dropdown, Menu, Button, Message } from '@arco-design/web-react'
 import { IconUser, IconPlus } from '@arco-design/web-react/icon'
-import logo from '../assets/logo.svg'
+import logo from '/src/assets/logo.svg'
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { loginTest, logoutBlog } from '../http/api/user'
-import { createBlog } from '../http/api/blog'
-import BlogEdit from '../blogPages/BlogEdit'
-import LoginModal from '../blogPages/components/LoginModal'
+import { loginTest, logoutBlog } from '../../http/api/user'
+import { createBlog } from '../../http/api/blog'
+import BlogEdit from '../BlogPages/BlogEdit'
+import LoginModal from './components/LoginModal'
 import { Radio } from '@arco-design/web-react'
 
 const RadioGroup = Radio.Group;
@@ -78,18 +78,19 @@ export const Header = () => {
 
     const [currentPage, setCurrentPage] = useState('tool')
     const handleSwitchPage = (value: string) => {
-        setCurrentPage(value)
         if (value === 'blog') {
             navigate(`/blog`)
+            setCurrentPage(value)
         } else if (value === 'tool') {
             navigate(`/`)
+            setCurrentPage('tool')
         }
     }
 
     return (
         <header className="header">
             <div className="header-txt">
-                <section className='header-logo-wrap' onClick={() => navigate(`/`)}>
+                <section className='header-logo-wrap' onClick={() => handleSwitchPage('tool')}>
                     <img className='header-logo-icon' src={logo} alt="iWhimsy" />
                     iWhimsy
                 </section>

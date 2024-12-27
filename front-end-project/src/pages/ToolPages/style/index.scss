@@ -36,8 +36,8 @@
         align-items: center;
         justify-content: center;
 
-        width: calc(100% - 48px);
-        height: calc(100% - 60px - 48px);
+        width: 100%;
+        height: calc(100% - 60px);
         padding: 24px;
 
         pointer-events: none;
@@ -58,7 +58,7 @@
         align-items: center;
         justify-content: space-between;
 
-        width: calc(100% - 32px);
+        width: 100%;
         height: 60px;
         padding: 0 16px;
 
@@ -77,4 +77,69 @@
         }
     }
 
+}
+
+.tools-content {
+    position: relative;
+
+    display: flex;
+
+    min-height: calc(100vh - 72px);
+}
+
+.tools-content-nav {
+    position: fixed;
+    z-index: 1;
+
+    width: 240px;
+    height: calc(100vh - 72px);
+    padding: 12px;
+    padding-left: 0;
+
+    border-right: 1px solid var(--border-color);
+
+    .arco-menu {
+        height: 100%;
+    }
+
+    .arco-menu-vertical .arco-menu-inner {
+        padding: 0;
+    }
+
+    .arco-menu-inline-header {
+        svg {
+            width: 16px;
+            height: 16px;
+        }
+    }
+
+    .arco-menu-indent {
+        width: 28px;
+    }
+}
+
+.tools-content-nav-title {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+}
+
+.tools-content-right {
+    position: relative;
+
+    width: 100%;
+    padding-left: 240px;
+
+    .arco-backtop {
+        .arco-btn {
+            width: 40px;
+            height: 40px;
+
+            .arco-icon {
+                width: 1.5em;
+                height: 1.5em;
+            }
+        }
+    }
 }

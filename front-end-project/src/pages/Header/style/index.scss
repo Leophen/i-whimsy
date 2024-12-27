@@ -8,9 +8,10 @@
     display: flex;
     align-items: center;
 
+    box-sizing: border-box;
     height: 72px;
 
-    border-bottom: 1px solid #e0e6f1;
+    border-bottom: 1px solid var(--border-color);
     background: rgba(255, 255, 255, 0.8);
 
     font-size: 24px;

@@ -1,0 +1,30 @@
+@import "./theme.scss";
+@import "../pages/Header/style/index.scss";
+@import "../pages/TermsPages/style/index.scss";
+@import "../pages/BlogPages/style/index.scss";
+@import "../pages/ToolPages/style/index.scss";
+
+.arco-input,
+.arco-input-tag-view {
+    height: 40px;
+}
+
+.w-e-text-placeholder {
+    color: #AAB4CA;
+
+    font-size: 14px;
+    font-style: normal;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.page {
+    max-width: 1300px;
+    margin: auto;
+}
+
+.content {
+    margin-top: 72px;
+}

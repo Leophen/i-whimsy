@@ -1,0 +1,256 @@
+.blog-list-wrapper {
+    display: flex;
+    flex-direction: column;
+
+    min-height: calc(100vh - 72px - 20px);
+
+    .blog-error-block,
+    .arco-spin {
+        display: flex;
+        align-items: center;
+        flex: 1;
+        justify-content: center;
+    }
+
+    .arco-empty-wrapper {
+
+        // transform: translateY(-100px);
+        .blog-list-error-icon {
+            height: 123px;
+        }
+    }
+
+    .arco-empty-description {
+        margin-top: 20px;
+    }
+}
+
+.blog-error-block {
+    flex-direction: column;
+}
+
+.blog-list-item {
+    padding: 20px 0;
+
+    border-bottom: 1px solid var(--border-color);
+}
+
+.blog-list-error {
+    margin: 20px 0;
+}
+
+.blog-item-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    width: fit-content;
+    height: 32px;
+
+    cursor: pointer;
+    transition: all 0.1s ease-out;
+
+    font-size: 20px;
+    font-weight: bold;
+
+    &:hover {
+        color: rgb(var(--primary-6));
+    }
+}
+
+.blog-item-content {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+
+    margin: 12px 0;
+
+    text-overflow: ellipsis;
+
+    font-size: 16px;
+
+    -webkit-line-clamp: 2;
+}
+
+.blog-item-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.blog-item-type {
+    .arco-tag {
+        margin-right: 8px;
+    }
+}
+
+.blog-item-info {
+    display: flex;
+    align-items: center;
+
+    opacity: 0.8;
+}
+
+.blog-list-footer {
+    width: 100%;
+    margin: 36px 0 24px;
+
+    .arco-pagination {
+        .arco-pagination-option {
+            margin-left: auto;
+        }
+    }
+}
+
+.blog-error-wrapper {
+    display: flex;
+    align-items: center;
+
+    height: calc(100vh - 72px);
+
+    .arco-result {
+        transform: translateY(-100px);
+    }
+
+    .arco-result-title {
+        font-size: 18px;
+    }
+
+    .arco-result-subtitle {
+        font-size: 16px;
+    }
+}
+
+.blog-detail-wrapper {
+    display: flex;
+    flex-direction: column;
+
+    min-height: calc(100vh - 72px - 60px);
+    padding: 20px 0;
+
+    .arco-spin {
+        display: block;
+        display: flex;
+        align-items: center;
+        flex: 1;
+        justify-content: center;
+    }
+
+    .blog-back-home {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 24px;
+        height: 24px;
+
+        cursor: pointer;
+
+        border-radius: 8px;
+        background-color: #F6F8FC;
+
+        &:hover {
+            background-color: #ecf0f9;
+        }
+    }
+
+    .arco-breadcrumb-item {
+        padding: 0;
+
+        font-size: 16px;
+    }
+
+    .arco-typography {
+        margin-top: 20px;
+    }
+}
+
+.blog-detail {
+    width: 700px;
+    margin: auto;
+
+    font-size: 16px;
+}
+
+.blog-detail-info {
+    display: flex;
+    align-items: center;
+
+    margin-bottom: 12px;
+
+    .arco-avatar {
+        background-color: #72D4B7;
+    }
+}
+
+.blog-detail-info-txt {
+    display: flex;
+    flex-direction: column;
+
+    margin-left: 12px;
+}
+
+.blog-detail-author {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.blog-detail-time {
+    color: #8a919f;
+
+    font-size: 14px;
+}
+
+.blog-detail-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.blog-detail-content {
+    margin-top: 20px;
+}
+
+.blog-detail-change {
+    svg {
+        margin-right: 8px;
+    }
+
+    span {
+        cursor: pointer;
+        transition: all 0.1s ease-out;
+
+        &:hover {
+            color: rgb(var(--primary-6));
+        }
+    }
+
+    .blog-detail-delete {
+        margin-left: 20px;
+    }
+}
+
+.blog-edit-item {
+    margin-bottom: 20px;
+}
+
+.blog-edit-item-title {
+    margin-bottom: 12px;
+}
+
+.blog-edit-editor {
+    overflow: hidden;
+
+    color: var(--color-text-1);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-small);
+
+    .blog-edit-editor-header {
+        border-bottom: 1px solid var(--border-color);
+        border-radius: var(--border-radius-small) var(--border-radius-small) 0 0;
+    }
+
+    .blog-edit-editor-content {
+        height: 500px;
+    }
+}
