@@ -1,4 +1,4 @@
-import { Daxiaoxie } from './components/TextTool/daxiaoxie';
+import { TextConvert } from './components/TextTool/textconvert';
 import { Textreplace } from './components/TextTool/Textreplace';
 
 export const tools = [
@@ -34,9 +34,9 @@ export const tools = [
     ),
     list: [
       {
-        name: '大小写转换',
-        path: 'daxiaoxie',
-        content: <Daxiaoxie />,
+        name: '文本转换',
+        path: 'textconvert',
+        content: <TextConvert />,
       },
       {
         name: '文本替换',

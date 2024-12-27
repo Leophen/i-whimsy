@@ -1,9 +1,15 @@
 #root {
     --border-color: #e0e6f1;
 
-    --bg-color: #fbfcfe;
+    --bg-color: rgba(242, 243, 245,0.5);
     --primary: #5370ff;
     --border-radius-small: 6px;
     --border-radius-medium: 12px;
     --border-radius-large: 24px;
+}
+
+body {
+    --border-radius-small: 6px !important;
+    --border-radius-medium: 12px !important;
+    --border-radius-large: 24px !important;
 }

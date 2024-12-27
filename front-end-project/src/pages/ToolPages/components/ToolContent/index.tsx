@@ -39,7 +39,7 @@ export const ToolContent = () => {
 
   /**
    * 具体工具 toolType
-   * eg: daxiaoxie
+   * eg: textconvert
    */
   const location = useLocation();
   const query = new URLSearchParams(location.search);
