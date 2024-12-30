@@ -18,7 +18,7 @@ const tips = [
   },
 ];
 
-export const TextReplace = () => {
+export const TextChange = () => {
   const [replaceVal, setReplaceVal] = useState({
     old: '',
     new: '',
