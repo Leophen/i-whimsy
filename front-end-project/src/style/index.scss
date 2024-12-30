@@ -1,8 +1,8 @@
-@import "./theme.scss";
-@import "../pages/Header/style/index.scss";
-@import "../pages/TermsPages/style/index.scss";
-@import "../pages/BlogPages/style/index.scss";
-@import "../pages/ToolPages/style/index.scss";
+@use "./theme.scss";
+@use "../pages/Header/style/index.scss" as Header;
+@use "../pages/TermsPages/style/index.scss" as TermsPages;
+@use "../pages/BlogPages/style/index.scss" as BlogPages;
+@use "../pages/ToolPages/style/index.scss" as ToolPages;
 
 .arco-input,
 .arco-input-tag-view {
