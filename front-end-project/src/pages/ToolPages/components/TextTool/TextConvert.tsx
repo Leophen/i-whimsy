@@ -1,5 +1,5 @@
 import { Input } from '@arco-design/web-react';
-import { UsualContent } from './UsualContent';
+import { UsualContent } from '../ToolContent/UsualContent';
 import { Button } from '@arco-design/web-react';
 import { IconRight } from '@arco-design/web-react/icon';
 import { Radio } from '@arco-design/web-react';
@@ -27,7 +27,7 @@ const tips = [
 ];
 
 export const TextConvert = () => {
-  const [mode, setMode] = useState('zhuanxiaoxie');
+  const [mode, setMode] = useState('zhuandaxie');
 
   const [oldVal, setOldVal] = useState('');
   const [newVal, setNewVal] = useState('');

@@ -1,5 +1,5 @@
 import { Input } from '@arco-design/web-react';
-import { UsualContent } from './UsualContent';
+import { UsualContent } from '../ToolContent/UsualContent';
 import { useState } from 'react';
 import { Descriptions } from '@arco-design/web-react';
 

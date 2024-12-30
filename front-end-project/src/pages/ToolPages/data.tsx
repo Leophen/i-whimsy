@@ -1,13 +1,15 @@
 import { TextConvert } from './components/TextTool/TextConvert';
 import { TextCount } from './components/TextTool/TextCount';
 import { TextChange } from './components/TextTool/TextChange';
+import { EToolType } from '../../enums';
+import { ImageCompress } from './components/ImageTool/ImageCompress';
 // import { TextTranslate } from './components/TextTool/TextTranslate';
 
 export const tools = [
   {
-    cnTitle: '文本类工具',
+    cnTitle: EToolType.getLabelById(EToolType.TEXT),
     enTitle: 'Text Tools',
-    path: 'text',
+    path: EToolType.TEXT,
     icon: (
       <svg
         viewBox="0 0 1024 1024"
@@ -36,31 +38,31 @@ export const tools = [
     ),
     list: [
       {
-        name: '文本转换',
-        path: 'textconvert',
+        name: EToolType.getLabelById(EToolType.TEXT_CONVERT),
+        path: EToolType.TEXT_CONVERT,
         content: <TextConvert />,
       },
       {
-        name: '文本替换',
-        path: 'textchange',
+        name: EToolType.getLabelById(EToolType.TEXT_REPLACE),
+        path: EToolType.TEXT_REPLACE,
         content: <TextChange />,
       },
       {
-        name: '文本统计',
-        path: 'textcount',
+        name: EToolType.getLabelById(EToolType.TEXT_COUNT),
+        path: EToolType.TEXT_COUNT,
         content: <TextCount />,
       },
       //   {
-      //     name: '生成变量名',
-      //     path: 'texttranslate',
+      //     name: EToolType.getLabelById(EToolType.TEXT_TRANSLATE),
+      //     path: EToolType.TEXT_TRANSLATE,
       //     content: <TextTranslate />,
       //   },
     ],
   },
   {
-    cnTitle: '图像类工具',
+    cnTitle: EToolType.getLabelById(EToolType.IMAGE),
     enTitle: 'Image Tools',
-    path: 'image',
+    path: EToolType.IMAGE,
     icon: (
       <svg
         viewBox="0 0 1024 1024"
@@ -82,9 +84,9 @@ export const tools = [
     ),
     list: [
       {
-        name: '图像压缩',
-        path: 'textconvert',
-        content: <TextConvert />,
+        name: EToolType.getLabelById(EToolType.IMAGE_COMPRESS),
+        path: EToolType.IMAGE_COMPRESS,
+        content: <ImageCompress />,
       },
     ],
   },
