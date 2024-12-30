@@ -133,6 +133,12 @@
     align-items: center;
 
     gap: 12px;
+
+    svg {
+        path {
+            fill: var(--color-text-2);
+        }
+    }
 }
 
 .tools-content-right {
