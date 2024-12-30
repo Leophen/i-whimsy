@@ -7,7 +7,6 @@ import { IconCopy } from '@arco-design/web-react/icon';
 import { Message } from '@arco-design/web-react';
 import { Tooltip } from '@arco-design/web-react';
 import { IconRefresh } from '@arco-design/web-react/icon';
-import { usualReplace } from './utils';
 
 const TextArea = Input.TextArea;
 
@@ -18,18 +17,13 @@ const tips = [
   },
 ];
 
-export const TextReplace = () => {
-  const [replaceVal, setReplaceVal] = useState({
-    old: '',
-    new: '',
-  });
-
+export const TextTranslate = () => {
   const [oldVal, setOldVal] = useState('');
   const [newVal, setNewVal] = useState('');
 
   const handleConvert = () => {
-    const val = usualReplace(oldVal, replaceVal);
-    setNewVal(val);
+    // const val = translateText(oldVal);
+    // setNewVal(val);
   };
 
   const handleCopy = () => {
@@ -53,26 +47,8 @@ export const TextReplace = () => {
       title="文本替换"
       content={
         <div className="textconvert-container">
-          <section className="text-tool-bar col">
-            <div className="text-tool-bar-item">
-              <h4 className="text-tool-content-title">查找目标</h4>
-              <Input
-                placeholder="请输入被替换的文本"
-                value={replaceVal.old}
-                onChange={(val) => setReplaceVal({ ...replaceVal, old: val })}
-              />
-            </div>
-            <div className="text-tool-bar-item">
-              <h4 className="text-tool-content-title">替换为</h4>
-              <Input
-                placeholder="请输入要替换成的文本"
-                value={replaceVal.new}
-                onChange={(val) => setReplaceVal({ ...replaceVal, new: val })}
-              />
-            </div>
-          </section>
+          <section className="text-tool-bar">123</section>
 
-          <h4 className="text-tool-content-title">替换文本</h4>
           <div className="text-tool-content">
             <TextArea
               className="text-tool-textarea"

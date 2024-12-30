@@ -182,12 +182,13 @@
     }
 }
 
-.textconvert-content {
+.text-tool-content {
     position: relative;
 
-    display: flex;
+    display: grid;
     align-items: center;
 
+    grid-template-columns: 1fr 32px 1fr;
     gap: 12px;
 
     .tool-copy-btn {
@@ -200,22 +201,43 @@
     }
 }
 
-.textconvert-content-handle {
+.text-tool-content-handle {
     display: flex;
     flex-direction: column;
 
     gap: 12px;
 }
 
-.textconvert-bar {
+.text-tool-bar {
     overflow: hidden;
 
     margin-bottom: 12px;
 
     border-radius: 6px;
     // background: var(--color-fill-2);
+
+    &.col {
+        display: flex;
+        align-items: center;
+
+        gap: 56px;
+    }
 }
 
-.textconvert-textarea {
+.text-tool-textarea {
     align-self: baseline;
+}
+
+.text-tool-bar-item {
+    flex: 1;
+}
+
+.text-tool-content-title {
+    margin: 0 0 12px;
+}
+
+.text-tool-count {
+    .usual-content-title {
+        margin-top: 24px;
+    }
 }

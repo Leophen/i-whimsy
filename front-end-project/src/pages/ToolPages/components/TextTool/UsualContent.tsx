@@ -5,7 +5,7 @@ export const UsualContent = (props) => {
 
   return (
     <div className="usual-content">
-      <h1 className="usual-content-title">{title}</h1>
+      <h1 className="usual-content-title">{title}工具</h1>
 
       <section className="usual-content-block">{content}</section>
 

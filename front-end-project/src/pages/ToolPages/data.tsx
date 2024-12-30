@@ -1,5 +1,7 @@
-import { TextConvert } from './components/TextTool/textconvert';
-import { Textreplace } from './components/TextTool/Textreplace';
+import { TextConvert } from './components/TextTool/TextConvert';
+import { TextCount } from './components/TextTool/TextCount';
+import { TextReplace } from './components/TextTool/TextReplace';
+// import { TextTranslate } from './components/TextTool/TextTranslate';
 
 export const tools = [
   {
@@ -41,8 +43,18 @@ export const tools = [
       {
         name: '文本替换',
         path: 'textreplace',
-        content: <Textreplace />,
+        content: <TextReplace />,
       },
+      {
+        name: '文本统计',
+        path: 'textcount',
+        content: <TextCount />,
+      },
+      //   {
+      //     name: '生成变量名',
+      //     path: 'texttranslate',
+      //     content: <TextTranslate />,
+      //   },
     ],
   },
 ];

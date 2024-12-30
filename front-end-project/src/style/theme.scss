@@ -3,13 +3,13 @@
 
     --bg-color: rgba(242, 243, 245,0.5);
     --primary: #5370ff;
-    --border-radius-small: 6px;
-    --border-radius-medium: 12px;
-    --border-radius-large: 24px;
+    --border-radius-small: 8px;
+    --border-radius-medium: 16px;
+    --border-radius-large: 32px;
 }
 
 body {
-    --border-radius-small: 6px !important;
-    --border-radius-medium: 12px !important;
-    --border-radius-large: 24px !important;
+    --border-radius-small: 8px !important;
+    --border-radius-medium: 16px !important;
+    --border-radius-large: 32px !important;
 }

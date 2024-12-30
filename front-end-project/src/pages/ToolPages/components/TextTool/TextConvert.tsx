@@ -5,10 +5,10 @@ import { IconRight } from '@arco-design/web-react/icon';
 import { Radio } from '@arco-design/web-react';
 import { useState } from 'react';
 import { IconCopy } from '@arco-design/web-react/icon';
-import clipboardy from 'clipboard';
 import { Message } from '@arco-design/web-react';
 import { Tooltip } from '@arco-design/web-react';
 import { IconRefresh } from '@arco-design/web-react/icon';
+import { textConvertOptions, usualConvert } from './utils';
 
 const TextArea = Input.TextArea;
 const RadioGroup = Radio.Group;
@@ -26,45 +26,6 @@ const tips = [
   },
 ];
 
-const options = [
-  {
-    value: 'zhuandaxie',
-    label: '转大写',
-  },
-  {
-    value: 'zhuanxiaoxie',
-    label: '转小写',
-  },
-  {
-    value: 'shouzimudaxie',
-    label: '首字母大写',
-  },
-  {
-    value: 'shouzimuxiaoxie',
-    label: '首字母小写',
-  },
-  {
-    value: 'juzishouzimudaxie',
-    label: '句子首字母大写',
-  },
-  {
-    value: 'konggezhuanxiahuaxian',
-    label: '空格转下划线',
-  },
-  {
-    value: 'xiahuaxianzhuankongge',
-    label: '下划线转空格',
-  },
-  {
-    value: 'quchukongge',
-    label: '去除空格',
-  },
-  {
-    value: 'zhuantuofeng',
-    label: '空格/下划线转驼峰',
-  },
-];
-
 export const TextConvert = () => {
   const [mode, setMode] = useState('zhuanxiaoxie');
 
@@ -72,72 +33,8 @@ export const TextConvert = () => {
   const [newVal, setNewVal] = useState('');
 
   const handleConvert = () => {
-    // 转大写
-    if (mode === 'zhuandaxie') {
-      const val = oldVal.toUpperCase();
-      setNewVal(val);
-    }
-
-    // 转小写
-    else if (mode === 'zhuanxiaoxie') {
-      const val = oldVal.toLowerCase();
-      setNewVal(val);
-    }
-
-    // 首字母大写
-    else if (mode === 'shouzimudaxie') {
-      const val = oldVal
-        .split(' ') // 按空格分割成单词
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // 将首字母转大写
-        .join(' '); // 重新连接成字符串
-      setNewVal(val);
-    }
-
-    // 首字母小写
-    else if (mode === 'shouzimuxiaoxie') {
-      const val = oldVal
-        .split(' ') // 按空格分割成单词
-        .map((word) => word.charAt(0).toLowerCase() + word.slice(1)) // 将首字母转小写
-        .join(' '); // 重新连接成字符串
-      setNewVal(val);
-    }
-
-    // 句子首字母大写
-    else if (mode === 'juzishouzimudaxie') {
-      const val = oldVal
-        .split(/([.!?])/)
-        .map((sentence) => sentence.trim())
-        .filter(Boolean) // 过滤空字符串
-        .map((sentence) => sentence.charAt(0).toUpperCase() + sentence.slice(1))
-        .join(' ');
-      setNewVal(val);
-    }
-
-    // 空格转下划线
-    else if (mode === 'konggezhuanxiahuaxian') {
-      const val = oldVal.replace(/ /g, '_');
-      setNewVal(val);
-    }
-
-    // 下划线转空格
-    else if (mode === 'xiahuaxianzhuankongge') {
-      const val = oldVal.replace(/_/g, ' ');
-      setNewVal(val);
-    }
-
-    // 去除空格
-    else if (mode === 'quchukongge') {
-      const val = oldVal.replace(/\s+/g, '');
-      setNewVal(val);
-    }
-
-    // 空格/下划线转驼峰
-    else if (mode === 'zhuantuofeng') {
-      const val = oldVal
-        .replace(/[_\s]+(.)/g, (_, char) => char.toUpperCase()) // 转换下划线和空格后的字符为大写
-        .replace(/^./, (char) => char.toLowerCase());
-      setNewVal(val);
-    }
+    const val = usualConvert(oldVal, mode);
+    setNewVal(val);
   };
 
   const handleCopy = () => {
@@ -161,25 +58,25 @@ export const TextConvert = () => {
       title="文本转换"
       content={
         <div className="textconvert-container">
-          <section className="textconvert-bar">
+          <section className="text-tool-bar">
             <RadioGroup
-              options={options}
+              options={textConvertOptions}
               size="large"
               value={mode}
               onChange={setMode}
             />
           </section>
 
-          <div className="textconvert-content">
+          <div className="text-tool-content">
             <TextArea
-              className="textconvert-textarea"
+              className="text-tool-textarea"
               placeholder="请输入要转换的文本"
               value={oldVal}
               onChange={setOldVal}
               autoSize={{ minRows: 20 }}
               allowClear
             />
-            <div className="textconvert-content-handle">
+            <div className="text-tool-content-handle">
               <Tooltip mini position="right" content="转换">
                 <Button
                   shape="circle"
@@ -198,7 +95,7 @@ export const TextConvert = () => {
               </Tooltip>
             </div>
             <TextArea
-              className="textconvert-textarea"
+              className="text-tool-textarea"
               placeholder="转换后的文本会从这里展示"
               value={newVal}
               onChange={setNewVal}
