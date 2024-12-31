@@ -103,31 +103,27 @@ export const TextCount = () => {
   };
 
   return (
-    <UsualContent
-      title="文本统计"
-      content={
-        <div className="textconvert-container">
-          <TextArea
-            className="text-tool-textarea"
-            placeholder="请输入要统计的文本"
-            value={val}
-            onChange={handleChange}
-            autoSize={{ minRows: 20 }}
-            allowClear
-          />
+    <UsualContent title="文本统计" tips={tips}>
+      <div className="tool-container">
+        <TextArea
+          className="text-tool-textarea"
+          placeholder="请输入要统计的文本"
+          value={val}
+          onChange={handleChange}
+          autoSize={{ minRows: 20 }}
+          allowClear
+        />
 
-          <section className="text-tool-count">
-            <h1 className="usual-content-title">统计详情</h1>
-            <Descriptions
-              column={1}
-              data={data}
-              border
-              labelStyle={{ paddingRight: 36 }}
-            />
-          </section>
-        </div>
-      }
-      tips={tips}
-    />
+        <section className="text-tool-count">
+          <h1 className="tool-content-title-big">统计详情</h1>
+          <Descriptions
+            column={1}
+            data={data}
+            border
+            labelStyle={{ paddingRight: 36 }}
+          />
+        </section>
+      </div>
+    </UsualContent>
   );
 };

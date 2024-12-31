@@ -54,66 +54,62 @@ export const TextConvert = () => {
   };
 
   return (
-    <UsualContent
-      title="文本转换"
-      content={
-        <div className="textconvert-container">
-          <section className="text-tool-bar">
-            <RadioGroup
-              options={textConvertOptions}
-              size="large"
-              value={mode}
-              onChange={setMode}
-            />
-          </section>
+    <UsualContent title="文本转换" tips={tips}>
+      <div className="tool-container">
+        <section className="text-tool-bar">
+          <RadioGroup
+            options={textConvertOptions}
+            size="large"
+            value={mode}
+            onChange={setMode}
+          />
+        </section>
 
-          <div className="text-tool-content">
-            <TextArea
-              className="text-tool-textarea"
-              placeholder="请输入要转换的文本"
-              value={oldVal}
-              onChange={setOldVal}
-              autoSize={{ minRows: 20 }}
-              allowClear
-            />
-            <div className="text-tool-content-handle">
-              <Tooltip mini position="right" content="转换">
-                <Button
-                  shape="circle"
-                  type="primary"
-                  icon={<IconRight />}
-                  onClick={handleConvert}
-                />
-              </Tooltip>
-              <Tooltip mini position="right" content="重置">
-                <Button
-                  shape="circle"
-                  type="primary"
-                  icon={<IconRefresh />}
-                  onClick={handleRevert}
-                />
-              </Tooltip>
-            </div>
-            <TextArea
-              className="text-tool-textarea"
-              placeholder="转换后的文本会从这里展示"
-              value={newVal}
-              onChange={setNewVal}
-              autoSize={{ minRows: 20 }}
-              readOnly
-            />
-            <Button
-              type="outline"
-              className="tool-copy-btn"
-              icon={<IconCopy />}
-              onClick={handleCopy}
-            >
-              一键复制
-            </Button>
+        <div className="text-tool-content">
+          <TextArea
+            className="text-tool-textarea"
+            placeholder="请输入要转换的文本"
+            value={oldVal}
+            onChange={setOldVal}
+            autoSize={{ minRows: 20 }}
+            allowClear
+          />
+          <div className="text-tool-content-handle">
+            <Tooltip mini position="right" content="转换">
+              <Button
+                shape="circle"
+                type="primary"
+                icon={<IconRight />}
+                onClick={handleConvert}
+              />
+            </Tooltip>
+            <Tooltip mini position="right" content="重置">
+              <Button
+                shape="circle"
+                type="primary"
+                icon={<IconRefresh />}
+                onClick={handleRevert}
+              />
+            </Tooltip>
           </div>
+          <TextArea
+            className="text-tool-textarea"
+            placeholder="已处理的文本"
+            value={newVal}
+            onChange={setNewVal}
+            autoSize={{ minRows: 20 }}
+            readOnly
+          />
+          <Button
+            type="outline"
+            className="tool-copy-btn"
+            icon={<IconCopy />}
+            onClick={handleCopy}
+          >
+            一键复制
+          </Button>
         </div>
-      }
-      tips={tips}
-    />
+      </div>
+    </UsualContent>
   );
 };

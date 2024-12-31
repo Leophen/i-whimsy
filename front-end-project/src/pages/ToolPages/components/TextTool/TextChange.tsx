@@ -49,77 +49,73 @@ export const TextChange = () => {
   };
 
   return (
-    <UsualContent
-      title="文本替换"
-      content={
-        <div className="textconvert-container">
-          <section className="text-tool-bar col">
-            <div className="text-tool-bar-item">
-              <h4 className="text-tool-content-title">查找目标</h4>
-              <Input
-                placeholder="请输入被替换的文本"
-                value={replaceVal.old}
-                onChange={(val) => setReplaceVal({ ...replaceVal, old: val })}
-              />
-            </div>
-            <div className="text-tool-bar-item">
-              <h4 className="text-tool-content-title">替换为</h4>
-              <Input
-                placeholder="请输入要替换成的文本"
-                value={replaceVal.new}
-                onChange={(val) => setReplaceVal({ ...replaceVal, new: val })}
-              />
-            </div>
-          </section>
-
-          <h4 className="text-tool-content-title">替换文本</h4>
-          <div className="text-tool-content">
-            <TextArea
-              className="text-tool-textarea"
-              placeholder="请输入替换原文"
-              value={oldVal}
-              onChange={setOldVal}
-              autoSize={{ minRows: 20 }}
-              allowClear
+    <UsualContent title="文本替换" tips={tips}>
+      <div className="tool-container">
+        <section className="text-tool-bar col">
+          <div className="text-tool-bar-item">
+            <h4 className="tool-content-title-small">查找目标</h4>
+            <Input
+              placeholder="请输入被替换的文本"
+              value={replaceVal.old}
+              onChange={(val) => setReplaceVal({ ...replaceVal, old: val })}
             />
-            <div className="text-tool-content-handle">
-              <Tooltip mini position="right" content="替换">
-                <Button
-                  shape="circle"
-                  type="primary"
-                  icon={<IconRight />}
-                  onClick={handleConvert}
-                />
-              </Tooltip>
-              <Tooltip mini position="right" content="重置">
-                <Button
-                  shape="circle"
-                  type="primary"
-                  icon={<IconRefresh />}
-                  onClick={handleRevert}
-                />
-              </Tooltip>
-            </div>
-            <TextArea
-              className="text-tool-textarea"
-              placeholder="已处理的文本"
-              value={newVal}
-              onChange={setNewVal}
-              autoSize={{ minRows: 20 }}
-              readOnly
-            />
-            <Button
-              type="outline"
-              className="tool-copy-btn"
-              icon={<IconCopy />}
-              onClick={handleCopy}
-            >
-              一键复制
-            </Button>
           </div>
+          <div className="text-tool-bar-item">
+            <h4 className="tool-content-title-small">替换为</h4>
+            <Input
+              placeholder="请输入要替换成的文本"
+              value={replaceVal.new}
+              onChange={(val) => setReplaceVal({ ...replaceVal, new: val })}
+            />
+          </div>
+        </section>
+
+        <h4 className="tool-content-title-small">替换文本</h4>
+        <div className="text-tool-content">
+          <TextArea
+            className="text-tool-textarea"
+            placeholder="请输入替换原文"
+            value={oldVal}
+            onChange={setOldVal}
+            autoSize={{ minRows: 20 }}
+            allowClear
+          />
+          <div className="text-tool-content-handle">
+            <Tooltip mini position="right" content="替换">
+              <Button
+                shape="circle"
+                type="primary"
+                icon={<IconRight />}
+                onClick={handleConvert}
+              />
+            </Tooltip>
+            <Tooltip mini position="right" content="重置">
+              <Button
+                shape="circle"
+                type="primary"
+                icon={<IconRefresh />}
+                onClick={handleRevert}
+              />
+            </Tooltip>
+          </div>
+          <TextArea
+            className="text-tool-textarea"
+            placeholder="已处理的文本"
+            value={newVal}
+            onChange={setNewVal}
+            autoSize={{ minRows: 20 }}
+            readOnly
+          />
+          <Button
+            type="outline"
+            className="tool-copy-btn"
+            icon={<IconCopy />}
+            onClick={handleCopy}
+          >
+            一键复制
+          </Button>
         </div>
-      }
-      tips={tips}
-    />
+      </div>
+    </UsualContent>
   );
 };

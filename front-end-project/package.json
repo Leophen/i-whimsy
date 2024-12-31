@@ -12,6 +12,7 @@
         "@arco-design/web-react": "^2.65.0",
         "@wangeditor/editor": "^5.1.23",
         "@wangeditor/editor-for-react": "^1.0.6",
+        "compressorjs": "^1.2.1",
         "dayjs": "^1.11.7",
         "formik": "^2.2.9",
         "lodash": "^4.17.21",
