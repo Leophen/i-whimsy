@@ -14,7 +14,7 @@
         "@wangeditor/editor-for-react": "^1.0.6",
         "color.js": "^1.2.0",
         "compressorjs": "^1.2.1",
-        "dayjs": "^1.11.7",
+        "dayjs": "^1.11.13",
         "formik": "^2.2.9",
         "lodash": "^4.17.21",
         "react": "^18.2.0",

@@ -34,12 +34,12 @@
     align-items: center;
     justify-content: center;
 
-    &.alignStart {
-        align-items: flex-start;
+    &.start {
+        justify-content: flex-start;
     }
 
-    &.alignEnd {
-        align-items: flex-end;
+    &.end {
+        justify-content: flex-end;
     }
 }
 
@@ -61,6 +61,14 @@
 
 .gap24 {
     gap: 24px;
+}
+
+.gap32 {
+    gap: 32px;
+}
+
+.gap36 {
+    gap: 36px;
 }
 
 .top12 {

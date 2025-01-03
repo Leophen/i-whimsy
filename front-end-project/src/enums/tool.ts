@@ -18,5 +18,5 @@ export const EToolType = enumxFactory({
     COLOR_CONTRAST: {id: 'colorcontrast' as const, label: '颜色对比度检查'},
 
     TIME: {id: 'time' as const, label: ' 时间类工具'},
-    TIME_COMPUTE: {id: 'timecompute' as const, label: '日期计算器'},
+    TIME_COMPUTE: {id: 'timecompute' as const, label: '计算日期差'},
 });
