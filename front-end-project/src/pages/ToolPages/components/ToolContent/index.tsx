@@ -45,7 +45,8 @@ export const ToolContent = () => {
   const query = new URLSearchParams(location.search);
   let toolType = query.get('type');
   if (!toolType) {
-    toolType = currentTools.list[0].path;
+    const type = currentTools.list[0].path;
+    toolType = type;
   }
 
   return (

@@ -1,0 +1,55 @@
+.tool-color-contrast {
+    .arco-color-picker {
+        height: 40px;
+        padding: 8px;
+
+        border-radius: var(--border-radius-small);
+    }
+
+    .arco-color-picker-preview {
+        border-radius: var(--border-radius-small);
+    }
+    .arco-form-item-wrapper {
+        padding-left: 12px;
+    }
+
+    .tool-color-contrast-preview {
+        margin-top: 12px;
+    }
+
+    .tool-color-contrast-block {
+        display: flex;
+        align-items: center;
+
+        padding: 12px;
+
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius-small);
+
+        gap: 12px;
+    }
+
+    .tool-color-contrast-small-txt {
+        font-size: 14px;
+    }
+
+    .tool-color-contrast-large-txt {
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    .tool-color-contrast-ratio {
+        width: fit-content;
+        padding: 8px;
+
+        border: 3px solid var(--border-color);
+        border-radius: var(--border-radius-small);
+    }
+
+    .tool-color-contrast-info {
+        margin-bottom: 8px;
+        span{
+            margin-right: 6px;
+        }
+    }
+}
