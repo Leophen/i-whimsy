@@ -54,7 +54,7 @@ export const TextConvert = () => {
   };
 
   return (
-    <UsualContent title="文本转换" tips={tips}>
+    <UsualContent tips={tips}>
       <div className="tool-container">
         <section className="text-tool-bar">
           <RadioGroup

@@ -1,3 +1,6 @@
+@use "../components/ImageTool/ImageTool.scss";
+@use "../components/TextTool/TextTool.scss";
+
 .tool-list {
     display: grid;
 
@@ -185,109 +188,5 @@
 
     .arco-alert:not(:last-child) {
         margin-bottom: 12px;
-    }
-}
-
-.text-tool-content {
-    position: relative;
-
-    display: grid;
-    align-items: center;
-
-    grid-template-columns: 1fr 32px 1fr;
-    gap: 12px;
-
-    .tool-copy-btn {
-        position: absolute;
-        z-index: 1;
-        right: 12px;
-        bottom: 12px;
-
-        background: var(--color-fill-2) !important;
-    }
-}
-
-.text-tool-content-handle {
-    display: flex;
-    flex-direction: column;
-
-    gap: 12px;
-}
-
-.text-tool-bar {
-    overflow: hidden;
-
-    margin-bottom: 12px;
-
-    border-radius: 6px;
-    // background: var(--color-fill-2);
-
-    &.col {
-        display: flex;
-        align-items: center;
-
-        gap: 56px;
-    }
-}
-
-.text-tool-textarea {
-    align-self: baseline;
-}
-
-.text-tool-bar-item {
-    flex: 1;
-}
-
-.tool-content-title-small {
-    margin: 0 0 12px;
-}
-
-.text-tool-count {
-    .tool-content-title-big {
-        margin-top: 24px;
-    }
-}
-
-.tool-compress-item {
-    .arco-upload-list-status,
-    .arco-upload-list-item-operation {
-        display: none;
-    }
-
-    .arco-upload-list {
-        .arco-upload-list-item {
-            padding-right: 0;
-            &:not(:last-of-type) {
-                display: none;
-            }
-        }
-    }
-}
-
-.tool-compress-show-item {
-    display: flex;
-    overflow: hidden;
-
-    gap: 24px;
-
-    .compress-show-item {
-        flex: 1;
-
-        max-width: 50%;
-        height: fit-content;
-
-        .arco-image,
-        .arco-image-img {
-            width: 100%;
-        }
-
-        .arco-image,
-        .arco-image-overlay,
-        .arco-image-error {
-            height: fit-content;
-            min-height: 200px;
-
-            border-radius: var(--border-radius-small);
-        }
     }
 }

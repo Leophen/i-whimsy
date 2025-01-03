@@ -1,11 +1,22 @@
 import { Alert } from '@arco-design/web-react';
+import { useLocation } from 'react-router-dom';
+import { EToolType } from '../../../../enums';
+
+const useQuery = () => {
+  return new URLSearchParams(useLocation().search);
+};
 
 export const UsualContent = (props) => {
-  const { title, children, tips } = props;
+  const { children, tips } = props;
+
+  const query = useQuery();
+  const type = query.get('type');
 
   return (
     <div className="usual-content">
-      <h1 className="tool-content-title-big">{title}工具</h1>
+      <h1 className="tool-content-title-big">
+        {EToolType.getLabelById(type)}工具
+      </h1>
 
       <section className="usual-content-block">{children}</section>
 

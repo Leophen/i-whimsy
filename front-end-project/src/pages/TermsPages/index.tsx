@@ -1,6 +1,6 @@
 const Terms = () => {
   return (
-    <div className='terms-wrapper'>
+    <div className="terms-wrapper">
       <div className={'terms-content'}>
         <div className={'terms-title'}>“iWhimsy”用户协议</div>
         <div>
@@ -47,7 +47,7 @@ const Terms = () => {
           </section>
           <section className={'terms-txt'}>1.4 “官方内容”指 iWhimsy</section>
           <section className={'terms-txt'}>
-            1.5 “项目内容”指用户上传的全部内容，包括但不限于文字、数据、图像。
+            1.5 “项目内容”指用户上传的全部内容，包括但不限于文字、数据、图片。
           </section>
           <br />
         </div>

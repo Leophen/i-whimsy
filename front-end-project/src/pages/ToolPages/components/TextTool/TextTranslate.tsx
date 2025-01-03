@@ -43,10 +43,8 @@ export const TextTranslate = () => {
   };
 
   return (
-    <UsualContent title="文本替换" tips={tips}>
+    <UsualContent tips={tips}>
       <div className="tool-container">
-        <section className="text-tool-bar">123</section>
-
         <div className="text-tool-content">
           <TextArea
             className="text-tool-textarea"

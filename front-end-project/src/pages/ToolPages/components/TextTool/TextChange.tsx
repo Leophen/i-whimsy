@@ -49,7 +49,7 @@ export const TextChange = () => {
   };
 
   return (
-    <UsualContent title="文本替换" tips={tips}>
+    <UsualContent tips={tips}>
       <div className="tool-container">
         <section className="text-tool-bar col">
           <div className="text-tool-bar-item">

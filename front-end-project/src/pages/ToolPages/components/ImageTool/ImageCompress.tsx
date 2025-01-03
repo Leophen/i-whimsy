@@ -4,6 +4,7 @@ import { UsualContent } from '../ToolContent/UsualContent';
 import Compressor from 'compressorjs';
 import { useRef } from 'react';
 import { Table } from '@arco-design/web-react';
+import { isAcceptFile } from './utils';
 
 const columns = [
   {
@@ -79,41 +80,6 @@ const data = [
   },
 ];
 
-const isAcceptFile = (file, accept) => {
-  if (accept && file) {
-    const accepts = Array.isArray(accept)
-      ? accept
-      : accept
-          .split(',')
-          .map((x) => x.trim())
-          .filter((x) => x);
-    const fileExtension =
-      file.name.indexOf('.') > -1 ? file.name.split('.').pop() : '';
-    return accepts.some((type) => {
-      const text = type && type.toLowerCase();
-      const fileType = (file.type || '').toLowerCase();
-      if (text === fileType) {
-        // 类似excel文件这种
-        // 比如application/vnd.ms-excel和application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
-        // 本身就带有.字符的，不能走下面的.jpg等文件扩展名判断处理
-        // 所以优先对比input的accept类型和文件对象的type值
-        return true;
-      }
-      if (new RegExp('/*').test(text)) {
-        // image/* 这种通配的形式处理
-        const regExp = new RegExp('/.*$');
-        return fileType.replace(regExp, '') === text.replace(regExp, '');
-      }
-      if (new RegExp('..*').test(text)) {
-        // .jpg 等后缀名
-        return text === `.${fileExtension && fileExtension.toLowerCase()}`;
-      }
-      return false;
-    });
-  }
-  return !!file;
-};
-
 export const ImageCompress = () => {
   const [img, setImg] = useState({
     old: {
@@ -150,8 +116,8 @@ export const ImageCompress = () => {
   // 上传显示图片操作
   const uploadImage = (file) => {
     // 限制图片大小
-    if (file.size > 10 * 1024 * 1024) {
-      Message.error('图片不得大于 10M，请重新上传');
+    if (file.size > 50 * 1024 * 1024) {
+      Message.error('图片不得大于 50M，请重新上传');
     } else {
       uploadFile.current = file;
       img.old.size = (file.size / 1024).toFixed(1);
@@ -183,7 +149,7 @@ export const ImageCompress = () => {
   };
 
   return (
-    <UsualContent title="图像压缩">
+    <UsualContent>
       <div className="tool-container">
         <div className="tool-compress-item">
           <h4 className="tool-content-title-small">上传原图</h4>
@@ -245,8 +211,8 @@ export const ImageCompress = () => {
         <section className="top24">
           <h4 className="tool-content-title-small">说明</h4>
           <div className="bottom12">
-            输出图像的质量取决于压缩率的设置，压缩率默认值为
-            80%，该值不代表图像大小的压缩比例，具体压缩比例参考下表：
+            输出图片的质量取决于压缩率的设置，压缩率默认值为
+            80%，该值不代表图片大小的压缩比例，具体压缩比例参考下表：
           </div>
           <Table columns={columns} data={data} pagination={false} />
         </section>

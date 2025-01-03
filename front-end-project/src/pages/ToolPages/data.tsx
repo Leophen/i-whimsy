@@ -3,6 +3,7 @@ import { TextCount } from './components/TextTool/TextCount';
 import { TextChange } from './components/TextTool/TextChange';
 import { EToolType } from '../../enums';
 import { ImageCompress } from './components/ImageTool/ImageCompress';
+import { ImageTheme } from './components/ImageTool/ImageTheme';
 // import { TextTranslate } from './components/TextTool/TextTranslate';
 
 export const tools = [
@@ -87,6 +88,11 @@ export const tools = [
         name: EToolType.getLabelById(EToolType.IMAGE_COMPRESS),
         path: EToolType.IMAGE_COMPRESS,
         content: <ImageCompress />,
+      },
+      {
+        name: EToolType.getLabelById(EToolType.IMAGE_THEME),
+        path: EToolType.IMAGE_THEME,
+        content: <ImageTheme />,
       },
     ],
   },

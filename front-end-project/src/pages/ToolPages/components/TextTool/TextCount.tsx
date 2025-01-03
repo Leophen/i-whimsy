@@ -103,7 +103,7 @@ export const TextCount = () => {
   };
 
   return (
-    <UsualContent title="文本统计" tips={tips}>
+    <UsualContent tips={tips}>
       <div className="tool-container">
         <TextArea
           className="text-tool-textarea"

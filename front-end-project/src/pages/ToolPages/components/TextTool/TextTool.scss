@@ -1,0 +1,60 @@
+
+.text-tool-content {
+    position: relative;
+
+    display: grid;
+    align-items: center;
+
+    grid-template-columns: 1fr 32px 1fr;
+    gap: 12px;
+
+    .tool-copy-btn {
+        position: absolute;
+        z-index: 1;
+        right: 12px;
+        bottom: 12px;
+
+        background: var(--color-fill-2) !important;
+    }
+}
+
+.text-tool-content-handle {
+    display: flex;
+    flex-direction: column;
+
+    gap: 12px;
+}
+
+.text-tool-bar {
+    overflow: hidden;
+
+    margin-bottom: 12px;
+
+    border-radius: 6px;
+    // background: var(--color-fill-2);
+
+    &.col {
+        display: flex;
+        align-items: center;
+
+        gap: 56px;
+    }
+}
+
+.text-tool-textarea {
+    align-self: baseline;
+}
+
+.text-tool-bar-item {
+    flex: 1;
+}
+
+.tool-content-title-small {
+    margin: 0 0 12px;
+}
+
+.text-tool-count {
+    .tool-content-title-big {
+        margin-top: 24px;
+    }
+}
