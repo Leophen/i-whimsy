@@ -19,4 +19,5 @@ export const EToolType = enumxFactory({
 
     TIME: {id: 'time' as const, label: ' 时间类工具'},
     TIME_COMPUTE: {id: 'timecompute' as const, label: '计算日期差'},
+    TIME_CALCULATE: {id: 'timecalculate' as const, label: '日期推算器'},
 });

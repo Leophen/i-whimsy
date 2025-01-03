@@ -6,9 +6,22 @@ import { ImageCompress } from './components/ImageTool/ImageCompress';
 import { ImageTheme } from './components/ImageTool/ImageTheme';
 import { ColorContrast } from './components/ColorTool/ColorContrast';
 import { TimeCompute } from './components/TimeTool/TimeCompute';
+import { TimeCalculate } from './components/TimeTool/TimeCalculate';
 // import { TextTranslate } from './components/TextTool/TextTranslate';
 
-export const tools = [
+export interface Tools {
+  cnTitle: string;
+  enTitle: string;
+  path: typeof EToolType.idsEnum;
+  icon: React.ReactNode;
+  list: {
+    name: string,
+    path: typeof EToolType.idsEnum,
+    content: React.ReactNode,
+  }[];
+}
+
+export const tools: Tools[] = [
   {
     cnTitle: EToolType.getLabelById(EToolType.TEXT),
     enTitle: 'Text Tools',
@@ -176,6 +189,11 @@ export const tools = [
         name: EToolType.getLabelById(EToolType.TIME_COMPUTE),
         path: EToolType.TIME_COMPUTE,
         content: <TimeCompute />,
+      },
+      {
+        name: EToolType.getLabelById(EToolType.TIME_CALCULATE),
+        path: EToolType.TIME_CALCULATE,
+        content: <TimeCalculate />,
       },
     ],
   },

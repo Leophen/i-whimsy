@@ -105,7 +105,7 @@ export const ColorContrast = () => {
 
   const getWCAGTag = (level: string, isPass: boolean) => (
     <div className="tool-color-contrast-info">
-      <span>WCAG {level}:</span>
+      <span className="info-title">WCAG {level}:</span>
       <Tag color={isPass ? 'green' : 'red'} bordered>
         {isPass ? 'Pass' : 'Fail'}
       </Tag>

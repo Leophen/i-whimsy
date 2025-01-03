@@ -24,3 +24,29 @@
         }
     }
 }
+
+
+.tool-time-calculate-wrap {
+    .tool-time-calculate-btn-wrap {
+        width: 200px;
+        margin-top: 24px;
+
+        .arco-input-inner-wrapper {
+            border-radius: 0;
+        }
+
+        .arco-input-number {
+            overflow: hidden;
+
+            border-radius: var(--border-radius-small);
+        }
+    }
+
+    .tool-time-calculate-panel-item {
+        h4 {
+            margin: 0;
+            margin-bottom: 12px;
+            padding: 0;
+        }
+    }
+}

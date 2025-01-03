@@ -1,4 +1,5 @@
 .tool-color-contrast {
+
     .arco-color-picker {
         height: 40px;
         padding: 8px;
@@ -48,8 +49,13 @@
 
     .tool-color-contrast-info {
         margin-bottom: 8px;
-        span{
+        
+        .info-title{
             margin-right: 6px;
+        }
+
+        .arco-tag-content {
+            margin: 0;
         }
     }
 }

@@ -1,7 +1,6 @@
 import { DatePicker } from '@arco-design/web-react';
 import { UsualContent } from '../ToolContent/UsualContent';
 import { useState } from 'react';
-import { Form } from '@arco-design/web-react';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
 import { Statistic } from '@arco-design/web-react';

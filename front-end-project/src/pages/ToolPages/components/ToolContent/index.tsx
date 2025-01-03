@@ -1,15 +1,10 @@
+import { useEffect, useState, useMemo } from 'react';
 import { Menu } from '@arco-design/web-react';
 import { tools } from '../../data';
 import { BackTop } from '@arco-design/web-react';
 import { Button } from '@arco-design/web-react';
 import { IconUp } from '@arco-design/web-react/icon';
-import { useParams } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
-import { useState } from 'react';
-import { useEffect } from 'react';
-import { Empty } from '@arco-design/web-react';
-import { useMemo } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 
 const MenuItem = Menu.Item;
 const SubMenu = Menu.SubMenu;
@@ -20,46 +15,31 @@ export const ToolContent = () => {
   const location = useLocation();
   const query = new URLSearchParams(location.search);
 
-  /**
-   * 工具类型 toolsPath
-   * eg: text
-   */
-  const [toolsPath, setToolsPath] = useState(
-    params?.toolsPath || new URL(window.location.href).pathname.split('/')[2]
+  const toolsPath = useMemo(
+    () =>
+      params?.toolsPath || new URL(window.location.href).pathname.split('/')[2],
+    [params]
   );
+
+  const [toolType, setToolType] = useState(
+    query.get('type') ||
+      tools.find((tool) => tool.path === toolsPath)?.list[0]?.path
+  );
+
   useEffect(() => {
-    const path =
-      params?.toolsPath || new URL(window.location.href).pathname.split('/')[2];
-    setToolsPath(path);
-  }, [params]);
-
-  /**
-   * 当前工具类型 currentTools
-   * eg: tools[0]
-   */
-  const currentTools = useMemo(
-    () => tools.find((tool) => tool.path === toolsPath),
-    [toolsPath]
-  );
-
-  /**
-   * 具体工具 toolType
-   * eg: textconvert
-   */
-  const toolType = useMemo(
-    () => query.get('type') || currentTools?.list[0]?.path,
-    [toolsPath, currentTools]
-  );
+    const newToolType =
+      query.get('type') ||
+      tools.find((tool) => tool.path === toolsPath)?.list[0]?.path;
+    setToolType(newToolType);
+  }, [location.search, toolsPath]);
 
   const handleToQuery = (toolsPath: string, toolType: string) => {
     navigate(`/tool/${toolsPath}?type=${toolType}`);
   };
 
   const renderContent = () => {
-    if (currentTools?.list) {
-      return currentTools.list.find((item) => item.path === toolType)?.content;
-    }
-    return <Empty />;
+    const tool = tools.find((tool) => tool.path === toolsPath);
+    return tool?.list.find((item) => item.path === toolType)?.content;
   };
 
   return (
