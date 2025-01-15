@@ -3,6 +3,27 @@ import { UsualContent } from '../ToolContent/UsualContent';
 import { useState } from 'react';
 import dayjs from 'dayjs';
 import { InputNumber } from '@arco-design/web-react';
+import { Select } from '@arco-design/web-react';
+
+const Option = Select.Option;
+const unitOptions = [
+  {
+    label: '天',
+    value: 'day',
+  },
+  {
+    label: '周',
+    value: 'week',
+  },
+  {
+    label: '月',
+    value: 'month',
+  },
+  {
+    label: '年',
+    value: 'year',
+  },
+];
 
 export const TimeCalculate = () => {
   const [value, setValue] = useState({
@@ -15,9 +36,11 @@ export const TimeCalculate = () => {
     end: dayjs().format('YYYY-MM-DD'),
   });
 
+  const [unit, setUnit] = useState('day');
   const [calculateVal, setCalculateVal] = useState(0);
+
   const handleCalculate = (v: number) => {
-    const newDate = dayjs(value.start).add(v, 'day').format('YYYY-MM-DD');
+    const newDate = dayjs(value.start).add(v, unit).format('YYYY-MM-DD');
     if (dayjs(newDate).isValid()) {
       setValue({
         ...value,
@@ -25,6 +48,19 @@ export const TimeCalculate = () => {
       });
     }
     setCalculateVal(v);
+  };
+
+  const handleSelectUnit = (v: dayjs.ManipulateType) => {
+    const newDate = dayjs(value.start)
+      .add(calculateVal, v)
+      .format('YYYY-MM-DD');
+    if (dayjs(newDate).isValid()) {
+      setValue({
+        ...value,
+        end: newDate,
+      });
+    }
+    setUnit(v);
   };
 
   return (
@@ -39,6 +75,16 @@ export const TimeCalculate = () => {
               style={{ width: 268 }}
               value={value.start}
               onChange={(v) => {
+                const newDate = dayjs(v)
+                  .add(calculateVal, unit)
+                  .format('YYYY-MM-DD');
+                if (dayjs(newDate).isValid()) {
+                  setValue({
+                    ...value,
+                    end: newDate,
+                  });
+                }
+
                 value.start = v;
                 setValue({ ...value });
               }}
@@ -51,12 +97,28 @@ export const TimeCalculate = () => {
           </div>
 
           <div className="tool-time-calculate-btn-wrap">
-            <InputNumber
-              mode="button"
-              className="tool-time-calculate-btn"
-              value={calculateVal}
-              onChange={handleCalculate}
-            />
+            <h4>推算单位</h4>
+            <div className="tool-time-calculate-btn-wrap-inner">
+              <Select value={unit} onChange={handleSelectUnit}>
+                {unitOptions.map((option, index) => (
+                  <Option
+                    key={option.value}
+                    disabled={index === 4}
+                    value={option.value}
+                  >
+                    {option.label}
+                  </Option>
+                ))}
+              </Select>
+
+              <InputNumber
+                mode="button"
+                size="mini"
+                className="tool-time-calculate-btn"
+                value={calculateVal}
+                onChange={handleCalculate}
+              />
+            </div>
           </div>
 
           <div className="top24">

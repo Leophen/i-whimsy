@@ -32,15 +32,18 @@ export const TimeCompute = () => {
   }, [value.start, value.end]);
 
   const handleExchange = () => {
-    setValue({
-      start: pickerValue.end,
-      end: pickerValue.start,
-    });
+    const startTime = value.start;
+    const endTime = value.end;
+    value.start = endTime;
+    value.end = startTime;
+    setValue({ ...value });
 
-    setPickerValue({
-      start: pickerValue.end,
-      end: pickerValue.start,
-    });
+    const startPicker = pickerValue.start;
+    const endPicker = pickerValue.end;
+    pickerValue.start = endPicker;
+    pickerValue.end = startPicker;
+
+    setPickerValue({ ...pickerValue });
   };
 
   return (

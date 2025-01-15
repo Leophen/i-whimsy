@@ -49,4 +49,17 @@
             padding: 0;
         }
     }
+
+    .tool-time-calculate-btn-wrap-inner {
+        display: flex;
+        align-items: center;
+
+        width: 266.18px;
+
+        gap: 16px;
+
+        .arco-input {
+            height: 32px !important;
+        }
+    }
 }
