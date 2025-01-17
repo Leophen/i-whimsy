@@ -1,0 +1,7 @@
+{
+  "devDependencies": {
+    "classnames": "^2.5.1",
+    "cropperjs": "^1.6.2",
+    "react-cropper": "^2.3.3"
+  }
+}

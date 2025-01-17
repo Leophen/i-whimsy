@@ -12,6 +12,7 @@ export const EToolType = enumxFactory({
 
     IMAGE: {id: 'image' as const, label: '图片类工具'},
     IMAGE_COMPRESS: {id: 'imagecompress' as const, label: '图片压缩'},
+    IMAGE_CROP: {id: 'imagecrop' as const, label: '图片裁剪'},
     IMAGE_THEME: {id: 'imagetheme' as const, label: '图片主题色提取'},
 
     COLOR: {id: 'color' as const, label: '颜色类工具'},

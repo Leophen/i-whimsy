@@ -1,4 +1,4 @@
-import { Input, Upload, Message, Slider, Image } from '@arco-design/web-react';
+import { Upload, Message, Slider, Image } from '@arco-design/web-react';
 import { useState } from 'react';
 import { UsualContent } from '../ToolContent/UsualContent';
 import Compressor from 'compressorjs';

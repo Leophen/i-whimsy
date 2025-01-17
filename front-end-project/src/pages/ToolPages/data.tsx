@@ -3,6 +3,7 @@ import { TextCount } from './components/TextTool/TextCount';
 import { TextChange } from './components/TextTool/TextChange';
 import { EToolType } from '../../enums';
 import { ImageCompress } from './components/ImageTool/ImageCompress';
+import { ImageCrop } from './components/ImageTool/ImageCrop';
 import { ImageTheme } from './components/ImageTool/ImageTheme';
 import { ColorContrast } from './components/ColorTool/ColorContrast';
 import { TimeCompute } from './components/TimeTool/TimeCompute';
@@ -103,6 +104,11 @@ export const tools: Tools[] = [
         name: EToolType.getLabelById(EToolType.IMAGE_COMPRESS),
         path: EToolType.IMAGE_COMPRESS,
         content: <ImageCompress />,
+      },
+      {
+        name: EToolType.getLabelById(EToolType.IMAGE_CROP),
+        path: EToolType.IMAGE_CROP,
+        content: <ImageCrop />,
       },
       {
         name: EToolType.getLabelById(EToolType.IMAGE_THEME),

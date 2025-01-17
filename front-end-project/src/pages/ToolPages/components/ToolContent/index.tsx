@@ -46,7 +46,7 @@ export const ToolContent = () => {
     <section className="tools-content">
       <nav className="tools-content-nav">
         <Menu
-          accordion
+          //   accordion
           defaultOpenKeys={[toolsPath]}
           defaultSelectedKeys={toolType}
           autoScrollIntoView
