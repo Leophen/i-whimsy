@@ -1,3 +1,9 @@
+.arco-color-picker-input-wrapper {
+    .arco-input-size-mini {
+        height: 22px;
+    }
+}
+
 .tool-color-contrast {
 
     .arco-color-picker {
@@ -10,6 +16,7 @@
     .arco-color-picker-preview {
         border-radius: var(--border-radius-small);
     }
+
     .arco-form-item-wrapper {
         padding-left: 12px;
     }
@@ -49,13 +56,45 @@
 
     .tool-color-contrast-info {
         margin-bottom: 8px;
-        
-        .info-title{
+
+        .info-title {
             margin-right: 6px;
         }
 
         .arco-tag-content {
             margin: 0;
         }
+    }
+}
+
+.tool-color-convert {
+
+    .arco-color-picker {
+        height: 40px;
+        padding: 8px;
+
+        border-radius: var(--border-radius-small);
+    }
+
+    .arco-color-picker-preview {
+        border-radius: var(--border-radius-small);
+    }
+
+    .tool-color-convert-item {
+
+        .arco-form-item-control-children {
+            display: flex;
+            flex-direction: column;
+
+            gap: 12px;
+        }
+    }
+
+    .arco-color-picker {
+        border-radius: var(--border-radius-small) 0 0 var(--border-radius-small);
+    }
+
+    .arco-input-group-addbefore {
+        padding: 0 !important;
     }
 }

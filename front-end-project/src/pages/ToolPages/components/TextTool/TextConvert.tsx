@@ -9,6 +9,7 @@ import { Message } from '@arco-design/web-react';
 import { Tooltip } from '@arco-design/web-react';
 import { IconRefresh } from '@arco-design/web-react/icon';
 import { textConvertOptions, usualConvert } from './utils';
+import { handleCopy } from '../../utils';
 
 const TextArea = Input.TextArea;
 const RadioGroup = Radio.Group;
@@ -35,17 +36,6 @@ export const TextConvert = () => {
   const handleConvert = () => {
     const val = usualConvert(oldVal, mode);
     setNewVal(val);
-  };
-
-  const handleCopy = () => {
-    navigator.clipboard
-      .writeText(newVal)
-      .then(() => {
-        Message.success('复制成功');
-      })
-      .catch(() => {
-        Message.success('复制失败');
-      });
   };
 
   const handleRevert = () => {
@@ -104,7 +94,7 @@ export const TextConvert = () => {
             type="outline"
             className="tool-copy-btn"
             icon={<IconCopy />}
-            onClick={handleCopy}
+            onClick={() => handleCopy(newVal)}
           >
             一键复制
           </Button>

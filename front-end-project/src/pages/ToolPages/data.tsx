@@ -6,6 +6,7 @@ import { ImageCompress } from './components/ImageTool/ImageCompress';
 import { ImageCrop } from './components/ImageTool/ImageCrop';
 import { ImageTheme } from './components/ImageTool/ImageTheme';
 import { ColorContrast } from './components/ColorTool/ColorContrast';
+import { ColorConvert } from './components/ColorTool/ColorConvert';
 import { TimeCompute } from './components/TimeTool/TimeCompute';
 import { TimeCalculate } from './components/TimeTool/TimeCalculate';
 // import { TextTranslate } from './components/TextTool/TextTranslate';
@@ -138,6 +139,11 @@ export const tools: Tools[] = [
       </svg>
     ),
     list: [
+      {
+        name: EToolType.getLabelById(EToolType.COLOR_CONVERT),
+        path: EToolType.COLOR_CONVERT,
+        content: <ColorConvert />,
+      },
       {
         name: EToolType.getLabelById(EToolType.COLOR_CONTRAST),
         path: EToolType.COLOR_CONTRAST,

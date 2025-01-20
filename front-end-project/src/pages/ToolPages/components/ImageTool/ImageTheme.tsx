@@ -7,6 +7,7 @@ import { prominent } from 'color.js';
 import { useEffect } from 'react';
 import tinycolor from 'tinycolor2';
 import { Button } from '@arco-design/web-react';
+import { handleCopy } from '../../utils';
 
 export const ImageTheme = () => {
     const [src, setSrc] = useState('');
@@ -50,17 +51,6 @@ export const ImageTheme = () => {
 
     const getRgb = (col) => `rgb(${col.r}, ${col.g}, ${col.b})`;
     const getHex = (col) => tinycolor({ r: col.r, g: col.g, b: col.b }).toHexString();
-
-    const handleCopy = (text:string) => {
-        navigator.clipboard
-          .writeText(text)
-          .then(() => {
-            Message.success('复制成功');
-          })
-          .catch(() => {
-            Message.success('复制失败');
-          });
-    };
 
     return (
         <UsualContent>

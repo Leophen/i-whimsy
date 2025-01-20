@@ -16,6 +16,7 @@ export const EToolType = enumxFactory({
     IMAGE_THEME: {id: 'imagetheme' as const, label: '图片主题色提取'},
 
     COLOR: {id: 'color' as const, label: '颜色类工具'},
+    COLOR_CONVERT: {id: 'colorconvert' as const, label: '颜色转换'},
     COLOR_CONTRAST: {id: 'colorcontrast' as const, label: '颜色对比度检查'},
 
     TIME: {id: 'time' as const, label: ' 时间类工具'},
