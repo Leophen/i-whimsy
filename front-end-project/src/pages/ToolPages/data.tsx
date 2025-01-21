@@ -4,6 +4,7 @@ import { TextChange } from './components/TextTool/TextChange';
 import { EToolType } from '../../enums';
 import { ImageCompress } from './components/ImageTool/ImageCompress';
 import { ImageCrop } from './components/ImageTool/ImageCrop';
+import { ImageFilter } from './components/ImageTool/ImageFilter';
 import { ImageTheme } from './components/ImageTool/ImageTheme';
 import { ColorContrast } from './components/ColorTool/ColorContrast';
 import { ColorConvert } from './components/ColorTool/ColorConvert';
@@ -110,6 +111,11 @@ export const tools: Tools[] = [
         name: EToolType.getLabelById(EToolType.IMAGE_CROP),
         path: EToolType.IMAGE_CROP,
         content: <ImageCrop />,
+      },
+      {
+        name: EToolType.getLabelById(EToolType.IMAGE_FILTER),
+        path: EToolType.IMAGE_FILTER,
+        content: <ImageFilter />,
       },
       {
         name: EToolType.getLabelById(EToolType.IMAGE_THEME),
