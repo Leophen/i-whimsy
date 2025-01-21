@@ -97,4 +97,8 @@
     .arco-input-group-addbefore {
         padding: 0 !important;
     }
+
+    .arco-input-group-addbefore+.arco-input-inner-wrapper-focus {
+        border-radius: 0 !important;
+    }
 }
