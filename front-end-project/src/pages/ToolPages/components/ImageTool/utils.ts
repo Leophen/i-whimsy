@@ -32,3 +32,20 @@ export const isAcceptFile = (file, accept) => {
   }
   return !!file;
 };
+
+/**
+ * 将文件转换为 ArrayBuffer
+ *
+ * @param file 要转换的文件对象
+ * @returns 返回一个 Promise，该 Promise 解析为文件的 ArrayBuffer 表示
+ */
+export const fileToArrayBuffer = (file: File) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      resolve(reader.result); // 结果为 ArrayBuffer
+    };
+    reader.onerror = reject;
+    reader.readAsArrayBuffer(file); // 读取为 ArrayBuffer
+  });
+};

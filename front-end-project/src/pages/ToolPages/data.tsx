@@ -5,6 +5,7 @@ import { EToolType } from '../../enums';
 import { ImageCompress } from './components/ImageTool/ImageCompress';
 import { ImageCrop } from './components/ImageTool/ImageCrop';
 import { ImageFilter } from './components/ImageTool/ImageFilter';
+import { ImageWatermark } from './components/ImageTool/ImageWatermark';
 import { ImageTheme } from './components/ImageTool/ImageTheme';
 import { ColorContrast } from './components/ColorTool/ColorContrast';
 import { ColorConvert } from './components/ColorTool/ColorConvert';
@@ -18,9 +19,9 @@ export interface Tools {
   path: typeof EToolType.idsEnum;
   icon: React.ReactNode;
   list: {
-    name: string,
-    path: typeof EToolType.idsEnum,
-    content: React.ReactNode,
+    name: string;
+    path: typeof EToolType.idsEnum;
+    content: React.ReactNode;
   }[];
 }
 
@@ -116,6 +117,11 @@ export const tools: Tools[] = [
         name: EToolType.getLabelById(EToolType.IMAGE_FILTER),
         path: EToolType.IMAGE_FILTER,
         content: <ImageFilter />,
+      },
+      {
+        name: EToolType.getLabelById(EToolType.IMAGE_WATERMARK),
+        path: EToolType.IMAGE_WATERMARK,
+        content: <ImageWatermark />,
       },
       {
         name: EToolType.getLabelById(EToolType.IMAGE_THEME),

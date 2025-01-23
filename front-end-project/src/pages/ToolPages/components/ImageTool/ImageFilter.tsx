@@ -2,7 +2,7 @@ import { Upload, Message, Slider, Image } from '@arco-design/web-react';
 import { useState } from 'react';
 import { UsualContent } from '../ToolContent/UsualContent';
 import { useRef } from 'react';
-import { isAcceptFile } from './utils';
+import { fileToArrayBuffer, isAcceptFile } from './utils';
 import { Form } from '@arco-design/web-react';
 import { Jimp, JimpInstance, JimpMime } from 'jimp';
 
@@ -58,17 +58,6 @@ export const ImageFilter = () => {
     img.newSrc = newUrl;
     setImg({ ...img });
   };
-
-  function fileToArrayBuffer(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        resolve(reader.result); // 结果为 ArrayBuffer
-      };
-      reader.onerror = reject;
-      reader.readAsArrayBuffer(file); // 读取为 ArrayBuffer
-    });
-  }
 
   // 上传显示图片操作
   const uploadImage = async (originFile) => {
