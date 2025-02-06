@@ -193,3 +193,28 @@
         }
     }
 }
+
+.watermark-canvas {
+    width: 100%;
+}
+
+.watermark-img-wrap {
+    overflow: hidden;
+
+    border-radius: var(--border-radius-small);
+    background-color: var(--color-neutral-1);
+}
+
+.watermark-img-txt {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 200px;
+
+    color: var(--color-text-3);
+}
+
+.watermark-tool-color-picker {
+    border-radius: var(--border-radius-small) !important;
+}

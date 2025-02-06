@@ -169,8 +169,10 @@ export const ImageCrop = () => {
             }
             onChange={handleChangeAspectRatio}
           >
-            {aspectRatioList.map((item) => (
-              <Radio value={item.label}>{item.label}</Radio>
+            {aspectRatioList.map((item, index) => (
+              <Radio value={item.label} key={index}>
+                {item.label}
+              </Radio>
             ))}
           </RadioGroup>
         </section>

@@ -1,73 +1,44 @@
-import { Upload, Message, Slider, Image } from '@arco-design/web-react';
+import { Upload, Message, Slider } from '@arco-design/web-react';
 import { useState } from 'react';
 import { UsualContent } from '../ToolContent/UsualContent';
 import { fileToArrayBuffer, isAcceptFile } from './utils';
 import { Form } from '@arco-design/web-react';
-import {
-  HorizontalAlign,
-  Jimp,
-  JimpInstance,
-  JimpMime,
-  loadFont,
-  VerticalAlign,
-} from 'jimp';
+import { Jimp, JimpMime } from 'jimp';
 import { Input } from '@arco-design/web-react';
+import { useRef } from 'react';
+import { ColorPicker } from '@arco-design/web-react';
 
 const FormItem = Form.Item;
 
 export const ImageWatermark = () => {
+  const canvasRef = useRef(null);
+
   const [img, setImg] = useState({
     /**
      * 原图地址
      */
     oldSrc: '',
     /**
-     * 处理后图片地址
+     * 水印文本
      */
-    newSrc: '',
-
+    watermarkText: '水印',
     /**
-     * 亮度
+     * 水印颜色
      */
-    brightness: 1,
+    color: '#fff',
     /**
-     * 对比度
+     * 水印间距
      */
-    contrast: 0,
+    spacing: 100,
     /**
-     * 灰度
+     * 水印文本大小
      */
-    desaturate: 0,
+    fontSize: 20,
     /**
-     * 鲜明度
+     * 水印透明度
      */
-    saturate: 0,
-    /**
-     * 色相
-     */
-    hue: 0,
+    opacity: 0.6,
   });
-
-  const updateImage = async (image: JimpInstance) => {
-    // const newBuffer = await image.getBuffer(JimpMime.jpeg);
-    // const newImage = await Jimp.read(newBuffer);
-    // const font = await loadFont(OpenSans32Black);
-    // newImage.print({
-    //   font,
-    //   x: 10,
-    //   y: 10,
-    //   text: {
-    //     text: watermarkText,
-    //     alignmentX: HorizontalAlign.LEFT,
-    //     alignmentY: VerticalAlign.TOP,
-    //   },
-    //   maxWidth: newImage.bitmap.width,
-    //   maxHeight: newImage.bitmap.height,
-    // });
-    // const newUrl = await newImage?.getBase64(JimpMime.jpeg);
-    // img.newSrc = newUrl;
-    // setImg({ ...img });
-  };
 
   // 上传显示图片操作
   const uploadImage = async (originFile) => {
@@ -81,20 +52,58 @@ export const ImageWatermark = () => {
 
       img.oldSrc = url;
       setImg({ ...img });
-      updateImage(image as JimpInstance);
+      updateImage({ ...img });
       return false;
     }
   };
 
-  const [watermarkText, setWatermarkText] = useState('水印');
-  const [opacity, setOpacity] = useState(0.5);
+  const updateImage = (img: any) => {
+    if (canvasRef.current && img.oldSrc) {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+      const newImg = new Image();
+      newImg.src = img.oldSrc;
 
-  const handleChangeOpacity = async (value) => {
-    setOpacity(value / 100);
-    // if (img.oldSrc) {
-    //   const oldImage = await Jimp.read(img.oldSrc);
-    //   updateImage(oldImage as JimpInstance);
-    // }
+      newImg.onload = () => {
+        canvas.width = newImg.width;
+        canvas.height = newImg.height;
+        ctx.drawImage(newImg, 0, 0);
+        ctx.font = `${img.fontSize}px Arial`;
+        ctx.fillStyle = img.color;
+        ctx.globalAlpha = img.opacity;
+
+        const xCount = Math.ceil(
+          canvas.width /
+            (ctx.measureText(img.watermarkText).width + img.spacing)
+        );
+        const yCount = Math.ceil(canvas.height / (img.fontSize + img.spacing));
+
+        // 计算水印的旋转角度
+        const angle = (Math.PI / 180) * 45; // 45度转换为弧度
+
+        for (let x = 0; x < xCount; x++) {
+          for (let y = 0; y < yCount; y++) {
+            const xPos =
+              x * (ctx.measureText(img.watermarkText).width + img.spacing);
+            const yPos = y * (img.fontSize + img.spacing);
+
+            // 保存当前状态
+            ctx.save();
+            // 移动到水印位置
+            ctx.translate(
+              xPos + img.fontSize / 2 - 5,
+              yPos + img.fontSize / 2 - 5
+            );
+            // 旋转
+            ctx.rotate(angle);
+            // 绘制水印
+            ctx.fillText(img.watermarkText, 0, 0);
+            // 恢复状态
+            ctx.restore();
+          }
+        }
+      };
+    }
   };
 
   return (
@@ -126,13 +135,12 @@ export const ImageWatermark = () => {
 
           <div className="tool-compress-show-item">
             <div className="compress-show-item">
-              <section className="img-wrap">
-                <Image src={img.oldSrc} alt="未上传原图" />
-              </section>
-            </div>
-            <div className="compress-show-item">
-              <section className="img-wrap">
-                <Image src={img.newSrc} alt="未上传原图" />
+              <section className="img-wrap watermark-img-wrap">
+                {!img.oldSrc ? (
+                  <div className="watermark-img-txt">请先上传图片</div>
+                ) : (
+                  <canvas ref={canvasRef} className="watermark-canvas" />
+                )}
               </section>
             </div>
           </div>
@@ -151,26 +159,99 @@ export const ImageWatermark = () => {
           >
             <FormItem label="水印文本">
               <Input
-                value={watermarkText}
-                onChange={async (val) => {
-                  setWatermarkText(val);
-                  //   if (img.oldSrc) {
-                  //     const oldImage = await Jimp.read(img.oldSrc);
-                  //     updateImage(oldImage as JimpInstance);
-                  //   }
+                value={img.watermarkText}
+                onChange={(val) => {
+                  img.watermarkText = val;
+                  setImg({ ...img });
+                  if (img.oldSrc) {
+                    updateImage({ ...img });
+                  }
                 }}
               />
             </FormItem>
 
             <FormItem label="水印透明度">
               <Slider
-                marks={{ 0: '0%', 100: '100%' }}
+                min={0}
+                max={1}
+                step={0.1}
                 showTicks
                 showInput
-                value={opacity * 100}
+                value={img.opacity}
                 disabled={!img.oldSrc}
-                onChange={(value) => setOpacity(value / 100)}
-                onAfterChange={handleChangeOpacity}
+                onChange={(value) => {
+                  img.opacity = value;
+                  setImg({ ...img });
+                }}
+                onAfterChange={(val) => {
+                  img.opacity = val;
+                  setImg({ ...img });
+                  if (img.oldSrc) {
+                    updateImage({ ...img });
+                  }
+                }}
+              />
+            </FormItem>
+
+            <FormItem label="水印间距">
+              <Slider
+                min={0}
+                max={200}
+                step={5}
+                showTicks
+                showInput
+                value={img.spacing}
+                disabled={!img.oldSrc}
+                onChange={(value) => {
+                  img.spacing = value;
+                  setImg({ ...img });
+                }}
+                onAfterChange={(val) => {
+                  img.spacing = val;
+                  setImg({ ...img });
+                  if (img.oldSrc) {
+                    updateImage({ ...img });
+                  }
+                }}
+              />
+            </FormItem>
+
+            <FormItem label="水印文字大小">
+              <Slider
+                min={8}
+                max={72}
+                step={2}
+                showTicks
+                showInput
+                value={img.fontSize}
+                disabled={!img.oldSrc}
+                onChange={(value) => {
+                  img.fontSize = value;
+                  setImg({ ...img });
+                }}
+                onAfterChange={(val) => {
+                  img.fontSize = val;
+                  setImg({ ...img });
+                  if (img.oldSrc) {
+                    updateImage({ ...img });
+                  }
+                }}
+              />
+            </FormItem>
+
+            <FormItem label="水印颜色">
+              <ColorPicker
+                value={img.color}
+                disabled={!img.oldSrc}
+                className="watermark-tool-color-picker"
+                onChange={(value) => {
+                  img.color = value;
+                  setImg({ ...img });
+                  if (img.oldSrc) {
+                    updateImage({ ...img });
+                  }
+                }}
+                showText
               />
             </FormItem>
           </Form>
