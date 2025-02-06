@@ -31,11 +31,11 @@ const Terms = () => {
           <section className={'terms-txt'}>
             1.1 “iWhimsy” 或 “平台” 是指域名为 &nbsp;
             <a
-              href="https://iwhimsy.leophen.top/"
+              href="https://iwhimsy.leophen.cn/"
               target="_blank"
               rel="noreferrer"
             >
-              iwhimsy.leophen.top/
+              iwhimsy.leophen.cn/
             </a>
             &nbsp; 的奇思妙想问答平台。
           </section>
