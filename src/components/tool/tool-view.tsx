@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/card';
 import { InfoTip } from '@/components/ui/tooltip';
 import { ToolShell } from '@/components/tool/shell';
 import { getCategory, getTool, type ToolMeta } from '@/config/tools';
+import { homeToolsHref } from '@/lib/navigation';
 import { useToolStore } from '@/stores/use-tool-store';
 import { cn } from '@/lib/utils';
 
@@ -72,7 +73,7 @@ export function ToolView({ tool, actions, footer, children }: ToolViewProps) {
       description={tool.description}
       badges={
         <>
-          <Link href={`/categories/${category.id}`}>
+          <Link href={homeToolsHref(category.id)}>
             <Badge
               variant="neutral"
               className="border-transparent transition-colors hover:bg-surface-3"

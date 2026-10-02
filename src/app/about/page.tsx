@@ -4,6 +4,7 @@ import { GithubIcon } from '@/components/layout/brand-icons';
 import { Breadcrumbs } from '@/components/layout/breadcrumbs';
 import { CATEGORIES, TOTAL_TOOLS } from '@/config/tools';
 import { siteConfig } from '@/config/site';
+import { homeToolsHref } from '@/lib/navigation';
 
 export const metadata: Metadata = {
   title: '关于 iWhimsy',
@@ -64,7 +65,7 @@ export default function AboutPage() {
             return (
               <Link
                 key={c.id}
-                href={`/categories/${c.id}`}
+                href={homeToolsHref(c.id)}
                 className="flex items-start gap-3 rounded-xl border border-border bg-surface p-4 transition-colors hover:border-primary/40"
               >
                 <span
@@ -112,7 +113,7 @@ export default function AboutPage() {
 
       <section className="mt-10 flex flex-wrap items-center gap-3">
         <Link
-          href="/tools"
+          href={homeToolsHref()}
           className="inline-flex h-11 items-center rounded-xl bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-hover"
         >
           浏览全部 {TOTAL_TOOLS} 个工具

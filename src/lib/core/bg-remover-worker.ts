@@ -3,6 +3,8 @@
  */
 
 import { pickInferenceDevice } from './depth';
+import { formatModelLoadError } from './promise-utils';
+import { waitForWorker } from './worker-rpc';
 
 export interface MattingProgress {
   percent: number;
@@ -30,6 +32,11 @@ type WorkerOut =
     }
   | { type: 'error'; message: string };
 
+/** 首次下载 MODNet（约 25MB）+ Worker 冷启动。 */
+const INIT_TIMEOUT_MS = 180_000;
+const INFER_TIMEOUT_MS = 120_000;
+const MODEL_HINT = 'MODNet 抠图模型（约 25MB）';
+
 let worker: Worker | null = null;
 let initPromise: Promise<string> | null = null;
 let inferId = 0;
@@ -48,26 +55,31 @@ export async function initMattingModel(
 ): Promise<string> {
   if (initPromise) return initPromise;
 
-  initPromise = new Promise((resolve, reject) => {
+  onProgress?.({ percent: 0, status: '正在启动抠图 Worker…' });
+
+  initPromise = (async () => {
     const w = getWorker();
-    const device = pickInferenceDevice();
+    const device = await pickInferenceDevice();
 
-    const handler = (ev: MessageEvent<WorkerOut>) => {
-      const msg = ev.data;
-      if (msg.type === 'progress') {
-        onProgress?.({ percent: msg.percent, status: msg.status });
-      } else if (msg.type === 'ready') {
-        w.removeEventListener('message', handler);
-        resolve(msg.device);
-      } else if (msg.type === 'error') {
-        w.removeEventListener('message', handler);
-        initPromise = null;
-        reject(new Error(msg.message));
-      }
-    };
+    const ready = waitForWorker(
+      w,
+      (msg) => {
+        const m = msg as WorkerOut;
+        return m.type === 'ready' ? m.device : null;
+      },
+      {
+        timeoutMs: INIT_TIMEOUT_MS,
+        timeoutMessage: `抠图模型加载超时：${MODEL_HINT} 在 ${INIT_TIMEOUT_MS / 1000}s 内未完成。请检查网络是否能访问 Hugging Face，或配置 NEXT_PUBLIC_HF_ENDPOINT 镜像后刷新重试。`,
+        modelHint: MODEL_HINT,
+        onProgress,
+      },
+    );
 
-    w.addEventListener('message', handler);
-    void device.then((d) => w.postMessage({ type: 'init', device: d }));
+    w.postMessage({ type: 'init', device });
+    return ready;
+  })().catch((err) => {
+    initPromise = null;
+    throw new Error(formatModelLoadError(err, MODEL_HINT));
   });
 
   return initPromise;
@@ -87,35 +99,38 @@ export async function removeBackgroundFromImage(
   const canvas = document.createElement('canvas');
   canvas.width = w;
   canvas.height = h;
-  const ctx = canvas.getContext('2d')!;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('无法创建画布');
   ctx.drawImage(image, 0, 0, w, h);
   const bitmap = await createImageBitmap(canvas);
 
   const id = ++inferId;
   const mattingWorker = getWorker();
 
-  return new Promise((resolve, reject) => {
-    const handler = (ev: MessageEvent<WorkerOut>) => {
-      const msg = ev.data;
-      if (msg.type === 'progress') {
-        onProgress?.({ percent: msg.percent, status: msg.status });
-      } else if (msg.type === 'result' && msg.id === id) {
-        mattingWorker.removeEventListener('message', handler);
-        resolve({
-          mask: msg.mask,
-          width: msg.width,
-          height: msg.height,
-          elapsedMs: msg.elapsedMs,
-          device,
-        });
-      } else if (msg.type === 'error') {
-        mattingWorker.removeEventListener('message', handler);
-        reject(new Error(msg.message));
-      }
-    };
-    mattingWorker.addEventListener('message', handler);
-    mattingWorker.postMessage({ type: 'infer', id, bitmap }, [bitmap]);
-  });
+  const inferPromise = waitForWorker(
+    mattingWorker,
+    (msg) => {
+      const m = msg as WorkerOut;
+      return m.type === 'result' && m.id === id
+        ? {
+            mask: m.mask,
+            width: m.width,
+            height: m.height,
+            elapsedMs: m.elapsedMs,
+            device,
+          }
+        : null;
+    },
+    {
+      timeoutMs: INFER_TIMEOUT_MS,
+      timeoutMessage: `抠图推理超时（${INFER_TIMEOUT_MS / 1000}s）。请换一张较小的图片或稍后重试。`,
+      modelHint: MODEL_HINT,
+      onProgress,
+    },
+  );
+
+  mattingWorker.postMessage({ type: 'infer', id, bitmap }, [bitmap]);
+  return inferPromise;
 }
 
 export function disposeMattingWorker() {

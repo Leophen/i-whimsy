@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { ArrowRight, Blocks, Gauge, ShieldCheck } from 'lucide-react';
+import { Suspense } from 'react';
+import { Blocks, Gauge, ShieldCheck } from 'lucide-react';
 
 import { Hero } from '@/components/home/hero';
-import { ToolGrid } from '@/components/tool/tool-card';
-import { CATEGORIES, FEATURED_TOOLS, TOTAL_TOOLS, toolsByCategory } from '@/config/tools';
+import { HomeToolsSection, HomeToolsSectionFallback } from '@/components/home/home-tools-section';
+import { CATEGORIES } from '@/config/tools';
 import { siteConfig } from '@/config/site';
+import { parseCategoryParam } from '@/lib/navigation';
 
 export const metadata: Metadata = {
   title: siteConfig.title,
@@ -27,7 +28,7 @@ const SECTION_FEATURES = [
   {
     icon: Blocks,
     title: '为每个工具做了专门优化',
-    body: '不是套同一个表单模板：抠图有前后对比滑块，模拟类默认自动运行动画，AI 推理带真实下载进度。',
+    body: '不是套同一个表单模板：抠图有前后对比滑块，调色实时预览，AI 推理带真实下载进度。',
   },
 ];
 
@@ -49,81 +50,24 @@ function HomeStructuredData() {
   );
 }
 
-export default function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string }>;
+}) {
+  const { category } = await searchParams;
+  const initialCategory = parseCategoryParam(category);
+
   return (
     <>
       <HomeStructuredData />
       <Hero />
 
-      {/* 分类浏览 */}
-      <section className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <header className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h2 className="text-2xl font-semibold tracking-tight sm:text-[28px]">按分类浏览</h2>
-            <p className="mt-1.5 text-sm text-muted-foreground">
-              {CATEGORIES.length} 大类工具，从本地 AI 推理到物理模拟与设计流水线，覆盖高级创作场景。
-            </p>
-          </div>
-          <Link
-            href="/tools"
-            className="group inline-flex items-center gap-1.5 text-[13px] font-medium text-primary transition-colors hover:gap-2.5"
-          >
-            查看全部 {TOTAL_TOOLS} 个工具
-            <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
-          </Link>
-        </header>
+      <Suspense fallback={<HomeToolsSectionFallback />}>
+        <HomeToolsSection initialCategory={initialCategory} />
+      </Suspense>
 
-        <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {CATEGORIES.map((cat) => {
-            const Icon = cat.icon;
-            const count = toolsByCategory(cat.id).length;
-            return (
-              <Link
-                key={cat.id}
-                href={`/categories/${cat.id}`}
-                className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-border bg-surface p-5 transition-all duration-200 ease-out-expo hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-md"
-              >
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute -top-14 -right-10 size-32 rounded-full opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100"
-                  style={{ background: `oklch(from ${cat.accentVar} l c h / 0.2)` }}
-                />
-                <span
-                  className="grid size-11 place-items-center rounded-xl border border-border bg-surface-2 transition-transform duration-200 group-hover:scale-105"
-                  style={{ color: cat.accentVar }}
-                >
-                  <Icon className="size-5" />
-                </span>
-                <div className="relative mt-4">
-                  <div className="flex items-baseline justify-between gap-2">
-                    <h3 className="text-[15px] font-semibold tracking-tight">{cat.name}</h3>
-                    <span className="tabular text-xs text-muted-foreground">{count}</span>
-                  </div>
-                  <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
-                    {cat.description}
-                  </p>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* 精选工具 */}
-      <section className="mx-auto w-full max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
-        <header className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h2 className="text-2xl font-semibold tracking-tight sm:text-[28px]">高频精选</h2>
-            <p className="mt-1.5 text-sm text-muted-foreground">
-              按日常使用率挑出来的 {FEATURED_TOOLS.length} 个，先试试这些。
-            </p>
-          </div>
-        </header>
-        <ToolGrid slugs={FEATURED_TOOLS.map((t) => t.slug)} className="mt-6" />
-      </section>
-
-      {/* 为什么 */}
-      <section className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+      <section className="mx-auto w-full max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
         <div className="grid gap-4 lg:grid-cols-3">
           {SECTION_FEATURES.map(({ icon: Icon, title, body }) => (
             <div
@@ -137,28 +81,6 @@ export default function HomePage() {
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{body}</p>
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="mx-auto w-full max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl border border-border bg-surface px-6 py-14 text-center sm:px-12">
-          <div className="bg-glow absolute inset-0 opacity-80" />
-          <div className="relative mx-auto max-w-2xl">
-            <h2 className="text-2xl font-semibold tracking-tight sm:text-[30px]">
-              把常用工具放进收藏，下次 ⌘K 直达
-            </h2>
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
-              收藏和最近使用会存在你自己的浏览器里，不会同步到任何地方。
-            </p>
-            <Link
-              href="/tools"
-              className="mt-8 inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-6 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary-hover"
-            >
-              开始使用
-              <ArrowRight className="size-4" />
-            </Link>
-          </div>
         </div>
       </section>
     </>

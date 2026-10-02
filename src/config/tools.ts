@@ -1,15 +1,11 @@
 import type { LucideIcon } from 'lucide-react';
 import {
-  Atom,
   AudioLines,
   BrainCircuit,
   Clapperboard,
-  Droplet,
-  FlaskConical,
   Images,
   Layers,
   Palette,
-  Snowflake,
 } from 'lucide-react';
 
 /* ------------------------------------------------------------------ *
@@ -23,7 +19,7 @@ import {
  * 按数据类型分类（文本/图片/时间）会让「Base64 编解码」和「浏览器端流体模拟」
  * 挤在同一层级；按主题与引擎分类则天然把有技术含量的工具聚在一起。
  * ------------------------------------------------------------------ */
-export type CategoryId = 'ai-image' | 'ai-voice' | 'simlab' | 'design' | 'content';
+export type CategoryId = 'ai-image' | 'ai-voice' | 'design' | 'content';
 
 export interface Category {
   id: CategoryId;
@@ -53,15 +49,6 @@ export const CATEGORIES: Category[] = [
       '语音转文字与语音合成都在本地完成。录音与文稿不上传任何服务器 —— 这是它和绝大多数在线服务的根本区别。',
     icon: AudioLines,
     accentVar: 'var(--cat-voice)',
-  },
-  {
-    id: 'simlab',
-    name: '模拟实验室',
-    enName: 'Simulation Lab',
-    description:
-      '流体、生长、涌现与物理。核心是 WebGL2 / WebGPU 的 GPGPU 计算与真实物理模型，不是预设动画。',
-    icon: FlaskConical,
-    accentVar: 'var(--cat-lab)',
   },
   {
     id: 'design',
@@ -201,112 +188,6 @@ export const TOOLS: ToolMeta[] = [
     keywords: ['配音', 'tts', '语音合成', '朗读', '文字转语音', '有声', 'kokoro'],
     status: 'ready',
     featured: true,
-  },
-
-  /* ==================== 模拟实验室 ==================== */
-  {
-    slug: 'flow-art',
-    name: '流场生成艺术',
-    summary: '数万粒子沿力场拖尾，长出一张画',
-    description:
-      '选一组配色与力场参数，数万粒子沿噪声力场拖尾生长，实时在画布上长成丝带状抽象画。每次生成都不同，可导出高清壁纸，参数种子能一键分享给他人复现。',
-    category: 'simlab',
-    icon: Atom,
-    keywords: ['流场', 'flow field', '生成艺术', 'perlin', '壁纸', '抽象', '粒子'],
-    status: 'ready',
-    featured: true,
-  },
-  {
-    slug: 'rd-lab',
-    name: '图灵斑纹 · 反应扩散',
-    summary: '在参数地图上点一下，长出一片斑纹',
-    description:
-      '反应扩散是自然界斑纹的来源：斑马、指纹、珊瑚都出自同一类方程。在参数地图上选一种形态，涂抹种子启动反应，看斑纹自己长满画布，可导出静态大图与演化过程视频。',
-    category: 'simlab',
-    icon: Atom,
-    keywords: ['反应扩散', '图灵斑纹', 'reaction diffusion', 'gray scott', '生成艺术', '演化'],
-    status: 'ready',
-    featured: true,
-  },
-  {
-    slug: 'ferrofluid',
-    name: '磁流体 · 液态金属',
-    summary: '拖动磁场，看黑色金属液长出尖刺',
-    description:
-      '磁流体在磁场下会自己长出尖刺与拉丝。拖动磁铁位置与强度，实时看这坨液态金属形变、断裂、重新聚合；也可以让它跟着一段音频的节奏跳动。',
-    category: 'simlab',
-    icon: Droplet,
-    keywords: ['磁流体', 'ferrofluid', '液态金属', '流体', '磁场', '尖刺', 'sph'],
-    status: 'ready',
-    featured: true,
-  },
-  {
-    slug: 'physarum',
-    name: '黏菌网络实验室',
-    summary: '单细胞生物也能画出交通网',
-    description:
-      '黏菌没有大脑，却能长出连接所有食物的最优网络 —— 科学家用它重画过东京铁路网。在画布上点几个食物点，十万个体会自组织出一张网络，可录制生长过程。',
-    category: 'simlab',
-    icon: Atom,
-    keywords: ['黏菌', 'physarum', 'slime mold', '涌现', '自组织', '网络', '人工生命'],
-    status: 'ready',
-    featured: true,
-  },
-  {
-    slug: 'snowflake',
-    name: '雪花 · 晶体生长',
-    summary: '生成一片世界上不存在的雪花',
-    description:
-      '按真实物理模型模拟冰晶生长：调温度与湿度，看晶体一格一格长出六个分支。每一片都有唯一编号可以分享，导出透明 PNG 做贺卡、冬日海报或纹样。',
-    category: 'simlab',
-    icon: Snowflake,
-    keywords: ['雪花', '晶体', 'snowflake', '冰晶', '生长', 'dla', '六角', '贺卡'],
-    status: 'ready',
-    featured: true,
-  },
-  {
-    slug: 'tree-grow',
-    name: '3D 树生长与进化',
-    summary: '种一棵树，让它为阳光竞争几百代',
-    description:
-      '用空间殖民算法模拟真实的分枝规则：枝干争夺阳光、顶端优势决定主次、粗细符合输水规律。可以让它一代代演化，看几百代后的树长成什么样，导出图片与模型。',
-    category: 'simlab',
-    icon: Atom,
-    keywords: ['树', 'tree', '生长', '空间殖民', '进化', '植物', '3d', 'L-system'],
-    status: 'ready',
-  },
-  {
-    slug: 'particle-life',
-    name: 'Particle Life 人工生命',
-    summary: '给物种定几条规则，看它们自己活起来',
-    description:
-      '设定若干物种之间互相吸引与排斥的强度，成千上万的粒子会自发涌现出会游动、会自我维持的形态。规则极简，结果完全不可预测。',
-    category: 'simlab',
-    icon: Atom,
-    keywords: ['particle life', '人工生命', '涌现', '粒子', '自组织', 'attraction'],
-    status: 'ready',
-  },
-  {
-    slug: 'sandpile',
-    name: '雪崩沙堆 · 分形曼陀罗',
-    summary: '一粒一粒落沙，长出分形曼陀罗',
-    description:
-      '从中心一粒一粒落沙，超过临界就向四周崩塌，最终形成自带分形结构的对称图案。规则只有几行，图案却复杂到不像是人画的，适合做成可打印的装饰海报。',
-    category: 'simlab',
-    icon: Atom,
-    keywords: ['沙堆', 'sandpile', 'abelian', '分形', '曼陀罗', '雪崩', '海报', '自组织临界'],
-    status: 'ready',
-  },
-  {
-    slug: 'origami',
-    name: '折纸与纸模折叠',
-    summary: '画折痕，看它自己折起来，导出展开图',
-    description:
-      '画（或导入）一张折痕图，拖动进度看它按真实几何折成 3D 形状。可以导出可打印的折痕图纸，也能导出折叠后的模型文件。',
-    category: 'simlab',
-    icon: Layers,
-    keywords: ['折纸', 'origami', '纸模', '折痕', '展开图', 'pepakura', '打印'],
-    status: 'ready',
   },
 
   /* ==================== 设计与图像 ==================== */

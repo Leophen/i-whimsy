@@ -11,11 +11,16 @@ import { Button } from '@/components/ui/button';
 import { SegmentedControl, Select } from '@/components/ui/controls';
 import {
   averageConfidence,
+  getOcrScene,
   LANG_PACK_INFO,
   linesToText,
+  LOW_CONFIDENCE_THRESHOLD,
   mergeWordsToLines,
+  OCR_SCENES,
   tableToCsv,
   type LangPackMode,
+  type OcrOutputMode,
+  type OcrSceneId,
   type OcrWord,
   wordsToTable,
 } from '@/lib/core/ocr';
@@ -38,15 +43,6 @@ interface Region {
   w: number;
   h: number;
 }
-
-type OutputMode = 'text' | 'table';
-
-const OCR_SCENES = [
-  { id: 'receipt', name: '收据发票', lang: 'fast' as LangPackMode, output: 'text' as OutputMode },
-  { id: 'doc', name: '文档扫描', lang: 'standard' as LangPackMode, output: 'text' as OutputMode },
-  { id: 'poster', name: '海报标语', lang: 'fast' as LangPackMode, output: 'text' as OutputMode },
-  { id: 'table', name: '表格数据', lang: 'standard' as LangPackMode, output: 'table' as OutputMode },
-];
 
 async function cloneBitmap(source: ImageBitmap): Promise<ImageBitmap> {
   const canvas = new OffscreenCanvas(source.width, source.height);
@@ -236,9 +232,11 @@ export default function OcrStudio() {
   const [pages, setPages] = React.useState<SourcePage[]>([]);
   const [currentPage, setCurrentPage] = React.useState(0);
   const [region, setRegion] = React.useState<Region | null>(null);
-  const [langMode, setLangMode] = React.useState<LangPackMode>('fast');
-  const [activeSceneId, setActiveSceneId] = React.useState('receipt');
-  const [outputMode, setOutputMode] = React.useState<OutputMode>('text');
+  const [langMode, setLangMode] = React.useState<LangPackMode>('standard');
+  const [languages, setLanguages] = React.useState('chi_sim+eng');
+  const [activeSceneId, setActiveSceneId] = React.useState<OcrSceneId>('doc');
+  const [outputMode, setOutputMode] = React.useState<OcrOutputMode>('text');
+  const [lowConfidence, setLowConfidence] = React.useState(false);
   const [resultText, setResultText] = React.useState('');
   const [resultTable, setResultTable] = React.useState<string[][]>([]);
   const [allWords, setAllWords] = React.useState<OcrWord[]>([]);
@@ -265,6 +263,7 @@ export default function OcrStudio() {
     setResultText('');
     setResultTable([]);
     setAllWords([]);
+    setLowConfidence(false);
     setRegion(null);
     setCurrentPage(0);
     cleanupPages(pages);
@@ -305,18 +304,23 @@ export default function OcrStudio() {
 
   const { init: initOcr, recognize: recognizePage, terminate: terminateOcr } = ocr;
 
+  const activeScene = getOcrScene(activeSceneId);
+
   const runOcr = React.useCallback(async () => {
     if (pages.length === 0) return;
     const runId = ++runIdRef.current;
     cancelRef.current = false;
     setBusy(true);
     setLoadError(null);
+    setLowConfidence(false);
     setResultText('');
     setResultTable([]);
     setAllWords([]);
 
+    const scene = getOcrScene(activeSceneId);
+
     try {
-      await initOcr(langMode);
+      await initOcr(langMode, languages);
 
       const textParts: string[] = [];
       const tableParts: string[][] = [];
@@ -341,7 +345,12 @@ export default function OcrStudio() {
             }
           : undefined;
 
-        const result = await recognizePage(bitmap, rectangle);
+        const result = await recognizePage(bitmap, {
+          rectangle,
+          psm: scene.psm,
+          preprocess: scene.preprocess,
+          rotateAuto: scene.rotateAuto,
+        });
         collectedWords.push(...result.words);
 
         const lines = mergeWordsToLines(result.words);
@@ -367,6 +376,9 @@ export default function OcrStudio() {
           ? tableParts.filter((row) => row.length > 0)
           : wordsToTable(collectedWords);
 
+      const avgConf = averageConfidence(collectedWords);
+      setLowConfidence(avgConf > 0 && avgConf < LOW_CONFIDENCE_THRESHOLD);
+
       if (outputMode === 'table') {
         setResultTable(mergedTable);
         setResultText(mergedTable.map((row) => row.join('\t')).join('\n'));
@@ -384,7 +396,7 @@ export default function OcrStudio() {
         setPageProgress(null);
       }
     }
-  }, [pages, region, langMode, outputMode, currentPage, initOcr, recognizePage]);
+  }, [pages, region, langMode, languages, outputMode, currentPage, activeSceneId, initOcr, recognizePage]);
 
   React.useEffect(() => {
     if (pages.length === 0) return;
@@ -392,7 +404,7 @@ export default function OcrStudio() {
       void runOcr();
     }, 400);
     return () => clearTimeout(timer);
-  }, [pages, region, langMode, outputMode, runOcr]);
+  }, [pages, region, langMode, languages, outputMode, activeSceneId, runOcr]);
 
   const handleCancel = () => {
     cancelRef.current = true;
@@ -446,7 +458,7 @@ export default function OcrStudio() {
       }
     >
       <Notice tone="info">
-        全部在浏览器本地完成，图片与 PDF 不会上传。适用于印刷体文字；手写体识别效果有限。
+        全部在浏览器本地完成，图片与 PDF 不会上传。海报、彩色底图请选「海报标语」场景并优先使用高精度语言包；手写体效果有限。
       </Notice>
 
       <ToolIO
@@ -479,7 +491,8 @@ export default function OcrStudio() {
                         type="button"
                         onClick={() => {
                           setActiveSceneId(scene.id);
-                          setLangMode(scene.lang);
+                          setLangMode(scene.langMode);
+                          setLanguages(scene.languages);
                           setOutputMode(scene.output);
                         }}
                         disabled={busy}
@@ -510,9 +523,14 @@ export default function OcrStudio() {
                     ariaLabel="语言包精度"
                     disabled={busy}
                   />
+                  <p className="text-xs text-muted-foreground">
+                    {LANG_PACK_INFO[langMode].hint}
+                    {activeScene.rotateAuto && ' · 已启用自动旋转校正'}
+                    {activeScene.preprocess.binarize && ' · 已启用海报二值化增强'}
+                  </p>
                   <SegmentedControl
                     value={outputMode}
-                    onValueChange={(v) => setOutputMode(v as OutputMode)}
+                    onValueChange={(v) => setOutputMode(v as OcrOutputMode)}
                     options={[
                       { value: 'text', label: '文本', icon: <FileText className="size-3.5" /> },
                       { value: 'table', label: '表格', icon: <Table2 className="size-3.5" /> },
@@ -570,6 +588,27 @@ export default function OcrStudio() {
             {loadError && (
               <Notice tone="danger" className="mb-4">
                 {loadError}
+              </Notice>
+            )}
+
+            {lowConfidence && !busy && (
+              <Notice tone="warning" className="mb-4">
+                平均置信度偏低（低于 {LOW_CONFIDENCE_THRESHOLD}%），结果可能不准确。建议切换到「
+                {LANG_PACK_INFO.standard.label}」或点选「海报标语」场景后重试；也可框选文字区域再识别。
+                {langMode === 'fast' && (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="mt-2"
+                    onClick={() => {
+                      setLangMode('standard');
+                      setActiveSceneId('poster');
+                      setLanguages(getOcrScene('poster').languages);
+                    }}
+                  >
+                    切换高精度并重试
+                  </Button>
+                )}
               </Notice>
             )}
 

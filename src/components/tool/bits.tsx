@@ -283,10 +283,12 @@ export function ProgressOverlay({
   show,
   label,
   percent,
+  actions,
 }: {
   show: boolean;
   label?: string;
   percent?: number;
+  actions?: React.ReactNode;
 }) {
   if (!show) return null;
   const pct = percent === undefined ? undefined : Math.min(100, Math.max(0, percent));
@@ -310,6 +312,7 @@ export function ProgressOverlay({
           />
         </div>
       )}
+      {actions}
     </div>
   );
 }

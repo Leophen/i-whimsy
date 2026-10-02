@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import Fuse from 'fuse.js';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { CheckCircle2, Heart, History, LayoutGrid, Search, X } from 'lucide-react';
 
 import { ToolGrid } from '@/components/tool/tool-card';
@@ -9,6 +10,7 @@ import { SegmentedControl } from '@/components/ui/controls';
 import { Input } from '@/components/ui/input';
 import { Kbd } from '@/components/ui/card';
 import { CATEGORIES, TOOLS, type CategoryId, type ToolMeta } from '@/config/tools';
+import { homeToolsHref, parseCategoryParam, TOOLS_SECTION_ID } from '@/lib/navigation';
 import { useToolStore } from '@/stores/use-tool-store';
 import { cn } from '@/lib/utils';
 
@@ -21,18 +23,58 @@ const SCOPES: { value: Scope; label: string; icon: React.ReactNode }[] = [
   { value: 'recent', label: '最近', icon: <History className="size-3.5" /> },
 ];
 
-/** 已实现的工具排在前面 —— 现在 38/43 是开发中，不排序的话能用的会被埋掉 */
+/** 已实现的工具排在前面，避免开发中工具把可用项埋掉 */
 const READY_FIRST = (a: ToolMeta, b: ToolMeta) =>
   a.status === b.status ? 0 : a.status === 'ready' ? -1 : 1;
 
-export function ToolExplorer() {
+type ToolExplorerProps = {
+  initialCategory?: CategoryId | 'all';
+  /** 在首页使用时同步 ?category= 到地址栏，便于分享筛选结果 */
+  syncUrl?: boolean;
+};
+
+export function ToolExplorer({ initialCategory = 'all', syncUrl = false }: ToolExplorerProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   const [query, setQuery] = React.useState('');
-  const [category, setCategory] = React.useState<CategoryId | 'all'>('all');
+  const [localCategory, setLocalCategory] = React.useState<CategoryId | 'all'>(initialCategory);
   const [scope, setScope] = React.useState<Scope>('all');
 
   const favorites = useToolStore((s) => s.favorites);
   const recent = useToolStore((s) => s.recent);
   const hydrated = useToolStore((s) => s.hydrated);
+
+  const categoryFromUrl = parseCategoryParam(searchParams.get('category'));
+  const category = syncUrl && pathname === '/' ? categoryFromUrl : localCategory;
+
+  const didInitialScroll = React.useRef(false);
+  React.useEffect(() => {
+    if (
+      !syncUrl ||
+      pathname !== '/' ||
+      categoryFromUrl === 'all' ||
+      didInitialScroll.current
+    ) {
+      return;
+    }
+    didInitialScroll.current = true;
+    requestAnimationFrame(() => {
+      document.getElementById(TOOLS_SECTION_ID)?.scrollIntoView({ behavior: 'smooth' });
+    });
+  }, [categoryFromUrl, pathname, syncUrl]);
+
+  const updateCategory = React.useCallback(
+    (next: CategoryId | 'all') => {
+      if (syncUrl && pathname === '/') {
+        router.replace(homeToolsHref(next), { scroll: false });
+        return;
+      }
+      setLocalCategory(next);
+    },
+    [pathname, router, syncUrl],
+  );
 
   const fuse = React.useMemo(
     () =>
@@ -111,14 +153,14 @@ export function ToolExplorer() {
               label="全部工具"
               count={total}
               active={category === 'all'}
-              onClick={() => setCategory('all')}
+              onClick={() => updateCategory('all')}
             />
             <SidebarItem
               label="已上线"
               count={readyCount}
               active={false}
               onClick={() => {
-                setCategory('all');
+                updateCategory('all');
                 setScope('ready');
               }}
             />
@@ -128,7 +170,7 @@ export function ToolExplorer() {
                 label={c.name}
                 count={countsByCategory.get(c.id) ?? 0}
                 active={category === c.id}
-                onClick={() => setCategory(c.id)}
+                onClick={() => updateCategory(c.id)}
                 accent={c.accentVar}
               />
             ))}
@@ -142,7 +184,7 @@ export function ToolExplorer() {
               label="全部"
               count={total}
               active={category === 'all'}
-              onClick={() => setCategory('all')}
+              onClick={() => updateCategory('all')}
             />
             {CATEGORIES.map((c) => (
               <ChipButton
@@ -150,7 +192,7 @@ export function ToolExplorer() {
                 label={c.name}
                 count={countsByCategory.get(c.id) ?? 0}
                 active={category === c.id}
-                onClick={() => setCategory(c.id)}
+                onClick={() => updateCategory(c.id)}
               />
             ))}
           </div>
@@ -192,9 +234,11 @@ export function ToolExplorer() {
         <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
           <span>
             {scope === 'all'
-              ? `共 ${total} 个工具 · 已上线 ${readyCount} 个`
+              ? `共 ${total} 个工具`
               : scope === 'ready'
-                ? `已上线 ${readyCount} 个（其余 ${total - readyCount} 个已完成方案设计）`
+                ? readyCount === total
+                  ? `全部 ${total} 个工具已上线`
+                  : `已上线 ${readyCount} 个（其余 ${total - readyCount} 个开发中）`
                 : scope === 'favorites'
                   ? `收藏了 ${favorites.length} 个`
                   : `最近使用 ${recent.length} 个`}

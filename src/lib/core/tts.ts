@@ -192,5 +192,7 @@ export function isMobileDevice(): boolean {
 }
 
 export function voiceUrl(voiceId: string): string {
-  return `https://huggingface.co/${KOKORO_MODEL_ID}/resolve/main/voices/${voiceId}.bin`;
+  const endpoint =
+    process.env.NEXT_PUBLIC_HF_ENDPOINT?.replace(/\/$/, '') ?? 'https://huggingface.co';
+  return `${endpoint}/${KOKORO_MODEL_ID}/resolve/main/voices/${voiceId}.bin`;
 }

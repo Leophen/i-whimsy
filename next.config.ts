@@ -9,6 +9,12 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', 'radix-ui'],
   },
+  async redirects() {
+    return [
+      { source: '/tools', destination: '/', permanent: true },
+      { source: '/categories/:id', destination: '/?category=:id', permanent: true },
+    ];
+  },
   async headers() {
     return [
       {

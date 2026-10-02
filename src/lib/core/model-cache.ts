@@ -3,9 +3,14 @@
  * 刷新页面后命中缓存可跳过重复下载。
  */
 
+import { formatModelLoadError } from './promise-utils';
+
 const DB_NAME = 'iwhimsy-model-cache';
 const DB_VERSION = 1;
 const STORE = 'blobs';
+
+/** 单次下载超时（大模型首次拉取可能较慢，但不应无限挂起）。 */
+const FETCH_TIMEOUT_MS = 90_000;
 
 export interface DownloadProgress {
   loaded: number;
@@ -52,6 +57,22 @@ async function writeCached(url: string, data: ArrayBuffer): Promise<void> {
   });
 }
 
+async function fetchWithTimeout(url: string, timeoutMs: number): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    return response;
+  } catch (err) {
+    if (controller.signal.aborted) {
+      throw new Error(`模型下载超时（${Math.round(timeoutMs / 1000)}s 内无响应）`);
+    }
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export async function fetchModelWithCache(
   url: string,
   onProgress?: (p: DownloadProgress) => void,
@@ -67,7 +88,13 @@ export async function fetchModelWithCache(
     return cached;
   }
 
-  const response = await fetch(url);
+  let response: Response;
+  try {
+    response = await fetchWithTimeout(url, FETCH_TIMEOUT_MS);
+  } catch (err) {
+    throw new Error(formatModelLoadError(err, 'ONNX 权重'));
+  }
+
   if (!response.ok) {
     throw new Error(`模型下载失败（HTTP ${response.status}）`);
   }

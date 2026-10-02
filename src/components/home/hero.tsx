@@ -1,12 +1,12 @@
 'use client';
 
-import Link from 'next/link';
 import { ArrowRight, Lock, Search, Zap } from 'lucide-react';
 
 import { Badge, Kbd } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useCommandMenu } from '@/components/layout/command-menu';
-import { PLANNED_TOOLS, READY_TOOLS, TOTAL_TOOLS } from '@/config/tools';
+import { TOTAL_TOOLS } from '@/config/tools';
+import { TOOLS_SECTION_ID } from '@/lib/navigation';
 
 const TRUST_ITEMS = [
   { icon: Lock, label: '数据不出设备', desc: '模型与文件都在本机处理' },
@@ -26,7 +26,7 @@ export function Hero() {
         <div className="mx-auto max-w-3xl text-center">
           <Badge variant="default" size="md" className="animate-fade-in">
             <span className="size-1.5 rounded-full bg-primary" />
-            {TOTAL_TOOLS} 个工具 · {READY_TOOLS.length} 个已上线 · 全部本地运行
+            {TOTAL_TOOLS} 个工具 · 全部本地运行
           </Badge>
 
           <h1 className="text-gradient mt-6 text-4xl leading-[1.1] font-semibold tracking-tight sm:text-5xl lg:text-[58px] animate-fade-up">
@@ -43,10 +43,10 @@ export function Hero() {
 
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row animate-fade-up">
             <Button variant="primary" size="lg" asChild>
-              <Link href="/tools">
+              <a href={`#${TOOLS_SECTION_ID}`}>
                 浏览全部工具
                 <ArrowRight />
-              </Link>
+              </a>
             </Button>
 
             <button
@@ -80,13 +80,6 @@ export function Hero() {
             ))}
           </div>
 
-          {PLANNED_TOOLS.length > 0 && (
-            <p className="mt-6 text-xs text-muted-foreground animate-fade-up">
-              另外 {PLANNED_TOOLS.length}{' '}
-              个工具已经写好实现规格（技术路线、依赖体积、步骤与验收标准）， 正在逐个落地 ——
-              点进去就能看到怎么实现。
-            </p>
-          )}
         </div>
       </div>
     </section>

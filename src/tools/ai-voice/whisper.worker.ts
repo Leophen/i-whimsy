@@ -1,11 +1,8 @@
 /// <reference lib="webworker" />
 
-import {
-  env,
-  pipeline,
-  type AutomaticSpeechRecognitionPipeline,
-} from '@huggingface/transformers';
+import { pipeline, type AutomaticSpeechRecognitionPipeline } from '@huggingface/transformers';
 
+import { configureTransformersEnv } from '@/lib/core/transformers-env';
 import {
   WHISPER_MODELS,
   type TranscriptChunk,
@@ -14,6 +11,8 @@ import {
   splitAudioSegments,
   WHISPER_SAMPLE_RATE,
 } from '@/lib/core/whisper';
+
+configureTransformersEnv();
 
 type WorkerRequest =
   | { type: 'init'; id: number; model: WhisperModelKey; device: 'webgpu' | 'wasm' }
@@ -71,10 +70,6 @@ async function loadTranscriber(model: WhisperModelKey, device: 'webgpu' | 'wasm'
 
 async function ensureModel(model: WhisperModelKey, device: 'webgpu' | 'wasm', jobId: number) {
   if (transcriber && activeModel === model && activeDevice === device) return;
-
-  env.allowLocalModels = false;
-  env.useBrowserCache = true;
-  env.allowRemoteModels = true;
 
   activeModel = model;
   transcriber = null;

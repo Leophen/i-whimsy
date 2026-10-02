@@ -4,7 +4,6 @@
  */
 
 import {
-  env,
   StyleTextToSpeech2Model,
   AutoTokenizer,
   Tensor,
@@ -12,6 +11,8 @@ import {
   type StyleTextToSpeech2Model as StyleTtsModel,
 } from '@huggingface/transformers';
 
+import { fetchModelWithCache } from '@/lib/core/model-cache';
+import { configureTransformersEnv } from '@/lib/core/transformers-env';
 import {
   KOKORO_DTYPE,
   KOKORO_MODEL_ID,
@@ -19,6 +20,8 @@ import {
   splitTextForTts,
   voiceUrl,
 } from '@/lib/core/tts';
+
+configureTransformersEnv();
 
 type WorkerRequest =
   | { type: 'init'; device: 'webgpu' | 'wasm' }
@@ -67,11 +70,12 @@ async function loadVoiceEmbedding(voiceId: string): Promise<Float32Array> {
   const cached = voiceCache.get(voiceId);
   if (cached) return cached;
 
-  post({ type: 'progress', percent: 0, status: `加载音色 ${voiceId}…` });
+  post({ type: 'progress', percent: 0, status: `下载音色 ${voiceId}…` });
   const url = voiceUrl(voiceId);
-  const resp = await fetch(url);
-  if (!resp.ok) throw new Error(`音色文件下载失败：${voiceId}`);
-  const data = new Float32Array(await resp.arrayBuffer());
+  const buffer = await fetchModelWithCache(url, (p) => {
+    reportProgress(p.loaded, p.total, p.percent < 100 ? p.status : `加载音色 ${voiceId}…`);
+  });
+  const data = new Float32Array(buffer);
   voiceCache.set(voiceId, data);
   return data;
 }
@@ -98,13 +102,13 @@ async function loadTtsModel(device: 'webgpu' | 'wasm') {
 async function ensureModel(device: 'webgpu' | 'wasm') {
   if (model && tokenizer && activeDevice === device) return;
 
-  env.allowLocalModels = false;
-  env.useBrowserCache = true;
-  env.allowRemoteModels = true;
-
   model = null;
   tokenizer = null;
-  post({ type: 'progress', percent: 0, status: '正在加载 Kokoro 中文模型…' });
+  post({
+    type: 'progress',
+    percent: 0,
+    status: '正在连接 Hugging Face 下载 Kokoro 中文模型（约 92MB，仅首次）…',
+  });
 
   try {
     const { loadedModel, loadedTokenizer } = await loadTtsModel(device);
@@ -119,8 +123,6 @@ async function ensureModel(device: 'webgpu' | 'wasm') {
     tokenizer = loadedTokenizer;
     activeDevice = 'wasm';
   }
-
-  post({ type: 'ready', device: activeDevice, dtype: KOKORO_DTYPE });
 }
 
 async function synthesizeSentence(
@@ -152,6 +154,7 @@ self.onmessage = async (ev: MessageEvent<WorkerRequest>) => {
   try {
     if (msg.type === 'init') {
       await ensureModel(msg.device);
+      post({ type: 'ready', device: activeDevice, dtype: KOKORO_DTYPE });
       return;
     }
 

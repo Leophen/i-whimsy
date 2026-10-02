@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 import { TOOL_COMPONENTS } from '@/tools/registry';
 import { TOOLS, getTool, type ToolMeta } from '@/config/tools';
+import { homeToolsHref } from '@/lib/navigation';
 
 /**
  * 占位页单独分包，且**保持 ssr: true**。
@@ -53,7 +54,7 @@ export function ToolRuntime({ slug }: { slug: string }) {
         <p className="text-sm font-medium text-foreground">这个工具还没上线</p>
         <p className="mt-1 text-xs text-muted-foreground">slug：{slug}</p>
         <Link
-          href="/tools"
+          href={homeToolsHref()}
           className="mt-4 inline-flex h-9 items-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground"
         >
           查看全部工具

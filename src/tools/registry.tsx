@@ -49,17 +49,6 @@ export const TOOL_COMPONENTS: Record<string, ComponentType> = {
   'whisper-transcribe': define(() => import('@/tools/ai-voice/whisper-transcribe')),
   'tts-voice': define(() => import('@/tools/ai-voice/tts-voice')),
 
-  /* ---- 模拟实验室 ---- */
-  'flow-art': define(() => import('@/tools/simlab/flow-art')),
-  'rd-lab': define(() => import('@/tools/simlab/rd-lab')),
-  ferrofluid: define(() => import('@/tools/simlab/ferrofluid')),
-  physarum: define(() => import('@/tools/simlab/physarum')),
-  snowflake: define(() => import('@/tools/simlab/snowflake')),
-  'tree-grow': define(() => import('@/tools/simlab/tree-grow')),
-  'particle-life': define(() => import('@/tools/simlab/particle-life')),
-  sandpile: define(() => import('@/tools/simlab/sandpile')),
-  origami: define(() => import('@/tools/simlab/origami')),
-
   /* ---- 设计与图像 ---- */
   'image-pipeline': define(() => import('@/tools/design/image-pipeline')),
   'color-system': define(() => import('@/tools/design/color-system')),

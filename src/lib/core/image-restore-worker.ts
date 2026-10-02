@@ -21,6 +21,8 @@ import {
   type RestoreMode,
 } from '@/lib/core/image-restore';
 import { pickInferenceDevice } from '@/lib/core/depth';
+import { formatModelLoadError } from '@/lib/core/promise-utils';
+import { waitForWorker } from '@/lib/core/worker-rpc';
 
 export interface RestoreProgress {
   percent: number;
@@ -49,6 +51,9 @@ type WorkerOut =
     }
   | { type: 'error'; message: string };
 
+const INIT_TIMEOUT_MS = 180_000;
+const INFER_TIMEOUT_MS = 120_000;
+
 let worker: Worker | null = null;
 let inferId = 0;
 const initPromises = new Map<RestoreMode, Promise<string>>();
@@ -63,31 +68,8 @@ function getWorker(): Worker {
   return worker;
 }
 
-function waitFor<T>(
-  w: Worker,
-  predicate: (msg: WorkerOut) => T | null,
-  onProgress?: (p: RestoreProgress) => void,
-): Promise<T> {
-  return new Promise((resolve, reject) => {
-    const handler = (ev: MessageEvent<WorkerOut>) => {
-      const msg = ev.data;
-      if (msg.type === 'progress') {
-        onProgress?.({ percent: msg.percent, status: msg.status });
-        return;
-      }
-      if (msg.type === 'error') {
-        w.removeEventListener('message', handler);
-        reject(new Error(msg.message));
-        return;
-      }
-      const hit = predicate(msg);
-      if (hit != null) {
-        w.removeEventListener('message', handler);
-        resolve(hit);
-      }
-    };
-    w.addEventListener('message', handler);
-  });
+function inferTimeoutMessage(action: string): string {
+  return `${action}超时（${INFER_TIMEOUT_MS / 1000}s）。请换一张较小的图片或稍后重试。`;
 }
 
 export async function initRestoreModel(
@@ -97,13 +79,24 @@ export async function initRestoreModel(
   const existing = initPromises.get(mode);
   if (existing) return existing;
 
+  const modelHint = getRestoreModelLabel(mode);
+
   const promise = (async () => {
     const w = getWorker();
     const device = await pickInferenceDevice();
-    const ready = waitFor(
+    onProgress?.({ percent: 0, status: `正在启动 ${modelHint}…` });
+    const ready = waitForWorker(
       w,
-      (msg) => (msg.type === 'ready' && msg.mode === mode ? msg.device : null),
-      onProgress,
+      (msg) => {
+        const m = msg as WorkerOut;
+        return m.type === 'ready' && m.mode === mode ? m.device : null;
+      },
+      {
+        timeoutMs: INIT_TIMEOUT_MS,
+        timeoutMessage: `模型加载超时：${modelHint} 在 ${INIT_TIMEOUT_MS / 1000}s 内未完成。请检查网络后重试。`,
+        modelHint,
+        onProgress,
+      },
     );
     w.postMessage({ type: 'init', mode, device });
     return ready;
@@ -111,7 +104,7 @@ export async function initRestoreModel(
 
   const tracked = promise.catch((err) => {
     initPromises.delete(mode);
-    throw err;
+    throw new Error(formatModelLoadError(err, modelHint));
   });
   initPromises.set(mode, tracked);
   return tracked;
@@ -124,10 +117,18 @@ async function inferLamaPatch(
   await initRestoreModel('inpaint', onProgress);
   const w = getWorker();
   const id = ++inferId;
-  const result = waitFor(
+  const result = waitForWorker(
     w,
-    (msg) => (msg.type === 'result-lama' && msg.id === id ? msg.rgb : null),
-    onProgress,
+    (msg) => {
+      const m = msg as WorkerOut;
+      return m.type === 'result-lama' && m.id === id ? m.rgb : null;
+    },
+    {
+      timeoutMs: INFER_TIMEOUT_MS,
+      timeoutMessage: inferTimeoutMessage('去物体推理'),
+      modelHint: getRestoreModelLabel('inpaint'),
+      onProgress,
+    },
   );
   w.postMessage(
     {
@@ -150,13 +151,20 @@ async function inferEsrganTile(
   await initRestoreModel('upscale', onProgress);
   const w = getWorker();
   const id = ++inferId;
-  const result = waitFor(
+  const result = waitForWorker(
     w,
-    (msg) =>
-      msg.type === 'result-esrgan' && msg.id === id
-        ? { rgb: msg.rgb, width: msg.width, height: msg.height }
-        : null,
-    onProgress,
+    (msg) => {
+      const m = msg as WorkerOut;
+      return m.type === 'result-esrgan' && m.id === id
+        ? { rgb: m.rgb, width: m.width, height: m.height }
+        : null;
+    },
+    {
+      timeoutMs: INFER_TIMEOUT_MS,
+      timeoutMessage: inferTimeoutMessage('放大推理'),
+      modelHint: getRestoreModelLabel('upscale'),
+      onProgress,
+    },
   );
   w.postMessage(
     { type: 'infer-esrgan', id, image: tensor, width, height },
@@ -174,13 +182,20 @@ async function inferDdcolor(
   await initRestoreModel('colorize', onProgress);
   const w = getWorker();
   const id = ++inferId;
-  const result = waitFor(
+  const result = waitForWorker(
     w,
-    (msg) =>
-      msg.type === 'result-ddcolor' && msg.id === id
-        ? { rgb: msg.rgb, width: msg.width, height: msg.height }
-        : null,
-    onProgress,
+    (msg) => {
+      const m = msg as WorkerOut;
+      return m.type === 'result-ddcolor' && m.id === id
+        ? { rgb: m.rgb, width: m.width, height: m.height }
+        : null;
+    },
+    {
+      timeoutMs: INFER_TIMEOUT_MS,
+      timeoutMessage: inferTimeoutMessage('上色推理'),
+      modelHint: getRestoreModelLabel('colorize'),
+      onProgress,
+    },
   );
   w.postMessage(
     { type: 'infer-ddcolor', id, image: tensor, width, height },

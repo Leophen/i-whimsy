@@ -1,15 +1,15 @@
 'use client';
 
 import * as React from 'react';
-import { ChevronDown, ImageIcon } from 'lucide-react';
+import { ChevronDown, ImageIcon, RefreshCw, X } from 'lucide-react';
 
-import { BusyOverlay, DownloadButton, ResetButton, StatGrid } from '@/components/tool/bits';
+import { DownloadButton, ProgressOverlay, ResetButton, StatGrid } from '@/components/tool/bits';
 import { CompareSlider } from '@/components/tool/compare-slider';
 import { EmptyState, Notice, Panel, ToolIO } from '@/components/tool/shell';
 import { ToolView, useToolMeta, useTrackRecent } from '@/components/tool/tool-view';
 import { FileDropzone } from '@/components/tool/file-dropzone';
 import { SegmentedControl, SliderRow } from '@/components/ui/controls';
-import { removeBackgroundFromImage } from '@/lib/core/bg-remover-worker';
+import { disposeMattingWorker, removeBackgroundFromImage } from '@/lib/core/bg-remover-worker';
 import { loadImageFromSrc } from '@/lib/core/image';
 import {
   DEFAULT_MATTING_OPTIONS,
@@ -21,6 +21,7 @@ import {
 } from '@/lib/core/matting';
 import { useAsyncComputed, useHydrated } from '@/lib/hooks';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 const MATTING_SCENES = [
   { id: 'ecommerce', name: '电商白底', mode: 'solid' as BackgroundMode, solid: '#ffffff' },
@@ -53,7 +54,9 @@ export default function BgRemover() {
     null,
   );
   const [progress, setProgress] = React.useState<{ percent: number; status: string } | null>(null);
-  const fileTokenRef = React.useRef(0);
+  const mattingRunRef = React.useRef(0);
+  const [mattingRunId, setMattingRunId] = React.useState(0);
+  const [mattingPaused, setMattingPaused] = React.useState(false);
   const [activeSceneId, setActiveSceneId] = React.useState('transparent');
 
   const [backgroundMode, setBackgroundMode] = React.useState<BackgroundMode>('transparent');
@@ -71,9 +74,26 @@ export default function BgRemover() {
     const img = await loadImageFromSrc(url);
     imgRef.current = img;
     setFile(f);
-    fileTokenRef.current += 1;
-    setProgress(null);
+    mattingRunRef.current += 1;
+    setMattingRunId((id) => id + 1);
+    setMattingPaused(false);
+    setProgress({ percent: 0, status: '准备抠图…' });
     setPreview({ name: f.name, size: f.size, url });
+  };
+
+  const retryMatting = () => {
+    disposeMattingWorker();
+    mattingRunRef.current += 1;
+    setMattingPaused(false);
+    setMattingRunId((id) => id + 1);
+    setProgress({ percent: 0, status: '正在重新加载模型…' });
+  };
+
+  const cancelMatting = () => {
+    disposeMattingWorker();
+    mattingRunRef.current += 1;
+    setMattingPaused(true);
+    setProgress(null);
   };
 
   const handleBgFile = async (f: File) => {
@@ -87,13 +107,14 @@ export default function BgRemover() {
 
   const mattingJob = useAsyncComputed(
     async () => {
-      const token = fileTokenRef.current;
+      const runId = mattingRunRef.current;
       const img = imgRef.current;
       if (!img) return null;
+      setProgress((prev) => prev ?? { percent: 0, status: '正在启动抠图推理…' });
       const result = await removeBackgroundFromImage(img, (p) => {
-        if (fileTokenRef.current === token) setProgress(p);
+        if (mattingRunRef.current === runId) setProgress(p);
       });
-      if (fileTokenRef.current !== token) return null;
+      if (mattingRunRef.current !== runId) return null;
       setProgress(null);
       const pixels = extractScaledPixels(img, result.width, result.height);
       return {
@@ -103,8 +124,8 @@ export default function BgRemover() {
         inferenceMs: result.elapsedMs,
       };
     },
-    [file],
-    { enabled: Boolean(file) },
+    [file, mattingRunId],
+    { enabled: Boolean(file) && !mattingPaused, delay: 0 },
   );
 
   const maskResult = mattingJob.value?.maskResult ?? null;
@@ -200,11 +221,11 @@ export default function BgRemover() {
     return () => window.removeEventListener('paste', onPaste);
   }, []);
 
+  const busy = mattingJob.pending || Boolean(progress);
   const busyLabel = progress
-    ? `${progress.status} ${progress.percent > 0 ? `${progress.percent}%` : ''}`.trim()
-    : mattingJob.pending
-      ? '正在抠图…'
-      : '处理中…';
+    ? `${progress.status}${progress.percent > 0 ? ` ${progress.percent}%` : ''}`
+    : '正在抠图…';
+  const showNetworkHint = Boolean(file) && !ready && !mattingJob.error && !mattingPaused;
 
   return (
     <ToolView
@@ -242,7 +263,9 @@ export default function BgRemover() {
                 onFile={(f) => void handleFile(f)}
                 current={preview ? { name: preview.name, size: preview.size, url: preview.url } : null}
                 onRemove={() => {
-                  fileTokenRef.current += 1;
+                  disposeMattingWorker();
+                  mattingRunRef.current += 1;
+                  setMattingPaused(false);
                   setProgress(null);
                   setFile(null);
                   setPreview(null);
@@ -399,28 +422,46 @@ export default function BgRemover() {
               />
             )}
 
-            {file && mattingJob.error && (
-              <Notice tone="danger">{mattingJob.error}</Notice>
+            {showNetworkHint && (
+              <Notice tone="info" className="mb-3">
+                首次使用需从 Hugging Face 下载约 25MB 抠图模型，完成后会缓存到浏览器。若长时间停在
+                0%，请检查网络、代理或防火墙；国内环境可在部署时设置{' '}
+                <code className="rounded bg-surface-3 px-1 py-0.5 text-xs">
+                  NEXT_PUBLIC_HF_ENDPOINT=https://hf-mirror.com
+                </code>{' '}
+                镜像地址。
+              </Notice>
             )}
 
-            {file && progress && (
-              <div className="mb-4">
-                <div className="mb-1 flex min-w-0 items-center justify-between gap-2 text-xs text-muted-foreground">
-                  <span className="min-w-0 truncate">{progress.status}</span>
-                  <span className="shrink-0 tabular">{progress.percent}%</span>
-                </div>
-                <div className="h-2 overflow-hidden rounded-full bg-surface-3">
-                  <div
-                    className="h-full rounded-full bg-primary transition-[width] duration-200"
-                    style={{ width: `${progress.percent}%` }}
-                  />
-                </div>
+            {mattingPaused && file && (
+              <Notice tone="warning" className="mb-3">
+                已取消抠图。可点击下方「重试」继续，或重新上传图片。
+              </Notice>
+            )}
+
+            {file && mattingJob.error && (
+              <div className="mb-3 flex flex-col gap-2">
+                <Notice tone="danger">{mattingJob.error}</Notice>
+                <Button variant="secondary" size="sm" className="self-start" onClick={retryMatting}>
+                  <RefreshCw className="size-3.5" />
+                  重试加载模型
+                </Button>
               </div>
             )}
 
-            {file && (
-              <BusyOverlay show={Boolean(mattingJob.pending && !progress)} label={busyLabel} />
-            )}
+            <ProgressOverlay
+              show={busy}
+              label={busyLabel}
+              percent={progress?.percent}
+              actions={
+                busy ? (
+                  <Button variant="outline" size="sm" onClick={cancelMatting}>
+                    <X className="size-3.5" />
+                    取消
+                  </Button>
+                ) : undefined
+              }
+            />
 
             {ready && preview && resultUrl ? (
               <div className="flex flex-col gap-4">

@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { ChevronDown, Search } from 'lucide-react';
 import { DropdownMenu } from 'radix-ui';
 
@@ -14,16 +14,16 @@ import { Kbd } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { CATEGORIES } from '@/config/tools';
 import { siteConfig } from '@/config/site';
+import { homeToolsHref, parseCategoryParam } from '@/lib/navigation';
 
-const NAV_LINKS = [
-  { href: '/tools', label: '全部工具' },
-  { href: '/about', label: '关于' },
-] as const;
+const NAV_LINKS = [{ href: '/about', label: '关于' }] as const;
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { setOpen } = useCommandMenu();
   const [scrolled, setScrolled] = React.useState(false);
+  const activeCategory = pathname === '/' ? parseCategoryParam(searchParams.get('category')) : 'all';
 
   React.useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -71,7 +71,7 @@ export function SiteHeader() {
               <DropdownMenu.Trigger
                 className={cn(
                   'inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors',
-                  pathname.startsWith('/categories')
+                  pathname === '/' && activeCategory !== 'all'
                     ? 'bg-surface-2 text-foreground'
                     : 'text-muted-foreground hover:bg-surface-2 hover:text-foreground',
                   'focus-visible:outline-none',
@@ -91,7 +91,7 @@ export function SiteHeader() {
                     return (
                       <DropdownMenu.Item key={cat.id} asChild>
                         <Link
-                          href={`/categories/${cat.id}`}
+                          href={homeToolsHref(cat.id)}
                           className="flex cursor-pointer items-start gap-2.5 rounded-lg px-2.5 py-2 text-sm outline-none transition-colors data-[highlighted]:bg-surface-2"
                         >
                           <span className="mt-0.5 shrink-0" style={{ color: cat.accentVar }}>

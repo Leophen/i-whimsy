@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { Suspense } from 'react';
 
 import '@/app/globals.css';
 
@@ -59,7 +60,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen antialiased">
         <Providers>
           <div className="flex min-h-screen flex-col">
-            <SiteHeader />
+            <Suspense fallback={null}>
+              <SiteHeader />
+            </Suspense>
             <main className="flex-1">{children}</main>
             <SiteFooter />
           </div>

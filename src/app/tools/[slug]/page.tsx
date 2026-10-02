@@ -8,6 +8,7 @@ import { ToolGrid } from '@/components/tool/tool-card';
 import { Badge } from '@/components/ui/card';
 import { CATEGORY_MAP, TOOLS, getCategory, getTool, toolsByCategory } from '@/config/tools';
 import { siteConfig } from '@/config/site';
+import { homeToolsHref } from '@/lib/navigation';
 
 export const dynamicParams = false;
 
@@ -77,8 +78,8 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
 
       <Breadcrumbs
         items={[
-          { label: '全部工具', href: '/tools' },
-          { label: category.name, href: `/categories/${category.id}` },
+          { label: '全部工具', href: homeToolsHref() },
+          { label: category.name, href: homeToolsHref(category.id) },
           { label: tool.name },
         ]}
       />
@@ -112,7 +113,7 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
           <div className="flex flex-wrap items-end justify-between gap-3">
             <h2 className="text-[15px] font-semibold tracking-tight">同类工具 · {category.name}</h2>
             <Link
-              href={`/categories/${category.id}`}
+              href={homeToolsHref(category.id)}
               className="text-[13px] font-medium text-primary transition-colors hover:underline"
             >
               查看该分类全部 →

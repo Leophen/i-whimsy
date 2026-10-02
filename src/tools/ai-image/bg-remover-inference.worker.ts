@@ -3,12 +3,11 @@
  * 模型权重走 Hugging Face CDN + IndexedDB 缓存（transformers.js env.useBrowserCache）。
  */
 
-import {
-  env,
-  pipeline,
-  RawImage,
-  type BackgroundRemovalPipeline,
-} from '@huggingface/transformers';
+import { pipeline, RawImage, type BackgroundRemovalPipeline } from '@huggingface/transformers';
+
+import { configureTransformersEnv } from '@/lib/core/transformers-env';
+
+configureTransformersEnv();
 
 const MODEL_ID = 'Xenova/modnet';
 
@@ -56,12 +55,12 @@ async function loadRemover(device: 'webgpu' | 'wasm') {
 async function ensureModel(device: 'webgpu' | 'wasm') {
   if (remover && activeDevice === device) return;
 
-  env.allowLocalModels = false;
-  env.useBrowserCache = true;
-  env.allowRemoteModels = true;
-
   remover = null;
-  post({ type: 'progress', percent: 0, status: '正在加载抠图模型…' });
+  post({
+    type: 'progress',
+    percent: 0,
+    status: '正在连接 Hugging Face 下载抠图模型（约 25MB，仅首次）…',
+  });
 
   try {
     remover = await loadRemover(device);
@@ -72,8 +71,6 @@ async function ensureModel(device: 'webgpu' | 'wasm') {
     remover = await loadRemover('wasm');
     activeDevice = 'wasm';
   }
-
-  post({ type: 'ready', device: activeDevice });
 }
 
 function extractAlphaMask(output: RawImage): Uint8ClampedArray {
@@ -97,6 +94,7 @@ self.onmessage = async (ev: MessageEvent<WorkerRequest>) => {
   try {
     if (msg.type === 'init') {
       await ensureModel(msg.device);
+      post({ type: 'ready', device: activeDevice });
       return;
     }
 

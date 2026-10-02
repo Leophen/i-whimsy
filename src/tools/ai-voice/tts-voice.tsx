@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Pause, Play, Square, Volume2 } from 'lucide-react';
+import { Pause, Play, RefreshCw, Square, Volume2, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { DownloadButton, ProgressOverlay, ResetButton, StatGrid } from '@/components/tool/bits';
@@ -144,6 +144,7 @@ export default function TtsVoice() {
     synthesize,
     previewVoice,
     cancel,
+    retry,
     progress,
     initializing,
     synthesizing,
@@ -366,6 +367,7 @@ export default function TtsVoice() {
           <ResetButton
             onReset={() => {
               cancel();
+              retry();
               stopPlayback();
               setText(DEFAULT_SAMPLE_TEXT);
               setVoice(DEFAULT_VOICE_ID);
@@ -385,7 +387,12 @@ export default function TtsVoice() {
         input={
           <div className="flex flex-col gap-4">
             <Notice tone="info">
-              中文 Kokoro 模型自然度有限（偏机械感），适合草稿配音与快速试听。所有推理在浏览器本地完成，文本与音频不会上传。
+              中文 Kokoro 模型自然度有限（偏机械感），适合草稿配音与快速试听。首次合成需从 Hugging Face 下载约
+              92MB 模型，完成后会缓存到浏览器；国内环境可在部署时设置{' '}
+              <code className="rounded bg-surface-3 px-1 py-0.5 text-xs">
+                NEXT_PUBLIC_HF_ENDPOINT=https://hf-mirror.com
+              </code>
+              。
             </Notice>
 
             {mobile && (
@@ -504,6 +511,21 @@ export default function TtsVoice() {
               show={initializing || synthesizing}
               label={progress?.status ?? (initializing ? '加载模型…' : '合成中…')}
               percent={progress?.percent}
+              actions={
+                initializing || synthesizing ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      cancel();
+                      if (initializing) retry();
+                    }}
+                  >
+                    <X className="size-3.5" />
+                    取消
+                  </Button>
+                ) : undefined
+              }
             />
 
             <Panel title="波形与播放">
@@ -549,7 +571,23 @@ export default function TtsVoice() {
               </Panel>
             )}
 
-            {error && <Notice tone="danger">{error}</Notice>}
+            {error && (
+              <div className="flex flex-col gap-2">
+                <Notice tone="danger">{error}</Notice>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="self-start"
+                  onClick={() => {
+                    retry();
+                    setError(null);
+                  }}
+                >
+                  <RefreshCw className="size-3.5" />
+                  重试加载模型
+                </Button>
+              </div>
+            )}
 
             <Panel title="引擎状态">
               <StatGrid

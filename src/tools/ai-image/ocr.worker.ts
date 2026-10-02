@@ -1,8 +1,14 @@
 /// <reference lib="webworker" />
 
-import { createWorker, OEM, type LoggerMessage } from 'tesseract.js';
+import { createWorker, OEM, PSM, type LoggerMessage } from 'tesseract.js';
 
-import { LANG_PACK_INFO, type LangPackMode, type OcrWord } from '@/lib/core/ocr';
+import {
+  LANG_PACK_INFO,
+  type LangPackMode,
+  type OcrPsm,
+  type OcrWord,
+} from '@/lib/core/ocr';
+import { preprocessBitmapForOcr, type OcrPreprocessConfig } from '@/lib/core/ocr-preprocess';
 
 type WorkerRequest =
   | { type: 'init'; id: number; langMode: LangPackMode; languages?: string }
@@ -11,6 +17,9 @@ type WorkerRequest =
       id: number;
       bitmap: ImageBitmap;
       rectangle?: { left: number; top: number; width: number; height: number };
+      psm?: OcrPsm;
+      preprocess?: OcrPreprocessConfig;
+      rotateAuto?: boolean;
     }
   | { type: 'terminate'; id: number };
 
@@ -28,6 +37,17 @@ type WorkerResponse =
   | { type: 'terminated'; id: number };
 
 let tessWorker: Awaited<ReturnType<typeof createWorker>> | null = null;
+
+function psmFromCode(code: OcrPsm): PSM {
+  switch (code) {
+    case '6':
+      return PSM.SINGLE_BLOCK;
+    case '11':
+      return PSM.SPARSE_TEXT;
+    default:
+      return PSM.AUTO;
+  }
+}
 
 function extractWords(data: {
   blocks: Array<{
@@ -79,6 +99,11 @@ async function initWorker(
       self.postMessage(msg);
     },
   });
+
+  await tessWorker.setParameters({
+    user_defined_dpi: '300',
+    preserve_interword_spaces: '0',
+  });
 }
 
 self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
@@ -104,16 +129,20 @@ self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
     if (msg.type === 'recognize') {
       if (!tessWorker) throw new Error('OCR 引擎尚未初始化');
 
-      const { bitmap, rectangle } = msg;
-      const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
-      const ctx = canvas.getContext('2d');
-      if (!ctx) throw new Error('无法创建离屏画布');
-      ctx.drawImage(bitmap, 0, 0);
+      const { bitmap, rectangle, psm, preprocess, rotateAuto } = msg;
+      const canvas = preprocessBitmapForOcr(bitmap, preprocess);
       bitmap.close();
+
+      await tessWorker.setParameters({
+        tessedit_pageseg_mode: psmFromCode(psm ?? '3'),
+      });
 
       const result = await tessWorker.recognize(
         canvas,
-        rectangle ? { rectangle } : {},
+        {
+          rectangle,
+          rotateAuto: rotateAuto ?? false,
+        },
         { blocks: true },
         String(id),
       );

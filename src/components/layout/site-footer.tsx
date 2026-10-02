@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Logo } from '@/components/layout/logo';
 import { CATEGORIES, TOTAL_TOOLS } from '@/config/tools';
 import { siteConfig } from '@/config/site';
+import { homeToolsHref, TOOLS_SECTION_ID } from '@/lib/navigation';
 
 export function SiteFooter() {
   return (
@@ -26,7 +27,7 @@ export function SiteFooter() {
               {CATEGORIES.slice(0, 4).map((cat) => (
                 <li key={cat.id}>
                   <Link
-                    href={`/categories/${cat.id}`}
+                    href={homeToolsHref(cat.id)}
                     className="text-[13px] text-muted-foreground transition-colors hover:text-primary"
                   >
                     {cat.name}
@@ -44,7 +45,7 @@ export function SiteFooter() {
               {CATEGORIES.slice(4).map((cat) => (
                 <li key={cat.id}>
                   <Link
-                    href={`/categories/${cat.id}`}
+                    href={homeToolsHref(cat.id)}
                     className="text-[13px] text-muted-foreground transition-colors hover:text-primary"
                   >
                     {cat.name}
@@ -61,7 +62,7 @@ export function SiteFooter() {
             <ul className="mt-4 space-y-2">
               <li>
                 <Link
-                  href="/tools"
+                  href={`/#${TOOLS_SECTION_ID}`}
                   className="text-[13px] text-muted-foreground transition-colors hover:text-primary"
                 >
                   全部工具

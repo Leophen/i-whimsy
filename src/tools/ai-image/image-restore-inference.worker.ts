@@ -2,15 +2,20 @@
  * 图像修复 ONNX 推理 Worker（LaMa / Real-ESRGAN / DDColor）。
  */
 
-import * as ort from 'onnxruntime-web';
+import {
+  InferenceSession,
+  Tensor,
+  type InferenceSession as InferenceSessionType,
+} from 'onnxruntime-web';
 
 import { fetchModelWithCache } from '@/lib/core/model-cache';
 import {
   RESTORE_MODELS,
   type RestoreMode,
 } from '@/lib/core/image-restore';
+import { configureOnnxRuntimeEnv } from '@/lib/core/onnxruntime-env';
 
-const WASM_CDN = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.21.0/dist/';
+configureOnnxRuntimeEnv();
 
 type WorkerRequest =
   | { type: 'init'; mode: RestoreMode; device: 'webgpu' | 'wasm' }
@@ -62,7 +67,7 @@ type WorkerResponse =
     }
   | { type: 'error'; message: string };
 
-const sessions = new Map<RestoreMode, ort.InferenceSession>();
+const sessions = new Map<RestoreMode, InferenceSessionType>();
 let activeDevice: 'webgpu' | 'wasm' = 'wasm';
 
 function post(msg: WorkerResponse, transfer?: Transferable[]) {
@@ -81,14 +86,11 @@ async function ensureSession(mode: RestoreMode, device: 'webgpu' | 'wasm') {
   const existing = sessions.get(mode);
   if (existing && activeDevice === device) return existing;
 
-  ort.env.wasm.wasmPaths = WASM_CDN;
-  ort.env.wasm.numThreads = typeof navigator !== 'undefined' && crossOriginIsolated ? 4 : 1;
-
   activeDevice = device;
   sessions.delete(mode);
 
   const model = RESTORE_MODELS[mode];
-  reportProgress(0, `正在加载 ${model.label} 模型…`);
+  reportProgress(0, `正在下载 ${model.label} 模型（${model.sizeLabel}，仅首次）…`);
 
   const buffer = await fetchModelWithCache(model.url, (p) => {
     reportProgress(p.percent, p.status);
@@ -96,7 +98,7 @@ async function ensureSession(mode: RestoreMode, device: 'webgpu' | 'wasm') {
 
   reportProgress(99, '正在初始化推理会话…');
 
-  const session = await ort.InferenceSession.create(buffer, {
+  const session = await InferenceSession.create(buffer, {
     executionProviders: executionProviders(device),
     graphOptimizationLevel: 'all',
   });
@@ -105,12 +107,12 @@ async function ensureSession(mode: RestoreMode, device: 'webgpu' | 'wasm') {
   return session;
 }
 
-function pickTensorData(output: ort.Tensor): Float32Array {
+function pickTensorData(output: Tensor): Float32Array {
   if (output.data instanceof Float32Array) return output.data;
   return new Float32Array(output.data as ArrayLike<number>);
 }
 
-function pickInputNames(session: ort.InferenceSession): { image: string; mask?: string } {
+function pickInputNames(session: InferenceSessionType): { image: string; mask?: string } {
   const names = session.inputNames;
   const image =
     names.find((n: string) => /image|input|x/i.test(n) && !/mask/i.test(n)) ?? names[0]!;
@@ -118,18 +120,18 @@ function pickInputNames(session: ort.InferenceSession): { image: string; mask?: 
   return { image, mask };
 }
 
-async function runLama(session: ort.InferenceSession, image: Float32Array, mask: Float32Array) {
+async function runLama(session: InferenceSessionType, image: Float32Array, mask: Float32Array) {
   const size = 512;
   const { image: imageName, mask: maskName } = pickInputNames(session);
 
-  const feeds: Record<string, ort.Tensor> = {
-    [imageName]: new ort.Tensor('float32', image, [1, 3, size, size]),
+  const feeds: Record<string, Tensor> = {
+    [imageName]: new Tensor('float32', image, [1, 3, size, size]),
   };
 
   if (!maskName) {
     throw new Error('LaMa 模型缺少 mask 输入，无法执行去物体修复');
   }
-  feeds[maskName] = new ort.Tensor('float32', mask, [1, 1, size, size]);
+  feeds[maskName] = new Tensor('float32', mask, [1, 1, size, size]);
 
   const outputs = await session.run(feeds);
   const key = session.outputNames[0]!;
@@ -138,14 +140,14 @@ async function runLama(session: ort.InferenceSession, image: Float32Array, mask:
 }
 
 async function runEsrgan(
-  session: ort.InferenceSession,
+  session: InferenceSessionType,
   image: Float32Array,
   width: number,
   height: number,
 ) {
   const inputName = session.inputNames[0]!;
   const outputs = await session.run({
-    [inputName]: new ort.Tensor('float32', image, [1, 3, height, width]),
+    [inputName]: new Tensor('float32', image, [1, 3, height, width]),
   });
   const key = session.outputNames[0]!;
   const tensor = outputs[key]!;
@@ -156,14 +158,14 @@ async function runEsrgan(
 }
 
 async function runDdcolor(
-  session: ort.InferenceSession,
+  session: InferenceSessionType,
   image: Float32Array,
   width: number,
   height: number,
 ) {
   const inputName = session.inputNames[0]!;
   const outputs = await session.run({
-    [inputName]: new ort.Tensor('float32', image, [1, 3, height, width]),
+    [inputName]: new Tensor('float32', image, [1, 3, height, width]),
   });
   const key = session.outputNames[0]!;
   const tensor = outputs[key]!;
@@ -178,7 +180,7 @@ self.onmessage = async (ev: MessageEvent<WorkerRequest>) => {
   try {
     if (msg.type === 'init') {
       await ensureSession(msg.mode, msg.device);
-      post({ type: 'ready', mode: msg.mode, device: msg.device });
+      post({ type: 'ready', mode: msg.mode, device: activeDevice });
       return;
     }
 

@@ -3,9 +3,12 @@
  * 模型权重走 Hugging Face CDN + IndexedDB 缓存（transformers.js env.useBrowserCache）。
  */
 
-import { env, pipeline, RawImage, type DepthEstimationPipeline } from '@huggingface/transformers';
+import { pipeline, RawImage, type DepthEstimationPipeline } from '@huggingface/transformers';
 
 import { processDepthMap } from '@/lib/core/depth';
+import { configureTransformersEnv } from '@/lib/core/transformers-env';
+
+configureTransformersEnv();
 
 const MODEL_ID = 'onnx-community/depth-anything-v2-small';
 
@@ -46,12 +49,8 @@ async function loadEstimator(device: 'webgpu' | 'wasm') {
 async function ensureModel(device: 'webgpu' | 'wasm') {
   if (estimator && activeDevice === device) return;
 
-  env.allowLocalModels = false;
-  env.useBrowserCache = true;
-  env.allowRemoteModels = true;
-
   estimator = null;
-  post({ type: 'progress', percent: 0, status: '正在加载深度模型…' });
+  post({ type: 'progress', percent: 0, status: '正在连接 Hugging Face 下载深度模型（约 26MB，仅首次）…' });
 
   try {
     estimator = await loadEstimator(device);
@@ -62,8 +61,6 @@ async function ensureModel(device: 'webgpu' | 'wasm') {
     estimator = await loadEstimator('wasm');
     activeDevice = 'wasm';
   }
-
-  post({ type: 'ready', device: activeDevice });
 }
 
 self.onmessage = async (ev: MessageEvent<WorkerRequest>) => {
@@ -71,6 +68,7 @@ self.onmessage = async (ev: MessageEvent<WorkerRequest>) => {
   try {
     if (msg.type === 'init') {
       await ensureModel(msg.device);
+      post({ type: 'ready', device: activeDevice });
       return;
     }
 

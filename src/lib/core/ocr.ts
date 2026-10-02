@@ -3,6 +3,8 @@
  * 按 bbox 合并行、聚类表格、导出 CSV。
  */
 
+import type { OcrPreprocessConfig } from './ocr-preprocess';
+
 export interface OcrBBox {
   x0: number;
   y0: number;
@@ -28,6 +30,19 @@ function bboxCenterY(bbox: OcrBBox): number {
 
 function bboxHeight(bbox: OcrBBox): number {
   return bbox.y1 - bbox.y0;
+}
+
+const CJK_RE = /[\u4e00-\u9fff\u3400-\u4dbf]/;
+
+/** 中文等 CJK 文本不应在词间插入空格。 */
+export function joinOcrTokens(tokens: string[]): string {
+  if (tokens.length === 0) return '';
+  const combined = tokens.join('');
+  const cjkCount = (combined.match(CJK_RE) ?? []).length;
+  if (cjkCount / Math.max(1, combined.replace(/\s/g, '').length) >= 0.25) {
+    return tokens.join('');
+  }
+  return tokens.join(' ');
 }
 
 function mergeBboxes(words: OcrWord[]): OcrBBox {
@@ -65,7 +80,7 @@ export function mergeWordsToLines(words: OcrWord[]): OcrLine[] {
     if (current.length > 0 && Math.abs(cy - currentY) > rowThreshold) {
       const rowWords = current.sort((a, b) => a.bbox.x0 - b.bbox.x0);
       lines.push({
-        text: rowWords.map((w) => w.text).join(' '),
+        text: joinOcrTokens(rowWords.map((w) => w.text)),
         words: rowWords,
         bbox: mergeBboxes(rowWords),
       });
@@ -78,7 +93,7 @@ export function mergeWordsToLines(words: OcrWord[]): OcrLine[] {
   if (current.length > 0) {
     const rowWords = current.sort((a, b) => a.bbox.x0 - b.bbox.x0);
     lines.push({
-      text: rowWords.map((w) => w.text).join(' '),
+      text: joinOcrTokens(rowWords.map((w) => w.text)),
       words: rowWords,
       bbox: mergeBboxes(rowWords),
     });
@@ -152,22 +167,92 @@ export function averageConfidence(words: OcrWord[]): number {
 }
 
 export type LangPackMode = 'fast' | 'standard';
+export type OcrSceneId = 'receipt' | 'doc' | 'poster' | 'table';
+export type OcrOutputMode = 'text' | 'table';
+
+/** Tesseract PSM 值（与 tesseract.js PSM 枚举一致）。 */
+export type OcrPsm =
+  | '3' // AUTO
+  | '6' // SINGLE_BLOCK
+  | '11'; // SPARSE_TEXT
+
+export interface OcrSceneConfig {
+  id: OcrSceneId;
+  name: string;
+  langMode: LangPackMode;
+  languages: string;
+  output: OcrOutputMode;
+  psm: OcrPsm;
+  rotateAuto: boolean;
+  preprocess: OcrPreprocessConfig;
+}
 
 export const LANG_PACK_INFO: Record<
   LangPackMode,
-  { label: string; size: string; path: string }
+  { label: string; size: string; path: string; hint: string }
 > = {
   fast: {
-    label: '快速（推荐）',
+    label: '快速',
     size: '约 1.6 MB',
     path: 'https://tessdata.projectnaptha.com/4.0.0_fast',
+    hint: '适合清晰收据、大字号打印体',
   },
   standard: {
-    label: '高精度',
+    label: '高精度（推荐）',
     size: '约 19 MB',
     path: 'https://tessdata.projectnaptha.com/4.0.0',
+    hint: '适合海报、扫描件、复杂排版与彩色底图',
   },
 };
+
+export const OCR_SCENES: OcrSceneConfig[] = [
+  {
+    id: 'receipt',
+    name: '收据发票',
+    langMode: 'fast',
+    languages: 'chi_sim+eng',
+    output: 'text',
+    psm: '3',
+    rotateAuto: false,
+    preprocess: { minShortSide: 1000, contrast: true, binarize: false },
+  },
+  {
+    id: 'doc',
+    name: '文档扫描',
+    langMode: 'standard',
+    languages: 'chi_sim+eng',
+    output: 'text',
+    psm: '3',
+    rotateAuto: true,
+    preprocess: { minShortSide: 1400, contrast: true, binarize: false },
+  },
+  {
+    id: 'poster',
+    name: '海报标语',
+    langMode: 'standard',
+    languages: 'chi_sim',
+    output: 'text',
+    psm: '11',
+    rotateAuto: true,
+    preprocess: { minShortSide: 1600, contrast: true, binarize: true },
+  },
+  {
+    id: 'table',
+    name: '表格数据',
+    langMode: 'standard',
+    languages: 'chi_sim+eng',
+    output: 'table',
+    psm: '6',
+    rotateAuto: false,
+    preprocess: { minShortSide: 1200, contrast: true, binarize: false },
+  },
+];
+
+export const LOW_CONFIDENCE_THRESHOLD = 55;
+
+export function getOcrScene(id: OcrSceneId): OcrSceneConfig {
+  return OCR_SCENES.find((s) => s.id === id) ?? OCR_SCENES[0]!;
+}
 
 export function formatOcrStatus(status: string): string {
   const map: Record<string, string> = {

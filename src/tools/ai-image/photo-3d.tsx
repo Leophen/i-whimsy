@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Film, ImageIcon, Smartphone } from 'lucide-react';
+import { Film, ImageIcon, RefreshCw, Smartphone, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { DownloadButton, ProgressOverlay } from '@/components/tool/bits';
@@ -11,7 +11,7 @@ import { FileDropzone } from '@/components/tool/file-dropzone';
 import { SegmentedControl, SliderRow, SwitchRow } from '@/components/ui/controls';
 import { Button } from '@/components/ui/button';
 import { depthToImageData } from '@/lib/core/depth';
-import { estimateDepthFromImage } from '@/lib/core/depth-worker';
+import { disposeDepthWorker, estimateDepthFromImage } from '@/lib/core/depth-worker';
 import { loadImageFromSrc } from '@/lib/core/image';
 import {
   DEFAULT_PHOTO3D_PARAMS,
@@ -80,7 +80,9 @@ export default function Photo3D() {
     percent: number;
     status: string;
   } | null>(null);
-  const fileTokenRef = React.useRef(0);
+  const depthRunRef = React.useRef(0);
+  const [depthRunId, setDepthRunId] = React.useState(0);
+  const [depthPaused, setDepthPaused] = React.useState(false);
   const [activeSceneId, setActiveSceneId] = React.useState('portrait');
   const [gyroEnabled, setGyroEnabled] = React.useState(false);
   const [videoBlob, setVideoBlob] = React.useState<Blob | null>(null);
@@ -95,29 +97,47 @@ export default function Photo3D() {
     imgRef.current = img;
     setFile(f);
     setPreview({ name: f.name, size: f.size, url });
-    fileTokenRef.current += 1;
-    setDepthProgress(null);
+    depthRunRef.current += 1;
+    setDepthRunId((id) => id + 1);
+    setDepthPaused(false);
+    setDepthProgress({ percent: 0, status: '准备深度估计…' });
     setVideoBlob(null);
     setGifBlob(null);
   };
 
+  const retryDepth = () => {
+    disposeDepthWorker();
+    depthRunRef.current += 1;
+    setDepthPaused(false);
+    setDepthRunId((id) => id + 1);
+    setDepthProgress({ percent: 0, status: '正在重新加载模型…' });
+  };
+
+  const cancelDepth = () => {
+    disposeDepthWorker();
+    depthRunRef.current += 1;
+    setDepthPaused(true);
+    setDepthProgress(null);
+  };
+
   const depthJob = useAsyncComputed(
     async () => {
-      const token = fileTokenRef.current;
+      const runId = depthRunRef.current;
       const img = imgRef.current;
       if (!img) return null;
+      setDepthProgress((prev) => prev ?? { percent: 0, status: '正在启动深度推理…' });
       const result = await estimateDepthFromImage(img, (p) => {
-        if (fileTokenRef.current === token) setDepthProgress(p);
+        if (depthRunRef.current === runId) setDepthProgress(p);
       });
-      if (fileTokenRef.current !== token) return null;
+      if (depthRunRef.current !== runId) return null;
       setDepthProgress(null);
       return {
         depth: result.depth,
         deviceLabel: result.device === 'webgpu' ? 'WebGPU' : 'WASM',
       };
     },
-    [file],
-    { enabled: Boolean(file) },
+    [file, depthRunId],
+    { enabled: Boolean(file) && !depthPaused, delay: 0 },
   );
 
   const depth = depthJob.value?.depth ?? null;
@@ -271,8 +291,9 @@ export default function Photo3D() {
 
   const busy = depthJob.pending || Boolean(depthProgress);
   const busyLabel = depthProgress
-    ? `${depthProgress.status} ${depthProgress.percent}%`
+    ? `${depthProgress.status}${depthProgress.percent > 0 ? ` ${depthProgress.percent}%` : ''}`
     : '正在估计深度…';
+  const showNetworkHint = Boolean(file) && !ready && !depthJob.error && !depthPaused;
 
   return (
     <ToolView
@@ -440,7 +461,32 @@ export default function Photo3D() {
               />
             )}
 
-            {file && depthJob.error && <Notice tone="danger">{depthJob.error}</Notice>}
+            {showNetworkHint && (
+              <Notice tone="info" className="mb-3">
+                首次使用需从 Hugging Face 下载约 26MB 深度模型，完成后会缓存到浏览器。若长时间停在
+                0%，请检查网络、代理或防火墙；国内环境可在部署时设置{' '}
+                <code className="rounded bg-surface-3 px-1 py-0.5 text-xs">
+                  NEXT_PUBLIC_HF_ENDPOINT=https://hf-mirror.com
+                </code>{' '}
+                镜像地址。
+              </Notice>
+            )}
+
+            {depthPaused && file && (
+              <Notice tone="warning" className="mb-3">
+                已取消深度估计。可点击下方「重试」继续，或重新上传图片。
+              </Notice>
+            )}
+
+            {file && depthJob.error && (
+              <div className="mb-3 flex flex-col gap-2">
+                <Notice tone="danger">{depthJob.error}</Notice>
+                <Button variant="secondary" size="sm" className="self-start" onClick={retryDepth}>
+                  <RefreshCw className="size-3.5" />
+                  重试加载模型
+                </Button>
+              </div>
+            )}
 
             {file && showDepth && depth && (
               <canvas
@@ -476,6 +522,14 @@ export default function Photo3D() {
               show={busy && !exporting}
               label={busyLabel}
               percent={depthProgress?.percent}
+              actions={
+                busy && !exporting ? (
+                  <Button variant="outline" size="sm" onClick={cancelDepth}>
+                    <X className="size-3.5" />
+                    取消
+                  </Button>
+                ) : undefined
+              }
             />
             <ProgressOverlay show={Boolean(exporting)} label="导出中" percent={exportPct} />
           </Panel>

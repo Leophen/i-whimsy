@@ -2,7 +2,20 @@
 
 import * as React from 'react';
 
-import { formatOcrStatus, type LangPackMode, type OcrWord } from '@/lib/core/ocr';
+import {
+  formatOcrStatus,
+  type LangPackMode,
+  type OcrPsm,
+  type OcrWord,
+} from '@/lib/core/ocr';
+import type { OcrPreprocessConfig } from '@/lib/core/ocr-preprocess';
+
+export interface OcrRecognizeOptions {
+  rectangle?: { left: number; top: number; width: number; height: number };
+  psm?: OcrPsm;
+  preprocess?: OcrPreprocessConfig;
+  rotateAuto?: boolean;
+}
 
 export interface OcrProgress {
   status: string;
@@ -100,7 +113,7 @@ export function useOcrWorker() {
     };
   }, []);
 
-  const langModeRef = React.useRef<LangPackMode | null>(null);
+  const configRef = React.useRef<{ langMode: LangPackMode; languages: string } | null>(null);
 
   const runJob = <T,>(payload: Record<string, unknown>): Promise<T> => {
     const worker = workerRef.current;
@@ -122,23 +135,21 @@ export function useOcrWorker() {
   };
 
   const init = React.useCallback(async (langMode: LangPackMode, languages = 'chi_sim+eng') => {
-    if (langModeRef.current === langMode) return;
+    const cached = configRef.current;
+    if (cached?.langMode === langMode && cached.languages === languages) return;
     setInitializing(true);
     setProgress({ status: 'init', label: '准备语言包…', progress: 0 });
     await runJob({ type: 'init', langMode, languages });
-    langModeRef.current = langMode;
+    configRef.current = { langMode, languages };
   }, []);
 
   const recognize = React.useCallback(
-    async (
-      bitmap: ImageBitmap,
-      rectangle?: { left: number; top: number; width: number; height: number },
-    ): Promise<OcrRecognizeResult> => {
+    async (bitmap: ImageBitmap, options: OcrRecognizeOptions = {}): Promise<OcrRecognizeResult> => {
       setProgress({ status: 'recognizing', label: '识别文字…', progress: 0 });
       return runJob<OcrRecognizeResult>({
         type: 'recognize',
         bitmap,
-        rectangle,
+        ...options,
       });
     },
     [],
@@ -147,7 +158,7 @@ export function useOcrWorker() {
   const terminate = React.useCallback(async () => {
     const worker = workerRef.current;
     if (!worker) return;
-    langModeRef.current = null;
+    configRef.current = null;
     const id = ++jobIdRef.current;
     worker.postMessage({ type: 'terminate', id });
   }, []);

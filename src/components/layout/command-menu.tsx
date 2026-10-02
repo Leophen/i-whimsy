@@ -8,6 +8,7 @@ import { ArrowRight, Clock3, CornerDownLeft, Heart, Search } from 'lucide-react'
 import { create } from 'zustand';
 
 import { getCategory, TOOLS, type ToolMeta } from '@/config/tools';
+import { homeToolsHref } from '@/lib/navigation';
 import { useToolStore } from '@/stores/use-tool-store';
 
 /* ------------------------------------------------------------------ *
@@ -212,7 +213,7 @@ export function CommandMenu() {
                       value={`category-${cat}`}
                       onSelect={() => {
                         setOpen(false);
-                        router.push(`/categories/${cat}`);
+                        router.push(homeToolsHref(cat));
                       }}
                       className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm outline-none transition-colors data-[selected=true]:bg-surface-2"
                     >

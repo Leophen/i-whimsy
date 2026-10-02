@@ -1,9 +1,9 @@
 'use client';
 
 import * as React from 'react';
-import { Eraser, ImageIcon, Paintbrush, Sparkles, ZoomIn } from 'lucide-react';
+import { Eraser, ImageIcon, Paintbrush, RefreshCw, Sparkles, X, ZoomIn } from 'lucide-react';
 
-import { BusyOverlay, DownloadButton, ResetButton, StatGrid } from '@/components/tool/bits';
+import { DownloadButton, ProgressOverlay, ResetButton, StatGrid } from '@/components/tool/bits';
 import { CompareSlider } from '@/components/tool/compare-slider';
 import { EmptyState, Notice, Panel, ToolIO } from '@/components/tool/shell';
 import { ToolView, useToolMeta, useTrackRecent } from '@/components/tool/tool-view';
@@ -24,6 +24,7 @@ import {
   type RestoreMode,
 } from '@/lib/core/image-restore';
 import {
+  disposeRestoreWorker,
   getRestoreModelLabel,
   runColorize,
   runInpaint,
@@ -32,6 +33,7 @@ import {
 } from '@/lib/core/image-restore-worker';
 import { useAsyncComputed, useHydrated } from '@/lib/hooks';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 /* ------------------------------------------------------------------ *
  * 笔刷 mask 画布
@@ -199,6 +201,9 @@ export default function ImageRestore() {
 
   const [upscaleScale, setUpscaleScale] = React.useState<'2' | '4'>('2');
   const [progress, setProgress] = React.useState<RestoreProgress | null>(null);
+  const restoreRunRef = React.useRef(0);
+  const [restoreRunId, setRestoreRunId] = React.useState(0);
+  const [restorePaused, setRestorePaused] = React.useState(false);
   const [deviceLabel, setDeviceLabel] = React.useState<string | null>(null);
   const [resultUrl, setResultUrl] = React.useState<string | null>(null);
   const [resultBlob, setResultBlob] = React.useState<Blob | null>(null);
@@ -208,15 +213,35 @@ export default function ImageRestore() {
     const url = URL.createObjectURL(f);
     const img = await loadImageFromSrc(url);
     imgRef.current = img;
+    disposeRestoreWorker();
+    restoreRunRef.current += 1;
+    setRestoreRunId((id) => id + 1);
+    setRestorePaused(false);
     setFile(f);
     setPreview({ name: f.name, size: f.size, url });
     setMask(null);
     setMaskReady(false);
     setMaskVersion((v) => v + 1);
+    setProgress(null);
     setResultUrl(null);
     setResultBlob(null);
     setJpgBlob(null);
     setDeviceLabel(null);
+  };
+
+  const retryRestore = () => {
+    disposeRestoreWorker();
+    restoreRunRef.current += 1;
+    setRestorePaused(false);
+    setRestoreRunId((id) => id + 1);
+    setProgress({ percent: 0, status: '正在重新加载模型…' });
+  };
+
+  const cancelRestore = () => {
+    disposeRestoreWorker();
+    restoreRunRef.current += 1;
+    setRestorePaused(true);
+    setProgress(null);
   };
 
   const handleBatch = (files: File[]) => {
@@ -226,10 +251,14 @@ export default function ImageRestore() {
 
   const inpaintJob = useAsyncComputed(
     async () => {
+      const runId = restoreRunRef.current;
       const img = imgRef.current;
       if (!img || !mask || !maskReady) return null;
-      setProgress({ percent: 0, status: '准备修复…' });
-      const result = await runInpaint(img, mask, setProgress);
+      setProgress({ percent: 0, status: '准备 LaMa 输入…' });
+      const result = await runInpaint(img, mask, (p) => {
+        if (restoreRunRef.current === runId) setProgress(p);
+      });
+      if (restoreRunRef.current !== runId) return null;
       setProgress(null);
       setDeviceLabel(result.device === 'webgpu' ? 'WebGPU' : 'WASM');
       const url = await imageDataToObjectUrl(result.data);
@@ -242,12 +271,13 @@ export default function ImageRestore() {
       setJpgBlob(null);
       return result;
     },
-    [file, mask, maskReady, tab],
-    { enabled: Boolean(file && tab === 'inpaint' && maskReady), delay: 400 },
+    [file, mask, maskReady, tab, restoreRunId],
+    { enabled: Boolean(file && tab === 'inpaint' && maskReady && !restorePaused), delay: 0 },
   );
 
   const upscaleJob = useAsyncComputed(
     async () => {
+      const runId = restoreRunRef.current;
       const img = imgRef.current;
       if (!img) return null;
       const scale = Number(upscaleScale) as 2 | 4;
@@ -255,6 +285,7 @@ export default function ImageRestore() {
       if (batchFiles.length > 1) {
         let lastResult: ImageData | null = null;
         for (let i = 0; i < batchFiles.length; i++) {
+          if (restoreRunRef.current !== runId) return null;
           const bf = batchFiles[i]!;
           setProgress({
             percent: Math.round((i / batchFiles.length) * 100),
@@ -263,11 +294,13 @@ export default function ImageRestore() {
           const url = URL.createObjectURL(bf);
           const batchImg = await loadImageFromSrc(url);
           URL.revokeObjectURL(url);
-          const r = await runUpscale(batchImg, scale, setProgress);
+          const r = await runUpscale(batchImg, scale, (p) => {
+            if (restoreRunRef.current === runId) setProgress(p);
+          });
           lastResult = r.data;
           setDeviceLabel(r.device === 'webgpu' ? 'WebGPU' : 'WASM');
         }
-        if (!lastResult) return null;
+        if (!lastResult || restoreRunRef.current !== runId) return null;
         setProgress(null);
         const url = await imageDataToObjectUrl(lastResult);
         const blob = await imageDataToBlob(lastResult, 'image/png');
@@ -282,7 +315,10 @@ export default function ImageRestore() {
       }
 
       setProgress({ percent: 0, status: '准备放大…' });
-      const result = await runUpscale(img, scale, setProgress);
+      const result = await runUpscale(img, scale, (p) => {
+        if (restoreRunRef.current === runId) setProgress(p);
+      });
+      if (restoreRunRef.current !== runId) return null;
       setProgress(null);
       setDeviceLabel(result.device === 'webgpu' ? 'WebGPU' : 'WASM');
       const url = await imageDataToObjectUrl(result.data);
@@ -296,16 +332,20 @@ export default function ImageRestore() {
       setJpgBlob(jpg);
       return result;
     },
-    [file, upscaleScale, tab, batchFiles],
-    { enabled: Boolean(file && tab === 'upscale'), delay: 300 },
+    [file, upscaleScale, tab, batchFiles, restoreRunId],
+    { enabled: Boolean(file && tab === 'upscale' && !restorePaused), delay: 0 },
   );
 
   const colorizeJob = useAsyncComputed(
     async () => {
+      const runId = restoreRunRef.current;
       const img = imgRef.current;
       if (!img) return null;
       setProgress({ percent: 0, status: '准备上色…' });
-      const result = await runColorize(img, setProgress);
+      const result = await runColorize(img, (p) => {
+        if (restoreRunRef.current === runId) setProgress(p);
+      });
+      if (restoreRunRef.current !== runId) return null;
       setProgress(null);
       setDeviceLabel(result.device === 'webgpu' ? 'WebGPU' : 'WASM');
       const url = await imageDataToObjectUrl(result.data);
@@ -318,8 +358,8 @@ export default function ImageRestore() {
       setJpgBlob(null);
       return result;
     },
-    [file, tab],
-    { enabled: Boolean(file && tab === 'colorize'), delay: 300 },
+    [file, tab, restoreRunId],
+    { enabled: Boolean(file && tab === 'colorize' && !restorePaused), delay: 0 },
   );
 
   const activeJob =
@@ -343,11 +383,16 @@ export default function ImageRestore() {
     };
   }, [resultUrl]);
 
+  const busy = activeJob.pending || Boolean(progress);
   const busyLabel = progress
-    ? `${progress.status}${progress.percent > 0 ? ` ${progress.percent}%` : ''}`.trim()
-    : activeJob.pending
-      ? '处理中…'
-      : '加载模型…';
+    ? `${progress.status}${progress.percent > 0 ? ` ${progress.percent}%` : ''}`
+    : '加载模型…';
+  const showNetworkHint =
+    Boolean(file) &&
+    !restorePaused &&
+    !activeJob.error &&
+    (activeJob.pending || Boolean(progress)) &&
+    (tab !== 'inpaint' || maskReady);
 
   return (
     <ToolView
@@ -384,6 +429,11 @@ export default function ImageRestore() {
         value={tab}
         onValueChange={(v) => {
           const next = v as TabMode;
+          disposeRestoreWorker();
+          restoreRunRef.current += 1;
+          setRestoreRunId((id) => id + 1);
+          setRestorePaused(false);
+          setProgress(null);
           setTab(next);
           setActiveSceneId(
             next === 'inpaint' ? 'object' : next === 'upscale' ? 'social2x' : 'portrait',
@@ -610,24 +660,45 @@ export default function ImageRestore() {
                 />
               )}
 
-              {file && activeJob.error && <Notice tone="danger">{activeJob.error}</Notice>}
+              {showNetworkHint && (
+                <Notice tone="info" className="mb-3">
+                  正在下载 {RESTORE_MODELS[tab].label} 模型（{RESTORE_MODELS[tab].sizeLabel}
+                  ），完成后会缓存到浏览器。若长时间无进度，请检查网络或代理；国内环境 Hugging Face
+                  可能较慢。
+                </Notice>
+              )}
 
-              {file && progress && (
-                <div className="mb-4">
-                  <div className="mb-1 flex min-w-0 items-center justify-between gap-2 text-xs text-muted-foreground">
-                    <span className="min-w-0 truncate">{progress.status}</span>
-                    <span className="shrink-0 tabular">{progress.percent}%</span>
-                  </div>
-                  <div className="h-2 overflow-hidden rounded-full bg-surface-3">
-                    <div
-                      className="h-full rounded-full bg-primary transition-[width] duration-200"
-                      style={{ width: `${progress.percent}%` }}
-                    />
-                  </div>
+              {restorePaused && file && (
+                <Notice tone="warning" className="mb-3">
+                  已取消处理。可点击「重试」继续，或重新上传图片。
+                </Notice>
+              )}
+
+              {file && activeJob.error && (
+                <div className="mb-3 flex flex-col gap-2">
+                  <Notice tone="danger">{activeJob.error}</Notice>
+                  <Button variant="secondary" size="sm" className="self-start" onClick={retryRestore}>
+                    <RefreshCw className="size-3.5" />
+                    重试加载模型
+                  </Button>
                 </div>
               )}
 
-              {file && <BusyOverlay show={Boolean(activeJob.pending && !progress)} label={busyLabel} />}
+              {file && (
+                <ProgressOverlay
+                  show={busy}
+                  label={busyLabel}
+                  percent={progress?.percent}
+                  actions={
+                    busy ? (
+                      <Button variant="outline" size="sm" onClick={cancelRestore}>
+                        <X className="size-3.5" />
+                        取消
+                      </Button>
+                    ) : undefined
+                  }
+                />
+              )}
 
               {file && preview && resultUrl ? (
                 <div className="flex flex-col gap-4">
