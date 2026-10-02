@@ -1,8 +1,58 @@
 {
+  "name": "i-whimsy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "iWhimsy — 一个跑在浏览器里的前端超级工具库：文本、编码加密、图片、颜色、数据、日期、CSS 与前端、开发速查、视觉创意与换算生成器，共 63 个工具，全部本地计算，数据不出浏览器。",
+  "packageManager": "npm@10.9.7",
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "@noble/hashes": "^2.4.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
+    "diff": "^9.0.0",
+    "fast-xml-parser": "^5.11.2",
+    "fuse.js": "^7.5.0",
+    "js-yaml": "^5.4.2",
+    "lucide-react": "^1.49.0",
+    "marked": "^18.0.14",
+    "motion": "^13.5.0",
+    "next": "^16.3.8",
+    "next-themes": "^0.4.6",
+    "papaparse": "^5.7.0",
+    "qrcode": "^1.5.4",
+    "radix-ui": "^1.6.7",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-easy-crop": "^6.2.3",
+    "sonner": "^2.0.8",
+    "sql-formatter": "^15.9.0",
+    "tailwind-merge": "^3.7.0",
+    "zustand": "^5.0.15"
+  },
   "devDependencies": {
-    "classnames": "^2.5.1",
-    "cropperjs": "^1.6.2",
-    "react-cropper": "^2.3.3",
-    "tinycolor2": "^1.6.0"
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^26.6.3",
+    "@types/papaparse": "^5.5.2",
+    "@types/qrcode": "^1.5.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.3.8",
+    "prettier": "^3.9.9",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.9.3"
   }
 }
