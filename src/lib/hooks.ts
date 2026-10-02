@@ -7,8 +7,10 @@ const noopSubscribe = () => () => {};
 /**
  * 判断当前是否已经完成 hydration。
  *
- * 服务端渲染时返回 false，客户端渲染时返回 true —— 用于回避 SSR 与首屏客户端
- * 结果不一致的问题（收藏按钮依赖 localStorage、时区依赖浏览器 Intl 等）。
+ * 服务端渲染时返回 false，客户端**首帧**渲染时返回 true —— 适合「读 localStorage /
+ * 探测 API 后算值」这类逻辑，但**不要**用它做首屏可见 DOM 分支（例如主题按钮
+ * 的 aria-checked、resolvedTheme 文案），否则 SSR 与客户端首帧仍会 hydration 不一致。
+ * 那种场景请用 `useState(false)` + `useEffect(() => setMounted(true), [])`。
  *
  * 相比 `useEffect(() => setMounted(true), [])` 的老写法，useSyncExternalStore
  * 不会触发额外的一次 render + commit。

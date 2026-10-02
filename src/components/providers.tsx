@@ -23,6 +23,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       defaultTheme="system"
       enableSystem
       disableTransitionOnChange
+      storageKey="theme"
     >
       <TooltipProvider delayDuration={250}>
         <StoreHydrator />
