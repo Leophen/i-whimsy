@@ -1,83 +1,33 @@
 import type { LucideIcon } from 'lucide-react';
 import {
-  AlignLeft,
-  ArrowLeftRight,
-  BarChart3,
-  Binary,
-  Braces,
-  CalendarClock,
-  CalendarPlus,
-  CalendarRange,
-  CaseSensitive,
-  CircleDashed,
-  Clock,
-  CodeXml,
-  Contrast,
-  Crop,
-  Crown,
+  Activity,
+  Aperture,
+  BadgeCheck,
+  BrainCircuit,
+  Clapperboard,
   Database,
-  Dices,
-  Droplets,
-  FileCode2,
-  FileKey,
-  FileLock2,
-  Fingerprint,
-  GitBranch,
+  FileStack,
   GitCompare,
-  Globe,
-  Grid2x2,
-  Hash,
-  ImageDown,
-  ImageIcon,
+  Images,
   KeyRound,
-  KeySquare,
-  Layers,
-  Link2,
-  ListFilter,
   ListTree,
-  Lock,
-  Minimize2,
-  MonitorSmartphone,
-  Network,
-  Paintbrush,
-  Percent,
-  Pipette,
-  QrCode,
-  Regex,
-  Replace,
-  Router,
-  Ruler,
-  Scaling,
-  Sigma,
-  SlidersHorizontal,
-  Sparkles,
-  Spline,
-  Stamp,
-  Table2,
-  Terminal,
-  Timer,
-  TypeIcon,
-  Wand2,
-  WandSparkles,
-  Waves,
-  WrapText,
+  Palette,
+  ShieldCheck,
+  SquareFunction,
 } from 'lucide-react';
 
 /* ------------------------------------------------------------------ *
- * Category
+ * Category —— 按「引擎」划分，不按「数据类型」划分
+ *
+ * 这是本项目的核心结构判断：
+ *   普通工具 = 纯 JS 字符串 / 数学运算，谁都能写一版
+ *   高级工具 = 把桌面软件的能力搬进浏览器（WASM / WebCodecs / WebGPU / OPFS / Web Crypto）
+ *
+ * 按数据类型分类（文本/图片/时间）会让「Base64 编解码」和「浏览器端视频转码」
+ * 挤在同一层级；按引擎分类则天然把有技术含量的工具聚在一起。
  * ------------------------------------------------------------------ */
 export type CategoryId =
-  | 'text'
-  | 'crypto'
-  | 'image'
-  | 'color'
-  | 'data'
-  | 'time'
-  | 'converter'
-  | 'generator'
-  | 'css'
-  | 'dev'
-  | 'creative';
+  'ai' | 'media' | 'document' | 'data' | 'imaging' | 'crypto' | 'code' | 'design' | 'runtime';
 
 export interface Category {
   id: CategoryId;
@@ -91,93 +41,84 @@ export interface Category {
 
 export const CATEGORIES: Category[] = [
   {
-    id: 'text',
-    name: '文本处理',
-    enName: 'Text',
-    description: '大小写、命名风格、替换、统计、对比与 Diff，写文档和处理内容的日常工具。',
-    icon: CaseSensitive,
-    accentVar: 'var(--cat-text)',
+    id: 'ai',
+    name: '本地 AI 推理',
+    enName: 'On-device AI',
+    description:
+      '模型在浏览器里跑，图片和语音不出本机。依赖 ONNX Runtime Web / transformers.js + WebGPU，不支持时自动回退 WASM。',
+    icon: BrainCircuit,
+    accentVar: 'var(--cat-ai)',
   },
   {
-    id: 'crypto',
-    name: '编码加密',
-    enName: 'Encoding & Crypto',
-    description: 'Base64、URL、HTML 实体、哈希、HMAC、UUID、密码与 JWT，全部在本地计算。',
-    icon: Lock,
-    accentVar: 'var(--cat-crypto)',
+    id: 'media',
+    name: '音视频引擎',
+    enName: 'Media',
+    description:
+      '浏览器内完成转码、抽帧、混流与录制。走 WebCodecs 硬编硬解（不依赖 WASM），音频处理走 Web Audio 图。',
+    icon: Clapperboard,
+    accentVar: 'var(--cat-media)',
   },
   {
-    id: 'image',
-    name: '图片处理',
-    enName: 'Image',
-    description: '压缩、裁剪、滤镜、水印、取色与二维码，基于 Canvas 全程在浏览器完成。',
-    icon: ImageIcon,
-    accentVar: 'var(--cat-image)',
-  },
-  {
-    id: 'color',
-    name: '颜色设计',
-    enName: 'Color',
-    description: '颜色格式互转、WCAG 对比度检查、渐变与色阶生成，给前端和设计师用。',
-    icon: Pipette,
-    accentVar: 'var(--cat-color)',
+    id: 'document',
+    name: '文档与 OCR',
+    enName: 'Document',
+    description:
+      '在本地解析与生成 PDF、Word、Excel、Markdown。PDF 对象级编辑用 pdf-lib，OCR 用 tesseract.js，全程不上传。',
+    icon: FileStack,
+    accentVar: 'var(--cat-document)',
   },
   {
     id: 'data',
-    name: '数据格式',
+    name: '数据与查询',
     enName: 'Data',
-    description: 'JSON / YAML / CSV / XML / SQL 的格式化、互转与校验，接口调试必备。',
-    icon: Braces,
+    description:
+      '把真正的数据库与分析引擎塞进浏览器：SQLite 持久化到 OPFS，DuckDB 直接查 CSV / Parquet。',
+    icon: Database,
     accentVar: 'var(--cat-data)',
   },
   {
-    id: 'time',
-    name: '日期时间',
-    enName: 'Date & Time',
-    description: '时间戳换算、日期差、日期推算、跨时区对照，处理时间不再心算。',
-    icon: Clock,
-    accentVar: 'var(--cat-time)',
-  },
-  {
-    id: 'converter',
-    name: '换算工具',
-    enName: 'Converter',
-    description: '单位换算、进制转换、百分比、文件权限与 Cron 表达式换算。',
-    icon: ArrowLeftRight,
-    accentVar: 'var(--cat-converter)',
-  },
-  {
-    id: 'generator',
-    name: '生成器',
-    enName: 'Generator',
-    description: '占位文本、随机数据、Unicode 转义与二进制视图。',
-    icon: Sparkles,
-    accentVar: 'var(--cat-generator)',
-  },
-  {
-    id: 'css',
-    name: 'CSS 与前端',
-    enName: 'CSS & Frontend',
+    id: 'imaging',
+    name: '图像工程',
+    enName: 'Imaging',
     description:
-      '代码美化压缩、CSS 单位换算、阴影、缓动、玻璃拟态、有机圆角，直接产出可粘贴的 CSS。',
-    icon: CodeXml,
-    accentVar: 'var(--cat-css)',
+      '编解码、批处理流水线、隐私元数据。核心是 WASM 编解码器与 Worker 并发，不靠 Canvas 硬扛。',
+    icon: Images,
+    accentVar: 'var(--cat-imaging)',
   },
   {
-    id: 'dev',
-    name: '开发速查',
-    enName: 'Dev Cheatsheet',
-    description: '.gitignore 生成、HTTP 状态码、User-Agent 解析、子网计算与 JSONPath 查询。',
-    icon: Terminal,
-    accentVar: 'var(--cat-dev)',
+    id: 'crypto',
+    name: '密码与安全',
+    enName: 'Crypto & Security',
+    description: 'Web Crypto 能做的都做，不能做的用 WASM 补。密钥与明文永远留在本机内存里。',
+    icon: ShieldCheck,
+    accentVar: 'var(--cat-crypto)',
   },
   {
-    id: 'creative',
-    name: '视觉创意',
-    enName: 'Creative',
-    description: 'SVG 波浪、噪点纹理与文字 ASCII 艺术，用来做背景、配图和一点炫技。',
-    icon: WandSparkles,
-    accentVar: 'var(--cat-creative)',
+    id: 'code',
+    name: '代码工程',
+    enName: 'Code',
+    description:
+      '语法树级解析、自动机可视化、结构化差异。走 tree-sitter / shiki / CodeMirror，不是简单的字符串替换。',
+    icon: SquareFunction,
+    accentVar: 'var(--cat-code)',
+  },
+  {
+    id: 'design',
+    name: '设计与视觉',
+    enName: 'Design',
+    description:
+      '参数联动的可视化工作台与系统级产出（设计令牌、字体子集、3D 预览），导出的是可直接落地的代码与资产。',
+    icon: Palette,
+    accentVar: 'var(--cat-design)',
+  },
+  {
+    id: 'runtime',
+    name: '运行时诊断',
+    enName: 'Runtime',
+    description:
+      '探测浏览器与设备真实能力、跑基准、量网络质量。回答「这台机器到底能不能跑」这类问题。',
+    icon: Activity,
+    accentVar: 'var(--cat-runtime)',
   },
 ];
 
@@ -198,6 +139,16 @@ export function getCategory(id: CategoryId): Category {
 /* ------------------------------------------------------------------ *
  * Tool metadata
  * ------------------------------------------------------------------ */
+
+/**
+ * 工具状态。
+ * - `ready`   ：已实现，可以直接用
+ * - `planned` ：已定方案、待实现，页面会渲染实现规格（见 tool-specs.ts）
+ *
+ * 没有第三种状态 —— 不允许出现「占位但没方案」的空壳。
+ */
+export type ToolStatus = 'ready' | 'planned';
+
 export interface ToolMeta {
   /** URL slug，同时作为路由参数 */
   slug: string;
@@ -210,594 +161,425 @@ export interface ToolMeta {
   icon: LucideIcon;
   /** 参与命令面板搜索的关键词（中英文混排） */
   keywords: string[];
+  status: ToolStatus;
   /** 首页精选 */
   featured?: boolean;
-  /** 依赖 Canvas / Clipboard 等仅浏览器 API */
-  clientOnly?: boolean;
 }
 
 export const TOOLS: ToolMeta[] = [
-  /* ==================== 文本处理 ==================== */
+  /* ==================== 本地 AI 推理 ==================== */
   {
-    slug: 'text-case-converter',
-    name: '文本大小写转换',
-    summary: '驼峰、下划线、常量式等 17 种命名风格互转',
+    slug: 'bg-remover',
+    name: '智能抠图去背景',
+    summary: '本地模型一键去背景，图片不上传',
     description:
-      '在线转换文本大小写与命名风格：全大写、全小写、首字母大写、小驼峰 camelCase、大驼峰 PascalCase、下划线 snake_case、短横线 kebab-case、常量式 CONSTANT_CASE 等 17 种，支持中英混合输入，实时预览结果，一键复制。',
-    category: 'text',
-    icon: CaseSensitive,
-    keywords: ['大小写', '驼峰', '命名', 'camel', 'pascal', 'snake', 'kebab', 'case'],
+      '用 RMBG 系列分割模型在浏览器里做前景/背景分离，输出带透明通道的 PNG，可换纯色或自定义背景。模型在本机推理，人像与商品图不会离开你的设备。',
+    category: 'ai',
+    icon: Aperture,
+    keywords: ['抠图', '去背景', 'remove background', 'matting', 'onnx', '透明', 'png'],
+    status: 'planned',
     featured: true,
   },
   {
-    slug: 'text-replace',
-    name: '文本替换',
-    summary: '支持正则、全词匹配、区分大小写的批量替换',
+    slug: 'whisper-transcribe',
+    name: '语音转文字',
+    summary: 'Whisper 本地转写，带时间轴',
     description:
-      '在线批量替换文本：支持普通文本与正则表达式两种模式，可开启区分大小写、全词匹配、多行模式，实时显示替换命中次数，特殊正则字符自动转义避免误替换。',
-    category: 'text',
-    icon: Replace,
-    keywords: ['替换', '批量', '正则', 'replace', 'regex', '查找'],
-  },
-  {
-    slug: 'text-statistics',
-    name: '文本统计',
-    summary: '字符数、字数、字节数、行数、单词数一站统计',
-    description:
-      '统计文本的字符数、UTF-8 字节数、行数、中文字数、英文单词数、去重词数、数字与空格数量，并估算阅读时长。正确处理 emoji 与代理对，中英混排同样准确。',
-    category: 'text',
-    icon: BarChart3,
-    keywords: ['统计', '字数', '字符', '字节', 'word', 'count', 'characters'],
+      '用 Whisper 模型在浏览器内把音频转成文字，输出带时间轴的字幕。支持中文与多语言，音频不会上传到任何服务器 —— 这是它和绝大多数「在线转写」的根本区别。',
+    category: 'ai',
+    icon: BrainCircuit,
+    keywords: ['语音识别', '转写', 'whisper', 'transcribe', '字幕', 'asr', 'srt'],
+    status: 'planned',
     featured: true,
   },
   {
-    slug: 'text-diff',
-    name: '文本对比 Diff',
-    summary: '按行或按字符对比两段文本的差异',
+    slug: 'semantic-search',
+    name: '语义相似度检索',
+    summary: '本地文本向量化，按意思找内容',
     description:
-      '对比两段文本的差异，支持按行或按字符粒度 Diff，直观标出新增与删除内容，适合校对文案、比对配置差异与查看代码改动。',
-    category: 'text',
-    icon: GitCompare,
-    keywords: ['对比', '差异', 'diff', 'compare', '比对'],
-    featured: true,
+      '把一批文本用嵌入模型转成向量，输入一句话按语义相似度排序返回最相关的条目，并可视化相似度矩阵。适用于整理素材、去重、找相似工单。',
+    category: 'ai',
+    icon: ListTree,
+    keywords: ['语义', '向量', 'embedding', '相似度', 'semantic', '余弦', '检索'],
+    status: 'planned',
   },
   {
-    slug: 'text-sort-dedupe',
-    name: '文本去重排序',
-    summary: '行去重、排序、洗牌、反转、压缩空行',
+    slug: 'image-classify',
+    name: '图像识别分类',
+    summary: '本地图像分类与标签识别',
     description:
-      '对多行文本做去重、按字典序或数值排序、随机打乱、倒序反转、去除首尾空格与多余空行，并给出被移除的行数统计。适合清洗日志、名单与标签列表。',
-    category: 'text',
-    icon: ListFilter,
-    keywords: ['去重', '排序', '洗牌', 'dedupe', 'sort', 'unique'],
+      '用轻量分类模型在浏览器内识别图片内容，输出 Top-N 标签与置信度，支持一次拖入多张批量推理并导出结果表。可用于素材归档、内容初筛。',
+    category: 'ai',
+    icon: Images,
+    keywords: ['图像分类', '识别', 'classification', 'mobilenet', '标签', 'ai'],
+    status: 'planned',
   },
   {
-    slug: 'text-width-converter',
-    name: '全角半角转换',
-    summary: '全角 ⇄ 半角字符一键互转',
+    slug: 'face-landmark',
+    name: '人脸与姿态识别',
+    summary: '实时人脸关键点、手势与姿态检测',
     description:
-      '把全角字符与半角字符互相转换，处理中英混排文档、清洗表单数据、对齐代码字符串时非常有用，实时转换并可复制结果。',
-    category: 'text',
-    icon: TypeIcon,
-    keywords: ['全角', '半角', 'fullwidth', 'halfwidth', '字符'],
-  },
-  {
-    slug: 'markdown-preview',
-    name: 'Markdown 预览',
-    summary: '实时渲染 Markdown 并美化代码块',
-    description:
-      '实时预览 Markdown 渲染效果，支持 GFM 表格、任务列表、代码块、引用、标题与链接，左右分栏编辑，所见即所得，适合写 README 与文档初稿。',
-    category: 'text',
-    icon: FileCode2,
-    keywords: ['markdown', '预览', 'md', '渲染', '富文本'],
-  },
-  {
-    slug: 'regex-tester',
-    name: '正则表达式测试',
-    summary: '实时匹配、分组捕获与替换结果预览',
-    description:
-      '在线测试正则表达式：支持全部修饰符，列出每个匹配及其分组捕获内容，并预览替换后的文本。附带邮箱、手机号、URL 等常用正则速查表。',
-    category: 'text',
-    icon: Regex,
-    keywords: ['正则', 'regex', '匹配', '分组', 'tester'],
-    featured: true,
+      '用 MediaPipe Tasks 在浏览器内做实时人脸关键点、手势识别与人体姿态估计，支持摄像头实时叠加骨架、视频逐帧分析。全部本地推理，画面不外传。',
+    category: 'ai',
+    icon: Activity,
+    keywords: ['人脸', '关键点', '姿态', 'pose', 'face landmark', '手势', 'mediapipe'],
+    status: 'planned',
   },
 
-  /* ==================== 编码加密 ==================== */
+  /* ==================== 音视频引擎 ==================== */
   {
-    slug: 'base64-text',
-    name: 'Base64 编解码',
-    summary: 'UTF-8 安全的文本 Base64 编解码',
+    slug: 'video-transcode',
+    name: '视频转码',
+    summary: '浏览器内硬编硬解转码，无需上传',
     description:
-      'Base64 编码与解码，正确处理中文、emoji 等 UTF-8 字符（原生 btoa 遇到非 Latin-1 字符会报错），支持 URL-safe 变体。常用于接口调试、数据传输与 Basic Auth。',
-    category: 'crypto',
-    icon: Binary,
-    keywords: ['base64', '编码', '解码', 'encode', 'decode', 'utf8'],
+      '用 WebCodecs 的硬件编解码能力在浏览器内转码视频：调整分辨率、码率、编码格式（H.264 / VP9 / AV1），不经过 ffmpeg.wasm，速度快且体积小。支持 MP4 与 WebM 封装。',
+    category: 'media',
+    icon: Clapperboard,
+    keywords: ['视频转码', '转码', 'transcode', 'webcodecs', 'h264', 'vp9', 'av1', '压缩'],
+    status: 'planned',
     featured: true,
   },
   {
-    slug: 'base64-image',
-    name: 'Base64 图片互转',
-    summary: '图片与 Data URL 双向转换',
+    slug: 'video-to-gif',
+    name: '视频转 GIF',
+    summary: '抽帧生成高质量 GIF，可控帧率与调色板',
     description:
-      '把图片文件转换成 Base64 Data URL（可直接写进 CSS / HTML），也能把 Data URL 还原成图片并下载。支持 PNG、JPEG、WebP、GIF、SVG 等格式。',
-    category: 'crypto',
-    icon: ImageDown,
-    keywords: ['base64', '图片', 'data url', '互转', 'image'],
-    featured: true,
+      '按指定时间段与帧率从视频中抽帧，生成可控尺寸、循环次数与调色板质量的 GIF。支持首尾裁剪、逐帧预览与体积预估，比在线转换服务更可控。',
+    category: 'media',
+    icon: Aperture,
+    keywords: ['gif', '视频转 gif', '抽帧', '动图', 'gifenc', 'webcodecs'],
+    status: 'planned',
   },
   {
-    slug: 'url-encoder',
-    name: 'URL 编解码',
-    summary: 'URL 与查询参数编码解码、参数表解析',
+    slug: 'audio-lab',
+    name: '音频工作台',
+    summary: '波形可视化、裁切、变速与增益',
     description:
-      '对 URL 或查询串做百分号编码与解码，同时把查询串拆成可读的键值对表格，方便调试接口参数、处理中文链接与回调地址。',
-    category: 'crypto',
-    icon: Link2,
-    keywords: ['url', '编码', '解码', 'encodeURIComponent', 'query', '参数'],
-    featured: true,
+      '载入音频后可视化波形与频谱，支持区间裁切、淡入淡出、变速变调、响度归一化与增益调节，导出 WAV / MP3。处理链路走 Web Audio 的离线渲染，速度快且无损中间环节。',
+    category: 'media',
+    icon: Activity,
+    keywords: ['音频', '波形', '裁切', '频谱', 'audio', 'waveform', '增益', '淡入淡出'],
+    status: 'planned',
   },
   {
-    slug: 'html-entities',
-    name: 'HTML 实体编解码',
-    summary: 'HTML 特殊字符与实体互转',
+    slug: 'screen-recorder',
+    name: '屏幕与摄像头录制',
+    summary: '本地录制屏幕、窗口或摄像头并导出视频',
     description:
-      '把尖括号、与号、引号等字符转成 HTML 实体，或把 &amp; &lt; 之类的实体还原成原文。处理富文本、防止 XSS 注入、在模板内插入代码片段时常用。',
-    category: 'crypto',
-    icon: FileCode2,
-    keywords: ['html', '实体', 'entity', 'escape', '转义'],
+      '录制屏幕、浏览器窗口、指定标签页或摄像头画面，支持系统声音与麦克风混音、区域裁剪与画质码率调节。全程在浏览器内编码，录制文件不上传。',
+    category: 'media',
+    icon: Clapperboard,
+    keywords: ['录屏', '录制', 'screen record', 'getDisplayMedia', 'mediaRecorder', '摄像头'],
+    status: 'planned',
   },
   {
-    slug: 'hash-generator',
-    name: '哈希生成器',
-    summary: 'MD5 / SHA-1 / SHA-256 / SHA-512 / SHA3 文本与文件摘要',
+    slug: 'subtitle-studio',
+    name: '字幕工作台',
+    summary: '字幕格式互转、时间轴偏移与校对',
     description:
-      '计算文本或文件的哈希摘要，支持 MD5、SHA-1、SHA-256、SHA-512、SHA3 与 RIPEMD-160。文件在本地按字节读取不上传，适合校验文件完整性与生成缓存键。',
-    category: 'crypto',
-    icon: Fingerprint,
-    keywords: ['hash', '哈希', 'md5', 'sha256', 'sha512', 'sha1', '摘要', '校验'],
-    featured: true,
-  },
-  {
-    slug: 'hmac-generator',
-    name: 'HMAC 生成器',
-    summary: '带密钥的消息认证码计算',
-    description:
-      '用密钥计算 HMAC 摘要，支持 MD5、SHA-1、SHA-256、SHA-512 与 SHA3。常用于接口签名、Webhook 验签与消息完整性校验，支持自定义输出进制。',
-    category: 'crypto',
-    icon: KeySquare,
-    keywords: ['hmac', '签名', '验签', 'sha256', '密钥'],
-  },
-  {
-    slug: 'uuid-generator',
-    name: 'UUID / NanoID 生成',
-    summary: '批量生成 UUID v4、v1 与 NanoID',
-    description:
-      '基于 Web Crypto 安全随机数批量生成 UUID v4、含时间序的 UUID v1 风格与 NanoID，可一键复制全部，适合构造测试数据的主键。',
-    category: 'crypto',
-    icon: Hash,
-    keywords: ['uuid', 'guid', 'nanoid', '随机', 'id'],
-    featured: true,
-  },
-  {
-    slug: 'password-generator',
-    name: '密码生成器',
-    summary: '可定制规则的随机密码批量生成',
-    description:
-      '生成高强度随机密码：可指定长度、是否包含大小写字母、数字、符号，排除易混淆字符，或保证每种字符至少出现一次。同时给出熵值与破解时长评估。',
-    category: 'crypto',
-    icon: KeyRound,
-    keywords: ['密码', 'password', '随机', '生成器', '强度'],
-    featured: true,
-  },
-  {
-    slug: 'jwt-decoder',
-    name: 'JWT 解析',
-    summary: '解码 Header / Payload 并检查过期时间',
-    description:
-      '粘贴 JWT 即可解析 Header 与 Payload，格式化展示过期时间 exp、签发时间 iat、生效时间 nbf，并标出令牌是否已过期。纯前端解析，令牌不会外泄。',
-    category: 'crypto',
-    icon: FileKey,
-    keywords: ['jwt', 'token', '解析', 'decode', 'payload'],
-    featured: true,
-  },
-  {
-    slug: 'aes-encryptor',
-    name: 'AES 加解密',
-    summary: '用口令对文本做对称加密与解密',
-    description:
-      '输入口令即可对文本做 AES（CBC + PKCS7）对称加密，或反过来把密文解回明文。适合临时加密一段敏感文本再粘贴给他人，密钥不落服务端。',
-    category: 'crypto',
-    icon: Lock,
-    keywords: ['aes', '加密', '解密', 'encrypt', 'decrypt', '对称'],
+      '在 SRT / VTT / ASS / LRC 之间互转，批量平移时间轴、合并与拆分条目、去重与校对，并可直接把视频与字幕放在一起预览对齐效果。',
+    category: 'media',
+    icon: FileStack,
+    keywords: ['字幕', 'srt', 'vtt', 'ass', 'lrc', '时间轴', 'subtitle'],
+    status: 'planned',
   },
 
-  /* ==================== 图片处理 ==================== */
+  /* ==================== 文档与 OCR ==================== */
   {
-    slug: 'image-compress',
-    name: '图片压缩',
-    summary: '调质量、限尺寸、换格式，实时对比压缩效果',
+    slug: 'pdf-suite',
+    name: 'PDF 编辑套件',
+    summary: '合并拆分、旋转、水印、加密与页面重排',
     description:
-      '在浏览器里压缩图片：可调质量、限制最大边长、切换 PNG / JPEG / WebP 输出格式，实时对比压缩前后体积与节省比例，一键下载。图片不上传任何服务器。',
-    category: 'image',
-    icon: Minimize2,
-    keywords: ['压缩', '图片', 'compress', 'image', '体积', 'webp'],
+      '在浏览器内做 PDF 对象级编辑：多文件合并、按范围拆分、页面重排与旋转、批量加水印与页码、元数据修改、密码加密与权限设置。文件不经过任何服务器。',
+    category: 'document',
+    icon: FileStack,
+    keywords: ['pdf', '合并', '拆分', '水印', '加密', '旋转', 'pdf-lib', '页面'],
+    status: 'planned',
     featured: true,
-    clientOnly: true,
   },
   {
-    slug: 'image-crop',
-    name: '图片裁剪',
-    summary: '拖拽裁剪区域，支持常见比例与圆形头像',
+    slug: 'ocr-studio',
+    name: '文字识别 OCR',
+    summary: '图片与扫描件转可编辑文本',
     description:
-      '可视化裁剪图片：拖动调整位置与缩放，支持自由比例与 1:1、4:3、16:9、9:16、3:4 等预设，可切圆形蒙版做头像，导出 PNG / JPEG / WebP。',
-    category: 'image',
-    icon: Crop,
-    keywords: ['裁剪', 'crop', '头像', '比例', '图片'],
+      '对图片或 PDF 扫描件做 OCR，输出可编辑文本与保留版式的表格数据。支持中文、英文等多语言，可框选区域只识别指定部分，结果可导出为 txt / csv。',
+    category: 'document',
+    icon: Aperture,
+    keywords: ['ocr', '文字识别', '扫描', 'tesseract', '提取文字', '识别'],
+    status: 'planned',
     featured: true,
-    clientOnly: true,
   },
   {
-    slug: 'image-filter',
-    name: '图片滤镜调整',
-    summary: '亮度、对比度、饱和度等参数化调色与预设',
+    slug: 'markdown-studio',
+    name: 'Markdown 排版导出',
+    summary: '代码高亮、公式、图表一次渲染并导出图片或 PDF',
     description:
-      '用滑杆调整图片的亮度、对比度、饱和度、色相、模糊、灰度、怀旧与反相，提供复古、黑白、胶片等预设，实时预览后导出图片。',
-    category: 'image',
-    icon: SlidersHorizontal,
-    keywords: ['滤镜', 'filter', '亮度', '对比度', '调色', '灰度'],
-    clientOnly: true,
+      '把 Markdown 渲染成可发布的版式：代码块语法高亮、KaTeX 数学公式、Mermaid 流程图与表格，支持自定义主题与明暗两套配色，导出为长图、PDF 或 HTML。',
+    category: 'document',
+    icon: FileStack,
+    keywords: ['markdown', '排版', '导出', 'shiki', 'katex', 'mermaid', '长图'],
+    status: 'planned',
   },
   {
-    slug: 'image-watermark',
-    name: '图片加水印',
-    summary: '平铺或居中的自定义文字水印',
+    slug: 'docx-builder',
+    name: 'Word 文档生成',
+    summary: '用结构化数据生成带样式的 docx',
     description:
-      '给图片添加文字水印：可选全图斜向平铺或居中单枚，自定义文案、颜色、字号、透明度、旋转角度与疏密程度，导出带水印的图片用于版权保护。',
-    category: 'image',
-    icon: Stamp,
-    keywords: ['水印', 'watermark', '版权', '文字', '图片'],
-    clientOnly: true,
+      '把 Markdown 或结构化 JSON 转成带标题层级、表格、页眉页脚与样式的 .docx 文件，或反向解析已有 docx 提取正文与结构。适合批量生成报告与合同。',
+    category: 'document',
+    icon: FileStack,
+    keywords: ['word', 'docx', '生成', '报告', '合同', '导出'],
+    status: 'planned',
+  },
+  {
+    slug: 'sheet-studio',
+    name: '表格数据工作台',
+    summary: 'CSV / Excel 读取、清洗与公式预览',
+    description:
+      '读取 xlsx / csv，做筛选、排序、去重、列变换与透视，预览公式计算结果，再导出为表格或 JSON。适合不进 Excel 快速处理一份数据。',
+    category: 'document',
+    icon: Database,
+    keywords: ['excel', 'xlsx', 'csv', '表格', '透视', '清洗', '公式'],
+    status: 'planned',
+  },
+
+  /* ==================== 数据与查询 ==================== */
+  {
+    slug: 'sqlite-browser',
+    name: 'SQLite 数据库浏览器',
+    summary: '打开数据库文件，建表查询并持久化到本地',
+    description:
+      '在浏览器里打开 .sqlite / .db 文件，浏览表结构与数据、执行 SQL、导出结果，改动可持久化到 OPFS，或另存为新的数据库文件。整个数据库不出本机。',
+    category: 'data',
+    icon: Database,
+    keywords: ['sqlite', '数据库', 'sql', 'opfs', '查询', 'sql.js', 'db'],
+    status: 'planned',
+    featured: true,
+  },
+  {
+    slug: 'duckdb-analytics',
+    name: '大数据集即席分析',
+    summary: '直接对 CSV / Parquet 跑 SQL，百万行不掉帧',
+    description:
+      '把 CSV、Parquet、JSON 拖进来直接用 SQL 查询，支持聚合、窗口函数与多表 JOIN。引擎是 DuckDB 的 WASM 版，面向分析场景优化，不会因为行数过百万就卡死。',
+    category: 'data',
+    icon: Database,
+    keywords: ['duckdb', 'olap', 'parquet', 'csv', 'sql', '大数据', '分析'],
+    status: 'planned',
+    featured: true,
+  },
+  {
+    slug: 'jq-playground',
+    name: 'jq 表达式调试',
+    summary: '真正的 jq 语法，实时看结果',
+    description:
+      '在浏览器里跑真正的 jq（不是子集实现）：编辑器里写表达式，实时预览匹配结果、路径与数量，内置常用配方与错误定位，适合处理接口返回的复杂 JSON。',
+    category: 'data',
+    icon: ListTree,
+    keywords: ['jq', 'json', '查询', '过滤', 'transform', '流式'],
+    status: 'planned',
+  },
+  {
+    slug: 'json-path',
+    name: 'JSONPath 查询',
+    summary: '用表达式从 JSON 里取数据并实时看结果',
+    description:
+      '输入 JSONPath 表达式（$.a.b[0]、$..name、$[?(@.age>18)] 等）从 JSON 中查询数据，实时显示匹配结果、路径与数量，附带常用语法速查。',
+    category: 'data',
+    icon: ListTree,
+    keywords: ['jsonpath', 'json', '查询', 'path', '过滤'],
+    status: 'ready',
+  },
+  {
+    slug: 'type-forge',
+    name: '类型定义互转',
+    summary: 'JSON 结构一键转 TypeScript、Zod、Go 结构体',
+    description:
+      '从样例 JSON 或 JSON Schema 生成目标语言的类型定义：TypeScript interface、Zod schema、Go struct、Rust struct、Java class，支持可选字段推断、命名风格与嵌套结构。',
+    category: 'data',
+    icon: SquareFunction,
+    keywords: ['typescript', 'zod', 'go', 'schema', '类型', '结构体', '代码生成'],
+    status: 'planned',
+  },
+
+  /* ==================== 图像工程 ==================== */
+  {
+    slug: 'image-codec',
+    name: '图像格式转码',
+    summary: 'AVIF / WebP / JPEG XL / OxiPNG 本地编解码',
+    description:
+      '用 WASM 编解码器做高质量格式转换与压缩：支持 AVIF、WebP、JPEG XL、OxiPNG、MozJPEG，可对比不同编码器的体积与画质，批量导出并给出压前压后对比。',
+    category: 'imaging',
+    icon: Images,
+    keywords: ['avif', 'webp', 'jpeg xl', 'jxl', 'oxipng', 'squoosh', '压缩', '转码'],
+    status: 'planned',
+    featured: true,
+  },
+  {
+    slug: 'image-pipeline',
+    name: '批量图像流水线',
+    summary: '拖入一批图，串起压缩、裁剪、水印、重命名',
+    description:
+      '把处理步骤串成流水线：统一尺寸、裁剪、滤镜、水印、格式转换、按规则重命名，一次跑完一批图片并打包下载。多步骤流水线可保存为预设复用。',
+    category: 'imaging',
+    icon: Images,
+    keywords: ['批量', '流水线', '压缩', '水印', '重命名', '预设', 'worker'],
+    status: 'planned',
+    featured: true,
+  },
+  {
+    slug: 'exif-studio',
+    name: 'EXIF 查看与擦除',
+    summary: '查看拍摄参数，一键抹掉隐私元数据',
+    description:
+      '读取照片的完整 EXIF / IPTC / XMP 信息（机型、镜头、参数、GPS 定位、编辑历史），并可按项擦除或整体剥离元数据后导出。发图前清 GPS 定位很实用。',
+    category: 'imaging',
+    icon: Images,
+    keywords: ['exif', '元数据', 'gps', '隐私', '清除', '拍摄参数'],
+    status: 'planned',
+  },
+  {
+    slug: 'svg-optimizer',
+    name: 'SVG 优化清理',
+    summary: '压缩体积、合并路径、去编辑器冗余',
+    description:
+      '清理导出 SVG 里的编辑器冗余：删除无用的 defs 与注释、合并路径、精简数值精度、去除 metadata 与命名空间，对比优化前后体积并预览渲染结果是否一致。',
+    category: 'imaging',
+    icon: SquareFunction,
+    keywords: ['svg', '优化', 'svgo', '压缩', '路径合并', '图标'],
+    status: 'planned',
   },
   {
     slug: 'image-palette',
     name: '图片主色提取',
-    summary: '用中位切分算法提取图片配色方案',
+    summary: '中位切分算法提取主色与配色比例',
     description:
-      '上传图片后用中位切分（median cut）算法提取主色调与占比，输出可直接使用的色卡，点击即复制色值。适合做主题色、配图取色与 UI 一致性检查。',
-    category: 'image',
-    icon: Droplets,
-    keywords: ['取色', '主色', '配色', 'palette', 'color', '调色板'],
-    featured: true,
-    clientOnly: true,
-  },
-  {
-    slug: 'qrcode-generator',
-    name: '二维码生成器',
-    summary: '文本、链接、WiFi 生成二维码并可下载',
-    description:
-      '把文本、网址、电话或 WiFi 信息生成二维码：可调尺寸、纠错级别与前后景色；也能把 Data URL 反向读作图片。适合做分享卡片与线下物料。',
-    category: 'image',
-    icon: QrCode,
-    keywords: ['二维码', 'qrcode', 'qr', '生成', '扫码'],
-    featured: true,
-    clientOnly: true,
+      '用中位切分（median cut）算法从图片中提取主色板，给出每种颜色的占比，可直接导出为 CSS 变量、Tailwind 配置或设计令牌。',
+    category: 'imaging',
+    icon: Palette,
+    keywords: ['主色', '调色板', 'palette', '取色', 'median cut', '设计令牌'],
+    status: 'ready',
   },
 
-  /* ==================== 颜色设计 ==================== */
+  /* ==================== 密码与安全 ==================== */
   {
-    slug: 'color-converter',
-    name: '颜色转换器',
-    summary: 'HEX / RGB / HSL / HSV / CMYK 互转',
+    slug: 'crypto-lab',
+    name: '非对称加密与密钥',
+    summary: 'RSA / ECDSA / Ed25519 加解密与签名验签',
     description:
-      '在 HEX、RGB、RGBA、HSL、HSLA、HSV 与 CMYK 之间互相转换颜色值，支持色名输入与可视化取色，实时输出各种格式的 CSS 值可直接复制。',
-    category: 'color',
-    icon: Pipette,
-    keywords: ['颜色', 'color', 'hex', 'rgb', 'hsl', 'cmyk', '转换'],
+      '生成与导入 RSA、ECDSA、Ed25519 密钥对，做加密解密、签名验签与密钥格式转换（PEM / JWK / DER）。私钥只在浏览器内存中生成，不经网络传输。',
+    category: 'crypto',
+    icon: KeyRound,
+    keywords: ['rsa', 'ecdsa', 'ed25519', '密钥', '签名', '验签', 'pem', 'jwk'],
+    status: 'planned',
     featured: true,
   },
   {
-    slug: 'color-contrast',
-    name: '对比度检查器',
-    summary: '按 WCAG 2.1 判定 AA / AAA 是否达标',
+    slug: 'hash-suite',
+    name: '哈希与密钥派生',
+    summary: '摘要、HMAC、PBKDF2 / Argon2 / scrypt / HKDF',
     description:
-      '检查前景色与背景色的对比度是否符合 WCAG 2.1：给出 1~21 的比值与正文 / 大文本 / UI 组件的 AA、AAA 达标结论，并提供真实文本预览，帮助通过无障碍审核。',
-    category: 'color',
-    icon: Contrast,
-    keywords: ['对比度', 'contrast', 'wcag', '无障碍', 'accessibility', 'a11y'],
+      '一个页面覆盖摘要与密钥派生：MD5 到 SHA-512、SHA-3、HMAC 全算法，以及 PBKDF2、Argon2id、scrypt、HKDF 等口令与密钥派生函数，可调节迭代与内存参数并给出耗时。',
+    category: 'crypto',
+    icon: ShieldCheck,
+    keywords: ['哈希', 'hash', 'pbkdf2', 'argon2', 'scrypt', 'hkdf', 'hmac', '派生'],
+    status: 'planned',
     featured: true,
   },
   {
-    slug: 'gradient-generator',
-    name: 'CSS 渐变生成',
-    summary: '多色停靠点的线性 / 径向渐变与 CSS 代码',
+    slug: 'x509-inspector',
+    name: '数字证书解析',
+    summary: '解析 X.509 证书与 ASN.1 结构',
     description:
-      '可视化生成 CSS 渐变：添加多个色标、切换线性与径向、调整角度，实时预览并导出可直接使用的 CSS 代码，也能一键复制 Tailwind 渐变写法。',
-    category: 'color',
-    icon: Layers,
-    keywords: ['渐变', 'gradient', 'css', '线性', '径向'],
-    featured: true,
+      '粘贴 PEM 证书或上传 .cer 文件，解析出主体、颁发者、有效期、公钥算法、扩展项与指纹，并可视化 ASN.1 树结构。排查证书链问题、看 SAN 域名列表时很省事。',
+    category: 'crypto',
+    icon: BadgeCheck,
+    keywords: ['x509', '证书', 'asn1', 'ssl', 'tls', 'pem', '指纹', 'san'],
+    status: 'planned',
   },
   {
-    slug: 'color-palette',
-    name: '调色板生成器',
-    summary: '由一个基色生成色阶与和谐配色方案',
+    slug: 'ctf-toolbox',
+    name: '编码链工作台',
+    summary: '像 CyberChef 一样把编码与加密串成流水线',
     description:
-      '输入一个基础色，自动生成 10 级色阶，以及互补色、类似色、三角配色、四方配色与分裂互补色，点击任意色块即可复制色值。适合搭建设计系统色板。',
-    category: 'color',
-    icon: Droplets,
-    keywords: ['调色板', '色阶', '配色', 'palette', 'harmony', '设计'],
-  },
-
-  /* ==================== 数据格式 ==================== */
-  {
-    slug: 'json-formatter',
-    name: 'JSON 格式化',
-    summary: '美化、压缩、校验并定位错误行列',
-    description:
-      'JSON 美化与压缩一体：支持 2 空格、4 空格、Tab 缩进，输入错误时精确定位到第几行第几列并给出原因。常用于接口报文调试与配置文件校验。',
-    category: 'data',
-    icon: Braces,
-    keywords: ['json', '格式化', '美化', '压缩', '校验', 'format'],
-    featured: true,
-  },
-  {
-    slug: 'json-yaml',
-    name: 'JSON ⇄ YAML 互转',
-    summary: 'JSON 与 YAML 双向转换，保留数据结构',
-    description:
-      '在 JSON 与 YAML 之间双向转换，保留原始键顺序与嵌套结构，支持自定义缩进。处理 Kubernetes 配置、CI 流水线与接口文档时非常方便。',
-    category: 'data',
-    icon: ArrowLeftRight,
-    keywords: ['json', 'yaml', 'yml', '互转', '转换'],
-    featured: true,
-  },
-  {
-    slug: 'json-csv',
-    name: 'JSON ⇄ CSV 互转',
-    summary: '对象数组与 CSV 表格双向转换',
-    description:
-      '把 JSON 对象数组转成 CSV（自动合并所有出现过的字段作为表头），或把 CSV 解析成 JSON，可切换是否以首行作为列名。适合导出报表与批量数据整理。',
-    category: 'data',
-    icon: Table2,
-    keywords: ['json', 'csv', '表格', '互转', '导出', 'excel'],
-  },
-  {
-    slug: 'json-escape',
-    name: 'JSON 转义 / 去转义',
-    summary: '字符串与 JSON 转义串互转',
-    description:
-      '把普通字符串转成带转义的 JSON 字符串值，或把转义序列还原成原文。处理接口报文、日志文件与嵌套 JSON 字符串时非常实用。',
-    category: 'data',
-    icon: Braces,
-    keywords: ['转义', 'escape', 'json', '字符串', '去转义'],
-  },
-  {
-    slug: 'xml-formatter',
-    name: 'XML 格式化校验',
-    summary: '美化 XML 并校验结构是否合法',
-    description:
-      '格式化 XML 让它有清晰的缩进层级，同时校验标签是否闭合、属性是否合法，出错时给出行列位置。处理老系统配置文件与 SOAP 报文时常用。',
-    category: 'data',
-    icon: FileCode2,
-    keywords: ['xml', '格式化', '校验', '美化'],
-  },
-  {
-    slug: 'sql-formatter',
-    name: 'SQL 格式化',
-    summary: '12 种方言美化 SQL 并统一关键字大小写',
-    description:
-      '格式化混乱的 SQL：支持 MySQL、PostgreSQL、SQL Server、Oracle、BigQuery、SQLite、Snowflake 等 12 种方言，可统一关键字大小写、设置缩进宽度与单行最大宽度。',
-    category: 'data',
-    icon: Database,
-    keywords: ['sql', '格式化', '美化', 'mysql', 'postgres', '方言'],
+      '把 Base64、Hex、URL、ROT13、异或、压缩、哈希等算子拖成一条流水线，数据依次流过每个算子并逐级预览中间结果。处理多层嵌套编码和 CTF 题目时效率远高于来回切工具。',
+    category: 'crypto',
+    icon: ShieldCheck,
+    keywords: ['cyberchef', '编码链', 'ctf', 'rot13', '异或', '流水线', 'recipe'],
+    status: 'planned',
     featured: true,
   },
 
-  /* ==================== 日期时间 ==================== */
+  /* ==================== 代码工程 ==================== */
   {
-    slug: 'timestamp-converter',
-    name: 'Unix 时间戳转换',
-    summary: '时间戳 ⇄ 日期字符串，自动识别秒 / 毫秒',
+    slug: 'ast-playground',
+    name: 'AST 解析与重构',
+    summary: '语法树级查看与批量代码改写',
     description:
-      'Unix 时间戳与可读日期互相转换，自动识别秒级与毫秒级时间戳，同时给出 ISO 8601、UTC、本地时间与相对时间。适合调试接口里的 createTime 字段。',
-    category: 'time',
-    icon: Timer,
-    keywords: ['时间戳', 'timestamp', 'unix', '转换', '日期'],
+      '把 JS / TS / CSS / HTML 解析成语法树并可视化，支持按节点类型查询、用选择器批量重命名与改写，导出改写后的代码或 codemod 脚本。不是正则替换，不会踩到字符串里的同名标识符。',
+    category: 'code',
+    icon: SquareFunction,
+    keywords: ['ast', 'codemod', '重构', '语法树', 'tree-sitter', 'swc', 'babel'],
+    status: 'planned',
     featured: true,
   },
   {
-    slug: 'date-diff',
-    name: '日期差计算',
-    summary: '两个日期相差多久，含工作日统计',
+    slug: 'regex-visualizer',
+    name: '正则可视化与调试',
+    summary: '把正则画成自动机图，逐步跟踪匹配',
     description:
-      '计算两个日期之间相差多少年、月、日、时、分、秒，同时给出总天数、周数、工作日数与周末天数，支持一键交换顺序。算工期、算年龄、算到期日都用它。',
-    category: 'time',
-    icon: CalendarRange,
-    keywords: ['日期差', '相差', '天数', '工作日', 'diff'],
+      '把正则表达式可视化成正则语法树与自动机状态图，支持逐步执行匹配过程、高亮回溯点、对比不同写法的性能差异。排查灾难性回溯时特别有用。',
+    category: 'code',
+    icon: SquareFunction,
+    keywords: ['正则', 'regex', '自动机', 'dfa', 'nfa', '回溯', '可视化'],
+    status: 'planned',
     featured: true,
   },
   {
-    slug: 'date-calculator',
-    name: '日期推算器',
-    summary: '在基准日期上加减年月日时分秒',
+    slug: 'code-image',
+    name: '代码高亮出图',
+    summary: '生成带主题的精美代码截图',
     description:
-      '给定基准日期，往前或往后推算任意数量的年、月、周、日、时、分、秒，支持负数。处理月度 fecha 边界、算 deadline 与订阅到期时间很方便。',
-    category: 'time',
-    icon: CalendarPlus,
-    keywords: ['日期', '推算', '加减', '计算', 'deadline'],
+      '把代码片段渲染成带语法高亮与窗口装饰的图片：可选主流主题、行号、高亮行、背景样式与内边距，导出 PNG 或 SVG。写文档、发帖配图直接用。',
+    category: 'code',
+    icon: Images,
+    keywords: ['代码截图', '高亮', 'shiki', 'carbon', '语法高亮', '出图'],
+    status: 'planned',
   },
   {
-    slug: 'timezone-converter',
-    name: '时区转换',
-    summary: '同一时刻在全球主要时区的时间对照',
+    slug: 'text-diff',
+    name: '文本差异比对',
+    summary: '按行或按字比对，双栏高亮差异',
     description:
-      '把一个时刻换算到全球常用时区，同时列出所有时区的对照表，标出当地是否处于工作时间。安排跨时区会议、制定上线计划时用得上。',
-    category: 'time',
-    icon: Globe,
-    keywords: ['时区', 'timezone', 'utc', '转换', '对照'],
+      '按行或按字符粒度比对两段文本，双栏高亮新增与删除，支持忽略空白与大小写差异，统计增删行数。适合比对配置、日志与文档改动。',
+    category: 'code',
+    icon: GitCompare,
+    keywords: ['diff', '对比', '差异', '文本比较', '变更'],
+    status: 'ready',
+  },
+  {
+    slug: 'bundle-inspector',
+    name: '构建产物分析',
+    summary: '分析打包体积，找出体积元凶',
+    description:
+      '上传打包分析产物（webpack stats、Rollup / Vite 的 bundle 报告），生成可交互的模块体积树图与排行：按体积排序、按 chunk 拆分、查看依赖引用链，定位能真正瘦身的模块。',
+    category: 'code',
+    icon: SquareFunction,
+    keywords: ['bundle', '体积', 'webpack', 'vite', 'rollup', 'treemap', '分析', 'stats'],
+    status: 'planned',
   },
 
-  /* ==================== 换算工具 ==================== */
+  /* ==================== 设计与视觉 ==================== */
   {
-    slug: 'unit-converter',
-    name: '单位换算',
-    summary: '长度、重量、面积、温度等 10 大类单位互换',
+    slug: 'css-lab',
+    name: 'CSS 效果实验室',
+    summary: '阴影、玻璃、圆角、渐变参数联动调参',
     description:
-      '覆盖长度、重量、面积、体积、温度、时间、数据存储、速度、压强与能量共 10 大类 100 多种单位的互换，含市制单位（里、斤、亩）与英制单位，可快速交换换算方向。',
-    category: 'converter',
-    icon: Ruler,
-    keywords: ['单位', '换算', '转换', 'unit', '长度', '重量', '温度'],
-    featured: true,
-  },
-  {
-    slug: 'number-base',
-    name: '进制转换',
-    summary: '2 ~ 36 进制互转，支持超大整数',
-    description:
-      '支持二进制、八进制、十进制、十六进制一直到三十六进制的任意互转，内部使用 BigInt 精确处理超大整数，同时展示常用进制对照表。适合底层开发与协议分析。',
-    category: 'converter',
-    icon: Binary,
-    keywords: ['进制', '二进制', '十六进制', '转换', 'binary', 'hex'],
-    featured: true,
-  },
-  {
-    slug: 'percentage-calculator',
-    name: '百分比计算器',
-    summary: '求占比、增减百分比、变化率一步到位',
-    description:
-      '覆盖六类常见百分比问题：X 占 Y 的百分之几、Y 的 X% 是多少、Y 增加 / 减少 X% 后的值、A 到 B 的变化率。输入即算，附对照公式说明。',
-    category: 'converter',
-    icon: Percent,
-    keywords: ['百分比', 'percent', '占比', '增长率', '折扣'],
-  },
-  {
-    slug: 'chmod-calculator',
-    name: 'Chmod 权限计算',
-    summary: 'rwx 勾选 ⇄ 数字 ⇄ 符号表示的权限换算',
-    description:
-      '勾选或反勾选读、写、执行权限，实时得到数字形式（如 755）与符号形式（rwxr-xr-x）的权限表示；反向输入数字同样能解析出各项权限的含义。',
-    category: 'converter',
-    icon: FileLock2,
-    keywords: ['chmod', '权限', 'linux', '755', 'rwx'],
-  },
-  {
-    slug: 'cron-parser',
-    name: 'Cron 表达式解析',
-    summary: '翻译成自然语言并列出未来执行时间',
-    description:
-      '把 Cron 表达式翻译成人话，并计算接下来 5 次执行时间，同时展示每个字段分别命中了哪些值。支持标准 5 段写法与带月、星期的别名写法。',
-    category: 'converter',
-    icon: CalendarClock,
-    keywords: ['cron', '定时任务', '表达式', '解析', 'schedule'],
-    featured: true,
-  },
-  {
-    slug: 'roman-numeral',
-    name: '罗马数字转换',
-    summary: '阿拉伯数字与罗马数字互转',
-    description:
-      '在普通数字与罗马数字之间互相转换（支持 1 ~ 3999），附带构成规则说明。适合排版、版权年份、章节序号等场景。',
-    category: 'converter',
-    icon: Crown,
-    keywords: ['罗马数字', 'roman', '数字', '转换'],
-  },
-
-  /* ==================== 生成器 ==================== */
-  {
-    slug: 'lorem-ipsum',
-    name: 'Lorem Ipsum 生成',
-    summary: '按字数、句子或段落生成占位文本',
-    description:
-      '生成指定数量的占位文本，可按字数、句子数或段落数生成，支持保留经典的 Lorem ipsum 开头。适合做设计稿排版与列表占位数据。',
-    category: 'generator',
-    icon: AlignLeft,
-    keywords: ['lorem', '占位', '文本', 'ipsum', '假文'],
-  },
-  {
-    slug: 'random-string',
-    name: '随机字符生成',
-    summary: '批量生成随机字符串、数字与口令',
-    description:
-      '按自定义字符集批量生成随机字符串：可选大小写字母、数字、符号，指定长度与生成数量，支持自动去重并保证每种字符集都被用到。',
-    category: 'generator',
-    icon: Dices,
-    keywords: ['随机', 'random', '字符串', '生成', '测试数据'],
-  },
-  {
-    slug: 'unicode-escape',
-    name: 'Unicode 转义转换',
-    summary: '文本 ⇄ \\uXXXX 转义串互转',
-    description:
-      '把文本转成 \\uXXXX 形式的 Unicode 转义串，或把转义串还原为原文。常用于绕过关键词检查、安全地写入配置文件中的特殊字符，以及排查编码问题。',
-    category: 'generator',
-    icon: WrapText,
-    keywords: ['unicode', '转义', 'escape', '编码', '乱码'],
-  },
-  {
-    slug: 'binary-converter',
-    name: '文本 ⇄ 二进制 / 十六进制',
-    summary: '按 UTF-8 字节查看文本的 01 串与 Hex',
-    description:
-      '把文本按 UTF-8 编码转换成二进制字符串与十六进制串，也支持反向还原。适合查看字符的真实字节构成、调试字符集问题与分析协议报文。',
-    category: 'generator',
-    icon: Sigma,
-    keywords: ['二进制', '十六进制', 'hex', 'binary', '编码'],
-  },
-
-  /* ==================== CSS 与前端 ==================== */
-  {
-    slug: 'code-formatter',
-    name: '代码美化 / 压缩',
-    summary: 'HTML / CSS / JS / TS / JSON 格式化与压缩',
-    description:
-      '用 Prettier 在浏览器里格式化 HTML、CSS、SCSS、JavaScript、TypeScript 与 JSON，也能反向压缩成一行。可选缩进宽度、单双引号与分号风格，代码不上传任何服务器。',
-    category: 'css',
-    icon: FileCode2,
-    keywords: [
-      '代码',
-      '格式化',
-      '美化',
-      '压缩',
-      'prettier',
-      'minify',
-      'beautify',
-      'html',
-      'css',
-      'js',
-    ],
-    featured: true,
-  },
-  {
-    slug: 'css-unit-converter',
-    name: 'CSS 单位换算',
-    summary: 'px / rem / em / vw / vh / pt 互转并给出 vw→px 对照',
-    description:
-      '在 px、rem、em、vw、vh、pt、%、in、cm 之间换算 CSS 单位。可设定根字号与视口尺寸，同时给出 clamp 所需的 vw 系数，响应式适配时不用再手算。',
-    category: 'css',
-    icon: Scaling,
-    keywords: ['css', '单位', 'px', 'rem', 'em', 'vw', 'vh', '换算'],
-    featured: true,
-  },
-  {
-    slug: 'clamp-calculator',
-    name: 'clamp() 流体排版计算',
-    summary: '算出随视口平滑缩放的字号并生成 CSS',
-    description:
-      '给定最小与最大字号、以及对应的视口宽度区间，算出 clamp() 需要的首选值与 vw 系数，生成可直接使用的 CSS，并列出各断点下的实际字号。',
-    category: 'css',
-    icon: Ruler,
-    keywords: ['clamp', '流体', '响应式', '排版', 'font-size', 'css'],
-  },
-  {
-    slug: 'box-shadow-generator',
-    name: 'CSS 阴影生成',
-    summary: '可视化调多层阴影，实时预览并导出代码',
-    description:
-      '可视化生成 box-shadow：可叠加多层阴影，分别调整偏移、模糊、扩散、颜色与内外阴影，实时预览后导出 CSS 代码，也支持 text-shadow 模式。',
-    category: 'css',
-    icon: Layers,
-    keywords: ['box-shadow', '阴影', 'css', 'text-shadow', '生成'],
+      '一个工作台里联动调节阴影、玻璃拟态、有机圆角、渐变、滤镜与流体字号，实时预览多层叠加效果，导出干净的 CSS 与设计令牌，而不是每个效果一个独立页面。',
+    category: 'design',
+    icon: Palette,
+    keywords: ['css', '阴影', '玻璃拟态', '圆角', '渐变', '滤镜', 'clamp', '工作台'],
+    status: 'planned',
     featured: true,
   },
   {
@@ -806,118 +588,93 @@ export const TOOLS: ToolMeta[] = [
     summary: '拖拽控制点生成 cubic-bezier 与预设缓动',
     description:
       '拖动两个控制点生成 CSS cubic-bezier 缓动函数，实时预览动画曲线与小球运动，内置 ease / ease-in-out / 回弹等常用预设，一键复制 CSS。',
-    category: 'css',
-    icon: Spline,
+    category: 'design',
+    icon: Activity,
     keywords: ['cubic-bezier', '贝塞尔', '缓动', 'easing', '动画', 'css'],
+    status: 'ready',
     featured: true,
   },
   {
-    slug: 'glassmorphism',
-    name: '玻璃拟态生成',
-    summary: '毛玻璃效果参数调节并生成 CSS',
+    slug: 'color-system',
+    name: '配色系统生成',
+    summary: '从一个主色生成完整色阶与设计令牌',
     description:
-      '生成毛玻璃（glassmorphism）效果：调节模糊强度、透明度、饱和度、边框与圆角，实时预览 backdrop-filter 效果并导出 CSS 代码。',
-    category: 'css',
-    icon: Paintbrush,
-    keywords: ['玻璃拟态', 'glassmorphism', 'backdrop-filter', '毛玻璃', 'css'],
-  },
-  {
-    slug: 'fancy-border-radius',
-    name: '有机圆角生成',
-    summary: '八个角的圆角独立调整，生成异形 border-radius',
-    description:
-      '独立调整矩形四个角的水平与垂直圆角，生成 border-radius 的八值写法，做出有机形状与叶片造型。实时预览并导出 CSS。',
-    category: 'css',
-    icon: CircleDashed,
-    keywords: ['border-radius', '圆角', '有机', 'blob', 'css', '形状'],
-  },
-
-  /* ==================== 开发速查 ==================== */
-  {
-    slug: 'gitignore-generator',
-    name: '.gitignore 生成',
-    summary: '勾选技术栈，离线生成 gitignore 模板',
-    description:
-      '勾选项目用到的语言、框架与工具，合并生成一份 .gitignore。模板全部内置在本地，不请求任何外部接口，离线也能用。',
-    category: 'dev',
-    icon: GitBranch,
-    keywords: ['gitignore', 'git', '模板', '生成', 'node', 'python'],
+      '输入主色自动生成 50–950 的完整色阶、语义色（成功/警告/危险）、深色模式映射与对比度校验结果，导出为 CSS 变量、Tailwind 配置或 Figma Tokens。',
+    category: 'design',
+    icon: Palette,
+    keywords: ['配色', '色阶', '设计令牌', 'tailwind', 'tokens', '深色模式', '主题'],
+    status: 'planned',
     featured: true,
   },
   {
-    slug: 'http-status-codes',
-    name: 'HTTP 状态码速查',
-    summary: '全部状态码含义与排查建议，可搜索',
+    slug: 'color-contrast',
+    name: '对比度检查',
+    summary: '按 WCAG 标准校验文字与背景可读性',
     description:
-      '按分类查阅 HTTP 状态码：1xx 信息、2xx 成功、3xx 重定向、4xx 客户端错误、5xx 服务端错误，每个码给出含义、常见场景与排查方向，支持关键词搜索。',
-    category: 'dev',
-    icon: Network,
-    keywords: ['http', '状态码', '404', '500', '301', 'status', '速查'],
-    featured: true,
+      '按 WCAG 2.1 计算相对亮度与对比度比值，判断是否达到 AA / AAA 标准，给出修色建议与最接近的合规颜色，支持同时校验前景与背景的组合。',
+    category: 'design',
+    icon: Aperture,
+    keywords: ['对比度', 'wcag', '无障碍', 'a11y', '亮度', '配色'],
+    status: 'ready',
   },
   {
-    slug: 'user-agent-parser',
-    name: 'User-Agent 解析',
-    summary: '拆解 UA 里的浏览器、系统与设备信息',
+    slug: 'three-viewer',
+    name: '3D 模型预览',
+    summary: '加载 glTF / GLB / OBJ 并调试材质光照',
     description:
-      '粘贴 User-Agent 字符串，解析出浏览器及版本、渲染引擎、操作系统、设备类型与是否为爬虫，同时给出 navigator 侧的关键字段对照。',
-    category: 'dev',
-    icon: MonitorSmartphone,
-    keywords: ['user-agent', 'ua', '解析', '浏览器', '设备', '爬虫'],
+      '在浏览器里加载并检查 3D 模型：轨道相机漫游、线框与法线叠加、材质替换、环境光照与环境贴图切换、动画轨道播放，并给出模型面数与贴图体积统计。',
+    category: 'design',
+    icon: Images,
+    keywords: ['3d', 'gltf', 'glb', 'obj', 'three.js', '模型', '材质', '光照'],
+    status: 'planned',
   },
   {
-    slug: 'subnet-calculator',
-    name: 'IPv4 子网计算',
-    summary: 'CIDR 网段的网络号、掩码、可用主机与划分',
+    slug: 'font-subset',
+    name: '字体子集化',
+    summary: '按用到的字符裁剪字体，大幅减小体积',
     description:
-      '输入 IP 与 CIDR 前缀，算出网络地址、广播地址、子网掩码、可用主机数与范围，支持把网段等分成若干子网。运维和网络调试常用。',
-    category: 'dev',
-    icon: Router,
-    keywords: ['子网', 'cidr', 'ipv4', '掩码', 'subnet', '网络'],
-  },
-  {
-    slug: 'json-path',
-    name: 'JSONPath 查询',
-    summary: '用表达式从 JSON 里取数据并实时看结果',
-    description:
-      '输入 JSONPath 表达式（$.a.b[0]、$..name、$[?(@.age>18)] 等）从 JSON 中查询数据，实时显示匹配结果、路径与数量，附带常用语法速查。',
-    category: 'dev',
-    icon: ListTree,
-    keywords: ['jsonpath', 'json', '查询', 'path', '过滤', 'jq'],
+      '提取页面上真正用到的字符集合，对 TTF / OTF / WOFF / WOFF2 做子集化裁剪并转换格式，对比裁剪前后的体积与字符覆盖率。中文字体动辄十几 MB，子集化后常能压到几十 KB。',
+    category: 'design',
+    icon: SquareFunction,
+    keywords: ['字体', '子集化', 'subset', 'woff2', 'ttf', 'fonttools', '体积'],
+    status: 'planned',
     featured: true,
   },
 
-  /* ==================== 视觉创意 ==================== */
+  /* ==================== 运行时诊断 ==================== */
   {
-    slug: 'svg-wave-generator',
-    name: 'SVG 波浪生成',
-    summary: '生成可平铺的波浪分割线与背景',
+    slug: 'device-lab',
+    name: '设备能力探测',
+    summary: '一次看清这台设备支持哪些现代 API',
     description:
-      '生成平滑的 SVG 波浪路径：调整波数、振幅、平滑度与层数，实时预览后可复制 SVG 代码或 Data URL，直接用作分区背景、页头页脚装饰。',
-    category: 'creative',
-    icon: Waves,
-    keywords: ['svg', '波浪', 'wave', '背景', '分割线', '装饰'],
+      '逐项检测浏览器的现代能力矩阵：WebGPU、WebCodecs、WASM SIMD / 线程、OPFS、Compression Streams、SharedArrayBuffer 与跨源隔离状态，给出每项的真实支持情况与降级建议。',
+    category: 'runtime',
+    icon: Activity,
+    keywords: ['能力检测', 'feature detect', 'webgpu', 'webcodecs', 'wasm', '兼容性'],
+    status: 'planned',
     featured: true,
   },
   {
-    slug: 'noise-texture-generator',
-    name: '噪点纹理生成',
-    summary: '生成颗粒噪点与网格纹理背景并导出 PNG',
+    slug: 'perf-benchmark',
+    name: '性能基准测试',
+    summary: '跑分对比 CPU、内存、Canvas 与加解密吞吐',
     description:
-      '用 Canvas 生成颗粒噪点、网格线、点阵等纹理背景：可调密度、强度、颜色与画布尺寸，导出 PNG 或 CSS Data URL，适合做质感底图。',
-    category: 'creative',
-    icon: Grid2x2,
-    keywords: ['噪点', 'noise', '纹理', 'texture', '背景', 'grain', 'canvas'],
+      '在本机跑一组标准化基准：整数与浮点吞吐、字符串与 JSON 处理、Canvas 光栅化、Web Crypto 加解密与哈希速度、内存带宽，输出可对比的分数与历史记录。',
+    category: 'runtime',
+    icon: Activity,
+    keywords: ['跑分', 'benchmark', '性能', '基准', 'cpu', '内存', '吞吐'],
+    status: 'planned',
   },
   {
-    slug: 'ascii-art',
-    name: '图片转 ASCII 艺术',
-    summary: '把图片转成字符画，可调密度与字符集',
+    slug: 'network-lab',
+    name: '网络质量诊断',
+    summary: '测量延迟、抖动、吞吐与连通性',
     description:
-      '把图片按亮度映射成 ASCII 字符画：可选字符集、输出宽度与对比度，支持彩色 HTML 输出与纯文本输出，一键复制。纯 Canvas 本地处理。',
-    category: 'creative',
-    icon: Wand2,
-    keywords: ['ascii', '字符画', 'art', '图片', '转换', '文本'],
+      '在浏览器里测量网络质量：往返延迟与抖动、下游吞吐、DNS 与连接建立耗时拆解、常见端口的连通性探测，并把多次结果画成趋势图，用于判断网络抖动还是服务端问题。',
+    category: 'runtime',
+    icon: Activity,
+    keywords: ['网络', '延迟', '带宽', '抖动', 'network', '测速', 'ping'],
+    status: 'planned',
   },
 ];
 
@@ -943,3 +700,13 @@ export function toolsByCategory(categoryId: CategoryId): ToolMeta[] {
 export const FEATURED_TOOLS = TOOLS.filter((t) => t.featured);
 
 export const TOTAL_TOOLS = TOOLS.length;
+
+/** 已实现的工具 */
+export const READY_TOOLS = TOOLS.filter((t) => t.status === 'ready');
+
+/** 待实现的工具 */
+export const PLANNED_TOOLS = TOOLS.filter((t) => t.status === 'planned');
+
+export function isReady(slug: string): boolean {
+  return getTool(slug)?.status === 'ready';
+}

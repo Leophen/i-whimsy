@@ -2,7 +2,7 @@
   "name": "i-whimsy",
   "version": "1.0.0",
   "private": true,
-  "description": "iWhimsy — 一个跑在浏览器里的前端超级工具库：文本、编码加密、图片、颜色、数据、日期、CSS 与前端、开发速查、视觉创意与换算生成器，共 63 个工具，全部本地计算，数据不出浏览器。",
+  "description": "iWhimsy — 只做高级工具的前端超级工具箱：本地 AI 推理、音视频引擎、文档与 OCR、数据查询、图像工程、密码安全、代码工程、设计视觉、运行时诊断。全部在浏览器本地运行，数据不出你的设备。",
   "packageManager": "npm@10.9.7",
   "engines": {
     "node": ">=20.9.0"
@@ -13,6 +13,8 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "check:tools": "node scripts/check-tools.mjs",
+    "verify": "npm run check:tools && npm run typecheck && npm run lint && npm run build",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

@@ -43,17 +43,15 @@
   --shadow-5:
     0 0 0 1px oklch(0.545 0.245 285 / 0.18), 0 8px 32px -12px oklch(0.545 0.245 285 / 0.35);
 
-  --cat-text: oklch(0.6 0.19 258);
-  --cat-crypto: oklch(0.58 0.16 158);
-  --cat-image: oklch(0.6 0.21 355);
-  --cat-color: oklch(0.58 0.24 305);
+  --cat-ai: oklch(0.58 0.24 305);
+  --cat-media: oklch(0.6 0.21 355);
+  --cat-document: oklch(0.6 0.17 232);
   --cat-data: oklch(0.6 0.14 205);
-  --cat-time: oklch(0.66 0.16 62);
-  --cat-converter: oklch(0.6 0.14 178);
-  --cat-generator: oklch(0.6 0.22 325);
-  --cat-css: oklch(0.6 0.17 232);
-  --cat-dev: oklch(0.58 0.15 145);
-  --cat-creative: oklch(0.62 0.2 20);
+  --cat-imaging: oklch(0.6 0.19 258);
+  --cat-crypto: oklch(0.58 0.16 158);
+  --cat-code: oklch(0.58 0.15 145);
+  --cat-design: oklch(0.62 0.2 20);
+  --cat-runtime: oklch(0.66 0.16 62);
 }
 
 /* ------------------------------------------------------------------ *
@@ -93,17 +91,15 @@
   --shadow-4: 0 12px 32px -8px oklch(0 0 0 / 0.55), 0 4px 10px -4px oklch(0 0 0 / 0.4);
   --shadow-5: 0 0 0 1px oklch(0.7 0.185 288 / 0.22), 0 8px 32px -12px oklch(0.7 0.185 288 / 0.4);
 
-  --cat-text: oklch(0.74 0.16 258);
-  --cat-crypto: oklch(0.74 0.14 158);
-  --cat-image: oklch(0.74 0.17 355);
-  --cat-color: oklch(0.76 0.18 305);
+  --cat-ai: oklch(0.76 0.18 305);
+  --cat-media: oklch(0.74 0.17 355);
+  --cat-document: oklch(0.78 0.13 232);
   --cat-data: oklch(0.76 0.12 205);
-  --cat-time: oklch(0.82 0.14 62);
-  --cat-converter: oklch(0.76 0.12 178);
-  --cat-generator: oklch(0.78 0.16 325);
-  --cat-css: oklch(0.78 0.13 232);
-  --cat-dev: oklch(0.78 0.13 145);
-  --cat-creative: oklch(0.78 0.15 20);
+  --cat-imaging: oklch(0.74 0.16 258);
+  --cat-crypto: oklch(0.74 0.14 158);
+  --cat-code: oklch(0.78 0.13 145);
+  --cat-design: oklch(0.78 0.15 20);
+  --cat-runtime: oklch(0.82 0.14 62);
 }
 
 /* ------------------------------------------------------------------ *
@@ -139,17 +135,15 @@
   --color-danger: var(--danger);
   --color-danger-subtle: var(--danger-subtle);
 
-  --color-cat-text: var(--cat-text);
-  --color-cat-crypto: var(--cat-crypto);
-  --color-cat-image: var(--cat-image);
-  --color-cat-color: var(--cat-color);
+  --color-cat-ai: var(--cat-ai);
+  --color-cat-media: var(--cat-media);
+  --color-cat-document: var(--cat-document);
   --color-cat-data: var(--cat-data);
-  --color-cat-time: var(--cat-time);
-  --color-cat-converter: var(--cat-converter);
-  --color-cat-generator: var(--cat-generator);
-  --color-cat-css: var(--cat-css);
-  --color-cat-dev: var(--cat-dev);
-  --color-cat-creative: var(--cat-creative);
+  --color-cat-imaging: var(--cat-imaging);
+  --color-cat-crypto: var(--cat-crypto);
+  --color-cat-code: var(--cat-code);
+  --color-cat-design: var(--cat-design);
+  --color-cat-runtime: var(--cat-runtime);
 
   --shadow-xs: var(--shadow-1);
   --shadow-sm: var(--shadow-2);

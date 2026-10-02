@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Heart } from 'lucide-react';
+import { Clock, Heart } from 'lucide-react';
 
 import { Badge } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -43,6 +43,7 @@ export function ToolCard({ slug, favorite = true, compact, className }: ToolCard
         'group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-surface',
         'p-4 transition-[transform,border-color,box-shadow] duration-200 ease-out-expo',
         'hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md',
+        tool.status === 'planned' && 'border-dashed',
         'focus-visible:ring-[3px] focus-visible:ring-primary/25 focus-visible:outline-none',
         compact ? 'gap-2.5' : 'gap-3 p-5',
         className,
@@ -107,8 +108,10 @@ export function ToolCard({ slug, favorite = true, compact, className }: ToolCard
         </p>
       </div>
 
-      {!compact && (
-        <div className="mt-auto pt-1">
+      <div
+        className={cn('mt-auto flex flex-wrap items-center gap-1.5', compact ? 'pt-0.5' : 'pt-1')}
+      >
+        {!compact && (
           <Badge
             variant="neutral"
             className="border-transparent"
@@ -116,8 +119,14 @@ export function ToolCard({ slug, favorite = true, compact, className }: ToolCard
           >
             {category.name}
           </Badge>
-        </div>
-      )}
+        )}
+        {tool.status === 'planned' && (
+          <Badge variant="warning" size="sm">
+            <Clock className="size-3" />
+            开发中
+          </Badge>
+        )}
+      </div>
     </Link>
   );
 }

@@ -2,10 +2,18 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 import { TOOL_COMPONENTS } from '@/tools/registry';
 import { TOOLS, getTool, type ToolMeta } from '@/config/tools';
+
+/**
+ * 占位页单独分包，且**保持 ssr: true**。
+ * 规格文本有几十 KB，不该进每个工具页的共享 bundle；
+ * 同时它又要进 HTML（SEO / 无 JS 可见），所以不能用 `ssr: false`。
+ */
+const ToolPlaceholder = dynamic(() => import('@/components/tool/tool-placeholder'));
 
 /** 同一分类内的上一个 / 下一个工具，用于页脚导航 */
 export function getNeighbours(slug: string): { prev: ToolMeta | null; next: ToolMeta | null } {
@@ -22,9 +30,21 @@ export function getNeighbours(slug: string): { prev: ToolMeta | null; next: Tool
 
 /**
  * ToolRuntime —— 按 slug 渲染对应工具组件。
- * 放在客户端，配合注册表里的 dynamic import 做代码分割。
+ *
+ * 分两条路径：
+ * - `ready`   → 走 registry 的 dynamic import，每个工具一个独立 chunk。
+ *              工具页大量依赖浏览器 API，`ssr: false` 避免 hydration 不一致。
+ * - `planned` → 静态渲染 ToolPlaceholder。它的内容是纯数据（实现规格），
+ *              没有任何浏览器 API 依赖，所以**要服务端渲染** ——
+ *              这样规格能进 HTML，对搜索引擎和禁 JS 环境都可见。
  */
 export function ToolRuntime({ slug }: { slug: string }) {
+  const tool = getTool(slug);
+
+  if (tool?.status === 'planned') {
+    return <ToolPlaceholder slug={slug} />;
+  }
+
   const Component = TOOL_COMPONENTS[slug];
 
   if (!Component) {

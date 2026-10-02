@@ -12,7 +12,7 @@ export function SiteFooter() {
           <div className="max-w-sm">
             <Logo />
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              {TOTAL_TOOLS} 个在线工具，全部运行在你的浏览器里。
+              {TOTAL_TOOLS} 个工具，全部运行在你的浏览器里。
               <br />
               没有上传、没有登录、没有数据收集 —— 关掉页面数据就消失。
             </p>

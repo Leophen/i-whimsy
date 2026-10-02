@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Fuse from 'fuse.js';
-import { Heart, History, LayoutGrid, Search, X } from 'lucide-react';
+import { CheckCircle2, Heart, History, LayoutGrid, Search, X } from 'lucide-react';
 
 import { ToolGrid } from '@/components/tool/tool-card';
 import { SegmentedControl } from '@/components/ui/controls';
@@ -12,13 +12,18 @@ import { CATEGORIES, TOOLS, type CategoryId, type ToolMeta } from '@/config/tool
 import { useToolStore } from '@/stores/use-tool-store';
 import { cn } from '@/lib/utils';
 
-type Scope = 'all' | 'favorites' | 'recent';
+type Scope = 'all' | 'ready' | 'favorites' | 'recent';
 
 const SCOPES: { value: Scope; label: string; icon: React.ReactNode }[] = [
   { value: 'all', label: '全部', icon: <LayoutGrid className="size-3.5" /> },
+  { value: 'ready', label: '已上线', icon: <CheckCircle2 className="size-3.5" /> },
   { value: 'favorites', label: '收藏', icon: <Heart className="size-3.5" /> },
   { value: 'recent', label: '最近', icon: <History className="size-3.5" /> },
 ];
+
+/** 已实现的工具排在前面 —— 现在 38/43 是开发中，不排序的话能用的会被埋掉 */
+const READY_FIRST = (a: ToolMeta, b: ToolMeta) =>
+  a.status === b.status ? 0 : a.status === 'ready' ? -1 : 1;
 
 export function ToolExplorer() {
   const [query, setQuery] = React.useState('');
@@ -55,7 +60,9 @@ export function ToolExplorer() {
   const tools = React.useMemo(() => {
     let list: ToolMeta[] = TOOLS;
 
-    if (scope === 'favorites') {
+    if (scope === 'ready') {
+      list = list.filter((t) => t.status === 'ready');
+    } else if (scope === 'favorites') {
       list = hydrated ? list.filter((t) => favorites.includes(t.slug)) : [];
     } else if (scope === 'recent') {
       list = hydrated
@@ -68,7 +75,7 @@ export function ToolExplorer() {
     if (category !== 'all') list = list.filter((t) => t.category === category);
 
     const q = query.trim();
-    if (!q) return list;
+    if (!q) return [...list].sort(READY_FIRST);
 
     if (scope === 'recent') {
       // 最近/收藏是固定顺序，不再模糊排序
@@ -84,10 +91,12 @@ export function ToolExplorer() {
     return fuse
       .search(q)
       .map((r) => r.item)
-      .filter((t) => (category === 'all' ? true : t.category === category));
+      .filter((t) => (category === 'all' ? true : t.category === category))
+      .sort(READY_FIRST);
   }, [query, category, scope, favorites, recent, hydrated, fuse]);
 
   const total = TOOLS.length;
+  const readyCount = TOOLS.filter((t) => t.status === 'ready').length;
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[220px_1fr] lg:gap-8">
@@ -103,6 +112,15 @@ export function ToolExplorer() {
               count={total}
               active={category === 'all'}
               onClick={() => setCategory('all')}
+            />
+            <SidebarItem
+              label="已上线"
+              count={readyCount}
+              active={false}
+              onClick={() => {
+                setCategory('all');
+                setScope('ready');
+              }}
             />
             {CATEGORIES.map((c) => (
               <SidebarItem
@@ -174,10 +192,12 @@ export function ToolExplorer() {
         <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
           <span>
             {scope === 'all'
-              ? `共 ${total} 个工具`
-              : scope === 'favorites'
-                ? `收藏了 ${favorites.length} 个`
-                : `最近使用 ${recent.length} 个`}
+              ? `共 ${total} 个工具 · 已上线 ${readyCount} 个`
+              : scope === 'ready'
+                ? `已上线 ${readyCount} 个（其余 ${total - readyCount} 个已完成方案设计）`
+                : scope === 'favorites'
+                  ? `收藏了 ${favorites.length} 个`
+                  : `最近使用 ${recent.length} 个`}
             {category !== 'all' && <> · {CATEGORIES.find((c) => c.id === category)?.name}</>}
             {query.trim() && <> · 匹配 {tools.length} 个</>}
           </span>
@@ -195,9 +215,11 @@ export function ToolExplorer() {
             </p>
           ) : scope !== 'all' && tools.length === 0 ? (
             <p className="rounded-2xl border border-dashed border-border py-12 text-center text-sm text-muted-foreground">
-              {scope === 'favorites'
-                ? '还没有收藏任何工具，点卡片右上角的心形即可收藏'
-                : '还没有使用记录'}
+              {scope === 'ready'
+                ? '没有匹配的已上线工具'
+                : scope === 'favorites'
+                  ? '还没有收藏任何工具，点卡片右上角的心形即可收藏'
+                  : '还没有使用记录'}
             </p>
           ) : (
             <ToolGrid slugs={tools.map((t) => t.slug)} />
