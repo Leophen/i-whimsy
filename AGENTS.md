@@ -48,97 +48,100 @@
 ## 2. 工具总览
 
 ✅ 已上线 = 能直接用；🚧 待实现 = 页面已存在且渲染完整实现规格，等你把它做出来。
-L / M / XL 是实现投入量级（M ≈ 1–2 天，L ≈ 3–5 天，XL ≈ 1–2 周）。
+S ≈ 半天，M ≈ 1–2 天，L ≈ 3–5 天，XL ≈ 1–2 周。
 
-### 本地 AI 推理 · On-device AI（5）
+当前 **23 个工具 / 5 个分类**。**每个工具都有一份完整开发说明**（技术路线 / 依赖体积 /
+实现步骤 / 已知的坑 / 界面要求 / 验收标准），数据在 `src/config/tool-specs.ts`，
+页面在 status 为 planned 时会把它渲染出来。**实现前先打开工具页读一遍规格。**
 
-| 工具           | slug                 | 状态          | 一句话                         |
-| -------------- | -------------------- | ------------- | ------------------------------ |
-| 智能抠图去背景 | `bg-remover`         | 🚧 待实现 · L | 本地模型一键去背景，图片不上传 |
-| 语音转文字     | `whisper-transcribe` | 🚧 待实现 · L | Whisper 本地转写，带时间轴     |
-| 语义相似度检索 | `semantic-search`    | 🚧 待实现 · M | 本地文本向量化，按意思找内容   |
-| 图像识别分类   | `image-classify`     | 🚧 待实现 · M | 本地图像分类与标签识别         |
-| 人脸与姿态识别 | `face-landmark`      | 🚧 待实现 · M | 实时人脸关键点、手势与姿态检测 |
+### 本地 AI 图像 · `ai-image`（4）
 
-### 音视频引擎 · Media（5）
+| 工具           | slug            | 状态          | 一句话                             |
+| -------------- | --------------- | ------------- | ---------------------------------- |
+| 智能抠图换背景 | `bg-remover`    | 🚧 待实现 · M | 本地模型一键去背景，图片不上传     |
+| 图像修复与增强 | `image-restore` | 🚧 待实现 · L | 去物体去水印、无损放大、老照片上色 |
+| AI 照片转 3D   | `photo-3d`      | 🚧 待实现 · M | 一张普通照片变成会摇的立体图       |
+| 文字识别 OCR   | `ocr-studio`    | 🚧 待实现 · M | 图片与扫描件转可编辑文字           |
 
-| 工具             | slug              | 状态           | 一句话                               |
-| ---------------- | ----------------- | -------------- | ------------------------------------ |
-| 视频转码         | `video-transcode` | 🚧 待实现 · XL | 浏览器内硬编硬解转码，无需上传       |
-| 视频转 GIF       | `video-to-gif`    | 🚧 待实现 · L  | 抽帧生成高质量 GIF，可控帧率与调色板 |
-| 音频工作台       | `audio-lab`       | 🚧 待实现 · L  | 波形可视化、裁切、变速与增益         |
-| 屏幕与摄像头录制 | `screen-recorder` | 🚧 待实现 · M  | 本地录制屏幕、窗口或摄像头并导出视频 |
-| 字幕工作台       | `subtitle-studio` | 🚧 待实现 · M  | 字幕格式互转、时间轴偏移与校对       |
+### 本地 AI 语音 · `ai-voice`（2）
 
-### 文档与 OCR · Document（5）
+| 工具         | slug                 | 状态          | 一句话                       |
+| ------------ | -------------------- | ------------- | ---------------------------- |
+| 语音转文字   | `whisper-transcribe` | 🚧 待实现 · M | Whisper 本地转写，录音不上传 |
+| 本地 AI 配音 | `tts-voice`          | 🚧 待实现 · L | 中文文本转语音，音色可选     |
 
-| 工具              | slug              | 状态          | 一句话                                       |
-| ----------------- | ----------------- | ------------- | -------------------------------------------- |
-| PDF 编辑套件      | `pdf-suite`       | 🚧 待实现 · L | 合并拆分、旋转、水印、加密与页面重排         |
-| 文字识别 OCR      | `ocr-studio`      | 🚧 待实现 · L | 图片与扫描件转可编辑文本                     |
-| Markdown 排版导出 | `markdown-studio` | 🚧 待实现 · L | 代码高亮、公式、图表一次渲染并导出图片或 PDF |
-| Word 文档生成     | `docx-builder`    | 🚧 待实现 · M | 用结构化数据生成带样式的 docx                |
-| 表格数据工作台    | `sheet-studio`    | 🚧 待实现 · L | CSV / Excel 读取、清洗与公式预览             |
+### 模拟实验室 · `simlab`（9）
 
-### 数据与查询 · Data（5）
+| 工具                   | slug            | 状态           | 一句话                         |
+| ---------------------- | --------------- | -------------- | ------------------------------ |
+| 流场生成艺术           | `flow-art`      | 🚧 待实现 · S  | 数万粒子沿力场拖尾，长出一张画 |
+| 图灵斑纹 · 反应扩散    | `rd-lab`        | 🚧 待实现 · L  | 点一下参数地图，长出一片斑纹   |
+| 磁流体 · 液态金属      | `ferrofluid`    | 🚧 待实现 · L  | 拖动磁场，看金属液长出尖刺     |
+| 黏菌网络实验室         | `physarum`      | 🚧 待实现 · M  | 单细胞生物也能画出交通网       |
+| 雪花 · 晶体生长        | `snowflake`     | 🚧 待实现 · L  | 生成一片世界上不存在的雪花     |
+| 3D 树生长与进化        | `tree-grow`     | 🚧 待实现 · L  | 种一棵树，让它为阳光竞争几百代 |
+| Particle Life 人工生命 | `particle-life` | 🚧 待实现 · M  | 定几条规则，看粒子自己活起来   |
+| 雪崩沙堆 · 分形曼陀罗  | `sandpile`      | 🚧 待实现 · S  | 一粒一粒落沙，长出分形曼陀罗   |
+| 折纸与纸模折叠         | `origami`       | 🚧 待实现 · XL | 画折痕，看它自己折起来         |
 
-| 工具                | slug               | 状态          | 一句话                                     |
-| ------------------- | ------------------ | ------------- | ------------------------------------------ |
-| SQLite 数据库浏览器 | `sqlite-browser`   | 🚧 待实现 · L | 打开数据库文件，建表查询并持久化到本地     |
-| 大数据集即席分析    | `duckdb-analytics` | 🚧 待实现 · L | 直接对 CSV / Parquet 跑 SQL，百万行不掉帧  |
-| jq 表达式调试       | `jq-playground`    | 🚧 待实现 · M | 真正的 jq 语法，实时看结果                 |
-| JSONPath 查询       | `json-path`        | ✅ 已上线     | 用表达式从 JSON 里取数据并实时看结果       |
-| 类型定义互转        | `type-forge`       | 🚧 待实现 · M | JSON 结构一键转 TypeScript、Zod、Go 结构体 |
+### 设计与图像 · `design`（5）
 
-### 图像工程 · Imaging（5）
+| 工具           | slug             | 状态          | 一句话                             |
+| -------------- | ---------------- | ------------- | ---------------------------------- |
+| 批量图像流水线 | `image-pipeline` | 🚧 待实现 · L | 拖入一批图，串起压缩裁剪水印重命名 |
+| 智能配色系统   | `color-system`   | 🚧 待实现 · M | 从一个主色生成整套色阶与设计令牌   |
+| 图片主色提取   | `image-palette`  | 🚧 待实现 · S | 中位切分算法提取主色与配色比例     |
+| LUT 电影级调色 | `lut-grading`    | 🚧 待实现 · M | 载入调色包，实时给照片调出电影感   |
+| 手作图纸工坊   | `mosaic-pattern` | 🚧 待实现 · M | 照片转乐高 / 十字绣图纸与用料清单  |
 
-| 工具            | slug             | 状态           | 一句话                                    |
-| --------------- | ---------------- | -------------- | ----------------------------------------- |
-| 图像格式转码    | `image-codec`    | 🚧 待实现 · XL | AVIF / WebP / JPEG XL / OxiPNG 本地编解码 |
-| 批量图像流水线  | `image-pipeline` | 🚧 待实现 · L  | 拖入一批图，串起压缩、裁剪、水印、重命名  |
-| EXIF 查看与擦除 | `exif-studio`    | 🚧 待实现 · M  | 查看拍摄参数，一键抹掉隐私元数据          |
-| SVG 优化清理    | `svg-optimizer`  | 🚧 待实现 · M  | 压缩体积、合并路径、去编辑器冗余          |
-| 图片主色提取    | `image-palette`  | ✅ 已上线      | 中位切分算法提取主色与配色比例            |
+### 内容创作 · `content`（3）
 
-### 密码与安全 · Crypto & Security（4）
-
-| 工具             | slug             | 状态          | 一句话                                      |
-| ---------------- | ---------------- | ------------- | ------------------------------------------- |
-| 非对称加密与密钥 | `crypto-lab`     | 🚧 待实现 · L | RSA / ECDSA / Ed25519 加解密与签名验签      |
-| 哈希与密钥派生   | `hash-suite`     | 🚧 待实现 · M | 摘要、HMAC、PBKDF2 / Argon2 / scrypt / HKDF |
-| 数字证书解析     | `x509-inspector` | 🚧 待实现 · L | 解析 X.509 证书与 ASN.1 结构                |
-| 编码链工作台     | `ctf-toolbox`    | 🚧 待实现 · L | 像 CyberChef 一样把编码与加密串成流水线     |
-
-### 代码工程 · Code（5）
-
-| 工具             | slug               | 状态           | 一句话                           |
-| ---------------- | ------------------ | -------------- | -------------------------------- |
-| AST 解析与重构   | `ast-playground`   | 🚧 待实现 · XL | 语法树级查看与批量代码改写       |
-| 正则可视化与调试 | `regex-visualizer` | 🚧 待实现 · L  | 把正则画成自动机图，逐步跟踪匹配 |
-| 代码高亮出图     | `code-image`       | 🚧 待实现 · M  | 生成带主题的精美代码截图         |
-| 文本差异比对     | `text-diff`        | ✅ 已上线      | 按行或按字比对，双栏高亮差异     |
-| 构建产物分析     | `bundle-inspector` | 🚧 待实现 · L  | 分析打包体积，找出体积元凶       |
-
-### 设计与视觉 · Design（6）
-
-| 工具           | slug             | 状态           | 一句话                                 |
-| -------------- | ---------------- | -------------- | -------------------------------------- |
-| CSS 效果实验室 | `css-lab`        | 🚧 待实现 · L  | 阴影、玻璃、圆角、渐变参数联动调参     |
-| 贝塞尔缓动曲线 | `cubic-bezier`   | ✅ 已上线      | 拖拽控制点生成 cubic-bezier 与预设缓动 |
-| 配色系统生成   | `color-system`   | 🚧 待实现 · L  | 从一个主色生成完整色阶与设计令牌       |
-| 对比度检查     | `color-contrast` | ✅ 已上线      | 按 WCAG 标准校验文字与背景可读性       |
-| 3D 模型预览    | `three-viewer`   | 🚧 待实现 · L  | 加载 glTF / GLB / OBJ 并调试材质光照   |
-| 字体子集化     | `font-subset`    | 🚧 待实现 · XL | 按用到的字符裁剪字体，大幅减小体积     |
-
-### 运行时诊断 · Runtime（3）
-
-| 工具         | slug             | 状态          | 一句话                                  |
-| ------------ | ---------------- | ------------- | --------------------------------------- |
-| 设备能力探测 | `device-lab`     | 🚧 待实现 · M | 一次看清这台设备支持哪些现代 API        |
-| 性能基准测试 | `perf-benchmark` | 🚧 待实现 · M | 跑分对比 CPU、内存、Canvas 与加解密吞吐 |
-| 网络质量诊断 | `network-lab`    | 🚧 待实现 · M | 测量延迟、抖动、吞吐与连通性            |
+| 工具           | slug              | 状态          | 一句话                       |
+| -------------- | ----------------- | ------------- | ---------------------------- |
+| 视频转码压缩   | `video-transcode` | 🚧 待实现 · L | 浏览器内硬编硬解，视频不上传 |
+| 音乐可视化视频 | `music-video`     | 🚧 待实现 · M | 把一首歌变成能发出去的视频   |
+| 社交封面卡片图 | `social-card`     | 🚧 待实现 · M | 各平台尺寸封面一键出图       |
 
 ---
+
+### 2.1 界面与交互的统一要求（硬要求，不是建议）
+
+本项目卖的是「高级感」，界面做糙了等于没做。每个工具都必须满足：
+
+1. **一进来就有东西看**：模拟类工具默认自动开始跑动画，不要让页面停在空白等用户点按钮。
+2. **参数少而准**：主界面只放 2–4 个高频控件，其余收进可折叠面板。参数堆满屏 = 研发玩具。
+3. **预设优先于参数**：内置 4–8 个命名预设（带缩略图），让用户点一下就有好结果，再允许微调。
+4. **实时联动**：任何参数改动立即反映到预览，不要有「应用」按钮。
+5. **进度是真实的**：显示百分比、第几张 / 共几张、或已处理帧数。禁止假的进度动画。
+6. **结果能带走**：必须有明确的导出按钮（PNG / SVG / PDF / 视频 / 音频 / 模型），不能只在页面上看。
+7. **前后对比**：涉及图像处理的工具一律提供分屏 Before/After 拖动条。
+8. **状态诚实**：不支持的能力要置灰并说明原因，不要静默失败。
+
+### 2.2 模型与依赖的许可红线（商用前必查）
+
+「纯本地」不等于「可以随便用」。以下都是调研阶段核实过的授权事实：
+
+| 资源                              | 许可            | 处理                                                 |
+| --------------------------------- | --------------- | ---------------------------------------------------- |
+| `briaai/RMBG-1.4`（抠图）         | 仅评估用途      | **不要用**，改用 `Xenova/modnet`（Apache-2.0）       |
+| `depth-anything-v2-small`         | Apache-2.0      | 可用。**Base/Large/Giant 是 CC-BY-NC**，只能用 Small |
+| `Carve/LaMa-ONNX`（去物体）       | Apache-2.0      | 可用                                                 |
+| `Kokoro-82M-v1.1-zh`              | Apache-2.0      | 可用                                                 |
+| AnimeGAN 系列                     | 非商用          | 需商用授权，否则不要引入                             |
+| Zero-DCE 原仓库                   | 非商用          | 改用 Luxonis 版（MIT）                               |
+| MusicGen                          | CC BY-NC 4.0    | 不要引入                                             |
+| `jasonwebb/2d-space-colonization` | CC-BY-NC-SA     | 只能读算法自行实现，不能搬代码                       |
+| essentia.js                       | AGPLv3          | 有传染性，商用需确认                                 |
+| `@paper-design/shaders`           | PolyForm Shield | 含反竞争条款，商用前需法务确认                       |
+
+**不确定就用 MIT / Apache-2.0 的替代品**；没有替代品就在页面上标注清楚。
+
+### 2.3 体积与加载规范
+
+- 任何 >500KB 的依赖必须 `next/dynamic` 懒加载，并显示加载进度
+- 模型权重从 CDN 拉取 + IndexedDB 缓存，**禁止打进 bundle**
+- 模型必须「用到了才下载」：切到某个标签页 / 点了某个按钮才开始拉
+- 标签页或按钮上要标注模型体积（如「去物体 · 208MB」），让用户有预期
 
 ## 3. 技术栈与目录结构
 
@@ -500,12 +503,12 @@ const gpuOk = hydrated ? await detectWebGPU() : false;
 
 按「先出效果、再啃硬骨头」排：
 
-| 阶段               | 工具                                                                                                                                                                                                       | 理由                                                         |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| 第一批（快速见效） | `device-lab`、`perf-benchmark`、`network-lab`、`subtitle-studio`、`exif-studio`、`type-forge`                                                                                                              | 纯 JS + 原生 API，没有重依赖，能快速把「已上线」的数字做起来 |
-| 第二批（中等）     | `pdf-suite`、`docx-builder`、`sqlite-browser`、`code-image`、`svg-optimizer`、`hash-suite`、`color-system`、`jq-playground`                                                                                | 依赖体积可控（几百 KB 到 1MB），技术成熟                     |
-| 第三批（重活）     | `video-transcode`、`video-to-gif`、`audio-lab`、`screen-recorder`、`duckdb-analytics`、`ocr-studio`、`markdown-studio`、`css-lab`、`bundle-inspector`、`regex-visualizer`、`x509-inspector`、`ctf-toolbox` | 需要 WebCodecs / WASM / 复杂 UI                              |
-| 第四批（硬骨头）   | `image-codec`、`image-pipeline`、`bg-remover`、`whisper-transcribe`、`semantic-search`、`image-classify`、`face-landmark`、`three-viewer`、`crypto-lab`、`ast-playground`、`font-subset`                   | 重 WASM / 模型体积 / 复杂算法                                |
+| 阶段               | 工具                                                                                        | 理由                                                 |
+| ------------------ | ------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| 第一批（快速见效） | `sandpile`、`flow-art`、`image-palette`、`social-card`、`color-system`                      | 纯算法零依赖或极小依赖，能快速把「已上线」数字做起来 |
+| 第二批（中等）     | `physarum`、`particle-life`、`lut-grading`、`mosaic-pattern`、`ocr-studio`、`photo-3d`      | 单一模型或成熟库，技术路径清晰                       |
+| 第三批（重活）     | `bg-remover`、`whisper-transcribe`、`ferrofluid`、`rd-lab`、`snowflake`、`tree-grow`        | 需要 Worker + 模型缓存 + GPU 回退                    |
+| 第四批（硬骨头）   | `tts-voice`、`image-restore`、`image-pipeline`、`video-transcode`、`music-video`、`origami` | 大模型 / 复杂管线 / 长链路                           |
 
 做不动的时候，**宁可把 status 留在 planned 也不要交付一个假的实现**。
 
@@ -525,3 +528,13 @@ const gpuOk = hydrated ? await detectWebGPU() : false;
 [ ] status 已改成 ready，且 tool-specs.ts 里的旧规格已删除
 [ ] npm run verify 全绿
 ```
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

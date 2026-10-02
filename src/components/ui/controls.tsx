@@ -94,15 +94,15 @@ export function Select({
                   'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
                 )}
               >
-                <SelectPrimitive.ItemText>{opt.label}</SelectPrimitive.ItemText>
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <SelectPrimitive.ItemText>{opt.label}</SelectPrimitive.ItemText>
+                  {opt.description && (
+                    <span className="mt-0.5 text-xs text-muted-foreground">{opt.description}</span>
+                  )}
+                </div>
                 <SelectPrimitive.ItemIndicator className="absolute top-2 right-2.5">
                   <Check className="size-3.5" />
                 </SelectPrimitive.ItemIndicator>
-                {opt.description && (
-                  <span className="mt-0.5 block text-xs text-muted-foreground">
-                    {opt.description}
-                  </span>
-                )}
               </SelectPrimitive.Item>
             ))}
           </SelectPrimitive.Viewport>
@@ -141,10 +141,10 @@ export function SegmentedControl<T extends string>({
 }: SegmentedControlProps<T>) {
   return (
     <div
-      role="tablist"
+      role="radiogroup"
       className={cn(
-        'inline-flex items-center gap-1 rounded-xl border border-border bg-surface-2 p-1',
-        full && 'w-full',
+        'flex max-w-full items-center gap-1 overflow-x-auto rounded-xl border border-border bg-surface-2 p-1 scrollbar-none',
+        full ? 'w-full' : 'inline-flex',
         className,
       )}
     >
@@ -154,8 +154,8 @@ export function SegmentedControl<T extends string>({
           <button
             key={opt.value}
             type="button"
-            role="tab"
-            aria-selected={active}
+            role="radio"
+            aria-checked={active}
             onClick={() => onValueChange(opt.value)}
             className={cn(
               'inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg font-medium transition-all duration-150',
@@ -195,7 +195,7 @@ export function Switch({
     >
       <SwitchPrimitive.Thumb
         className={cn(
-          'pointer-events-none block size-4 rounded-full bg-white shadow-xs ring-0',
+          'pointer-events-none block size-4 rounded-full bg-surface shadow-xs ring-0',
           'transition-transform duration-200 ease-out-expo',
           'data-[state=checked]:translate-x-4 data-[state=unchecked]:translate-x-0.5',
         )}

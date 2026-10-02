@@ -125,3 +125,83 @@ export function useAsyncComputed<T>(
   return state;
 }
 /* eslint-enable react-hooks/set-state-in-effect */
+
+/* ------------------------------------------------------------------ *
+ * useVisibilityPause — 标签页隐藏时暂停 RAF，省电降温
+ * ------------------------------------------------------------------ */
+
+export function useVisibilityPause(): boolean {
+  const [visible, setVisible] = React.useState(true);
+
+  React.useEffect(() => {
+    const onChange = () => setVisible(!document.hidden);
+    document.addEventListener('visibilitychange', onChange);
+    return () => document.removeEventListener('visibilitychange', onChange);
+  }, []);
+
+  return visible;
+}
+
+/**
+ * 监听 canvas 容器尺寸变化，同步 backing store（devicePixelRatio 感知）。
+ * 布局未完成（0×0）时跳过，下一帧 ResizeObserver 会再次触发。
+ */
+export function useCanvasResize(
+  canvasRef: React.RefObject<HTMLCanvasElement | null>,
+  onResize?: (width: number, height: number) => void,
+) {
+  const onResizeRef = React.useRef(onResize);
+  React.useEffect(() => {
+    onResizeRef.current = onResize;
+  });
+
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const sync = () => {
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) return;
+      const dpr = window.devicePixelRatio || 1;
+      const w = Math.round(rect.width * dpr);
+      const h = Math.round(rect.height * dpr);
+      if (canvas.width === w && canvas.height === h) return;
+      canvas.width = w;
+      canvas.height = h;
+      onResizeRef.current?.(w, h);
+    };
+
+    sync();
+    const ro = new ResizeObserver(sync);
+    ro.observe(canvas);
+    window.addEventListener('resize', sync);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', sync);
+    };
+  }, [canvasRef]);
+}
+
+/** 在页面可见时跑 requestAnimationFrame 循环。 */
+export function useRafLoop(callback: (dt: number) => void, active = true) {
+  const cbRef = React.useRef(callback);
+  const visible = useVisibilityPause();
+  const lastRef = React.useRef(0);
+
+  React.useEffect(() => {
+    cbRef.current = callback;
+  });
+
+  React.useEffect(() => {
+    if (!active || !visible) return;
+    let id = 0;
+    const tick = (now: number) => {
+      const dt = lastRef.current ? now - lastRef.current : 16;
+      lastRef.current = now;
+      cbRef.current(dt);
+      id = requestAnimationFrame(tick);
+    };
+    id = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(id);
+  }, [active, visible]);
+}

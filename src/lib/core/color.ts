@@ -414,6 +414,197 @@ export function generateHarmony(input: string, mode: HarmonyMode): string[] {
   return (offsets[mode] ?? []).map((o) => rgbToHex(hslToRgb({ h: h + o, s, l })));
 }
 
+/* ------------------------------------------------------------------ *
+ * OKLCH —— 感知均匀的色阶生成（color-system 工具使用）
+ * 算法源自 CSS Color Module Level 4 / Björn Ottosson 的 OKLab
+ * ------------------------------------------------------------------ */
+
+export interface OKLCH {
+  /** 感知亮度 0–1 */
+  l: number;
+  /** 彩度 */
+  c: number;
+  /** 色相 0–360 */
+  h: number;
+}
+
+const LINEARIZE = (c: number) => {
+  const v = clamp01(c / 255);
+  return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+};
+
+const DELINEARIZE = (c: number) => {
+  const v = clamp01(c);
+  return v <= 0.0031308 ? v * 12.92 * 255 : (1.055 * v ** (1 / 2.4) - 0.055) * 255;
+};
+
+function rgbToOklab({ r, g, b }: RGB): { l: number; a: number; b: number } {
+  const lr = LINEARIZE(r);
+  const lg = LINEARIZE(g);
+  const lb = LINEARIZE(b);
+  const l = 0.4122214708 * lr + 0.5363325363 * lg + 0.0514459929 * lb;
+  const m = 0.2119034982 * lr + 0.6806995451 * lg + 0.1073969566 * lb;
+  const s = 0.0883024619 * lr + 0.2817188376 * lg + 0.6299787005 * lb;
+  const l_ = Math.cbrt(l);
+  const m_ = Math.cbrt(m);
+  const s_ = Math.cbrt(s);
+  return {
+    l: 0.2104542553 * l_ + 0.793617785 * m_ - 0.0040720468 * s_,
+    a: 1.9779984951 * l_ - 2.3575474782 * m_ + 0.4505937099 * s_,
+    b: 0.0259040371 * l_ + 0.7827717662 * m_ - 0.808675766 * s_,
+  };
+}
+
+function oklabToRgb(lab: { l: number; a: number; b: number }): RGB {
+  const l_ = lab.l + 0.3963377774 * lab.a + 0.2158037573 * lab.b;
+  const m_ = lab.l - 0.1055613458 * lab.a - 0.0638541728 * lab.b;
+  const s_ = lab.l - 0.0894841775 * lab.a - 1.291485548 * lab.b;
+  const l = l_ ** 3;
+  const m = m_ ** 3;
+  const s = s_ ** 3;
+  return {
+    r: Math.round(DELINEARIZE(4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s)),
+    g: Math.round(DELINEARIZE(-1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s)),
+    b: Math.round(DELINEARIZE(-0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s)),
+  };
+}
+
+export function rgbToOklch(rgb: RGB): OKLCH {
+  const lab = rgbToOklab(rgb);
+  const c = Math.hypot(lab.a, lab.b);
+  let h = (Math.atan2(lab.b, lab.a) * 180) / Math.PI;
+  if (h < 0) h += 360;
+  return { l: lab.l, c, h: round(h, 1) };
+}
+
+export function oklchToRgb({ l, c, h }: OKLCH): RGB {
+  const rad = (h * Math.PI) / 180;
+  return oklabToRgb({ l, a: c * Math.cos(rad), b: c * Math.sin(rad) });
+}
+
+export function oklchToHex(oklch: OKLCH): string {
+  return rgbToHex(oklchToRgb(oklch));
+}
+
+/** Tailwind 风格 11 级色阶步进。 */
+export const SCALE_STEPS = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as const;
+export type ScaleStep = (typeof SCALE_STEPS)[number];
+
+/** 亮度锚点：500 对齐输入主色，两端向极浅/极深展开。 */
+const LIGHTNESS_MAP: Record<ScaleStep, number> = {
+  50: 0.97,
+  100: 0.94,
+  200: 0.88,
+  300: 0.8,
+  400: 0.7,
+  500: 0.55,
+  600: 0.45,
+  700: 0.37,
+  800: 0.27,
+  900: 0.2,
+  950: 0.14,
+};
+
+export interface ColorScale {
+  step: ScaleStep;
+  hex: string;
+  oklch: OKLCH;
+  contrastOnWhite: ContrastResult | null;
+  contrastOnBlack: ContrastResult | null;
+}
+
+/** 从主色生成 OKLCH 色阶。 */
+export function generateOklchScale(input: string): ColorScale[] {
+  const rgba = parseColor(input);
+  if (!rgba) return [];
+  const base = rgbToOklch({ r: rgba.r, g: rgba.g, b: rgba.b });
+  const baseL = base.l;
+
+  return SCALE_STEPS.map((step) => {
+    const targetL = LIGHTNESS_MAP[step];
+    const ratio = targetL / Math.max(0.01, baseL);
+    const c = base.c * (step <= 400 ? 0.85 + ratio * 0.1 : step >= 700 ? 0.75 : 1);
+    const oklch: OKLCH = { l: targetL, c: Math.max(0, c), h: base.h };
+    const hex = oklchToHex(oklch);
+    return {
+      step,
+      hex,
+      oklch,
+      contrastOnWhite: checkContrast(hex, '#ffffff'),
+      contrastOnBlack: checkContrast(hex, '#000000'),
+    };
+  });
+}
+
+export interface SemanticPalette {
+  success: ColorScale[];
+  warning: ColorScale[];
+  danger: ColorScale[];
+  info: ColorScale[];
+}
+
+const SEMANTIC_BASE: Record<keyof SemanticPalette, string> = {
+  success: '#16a34a',
+  warning: '#ca8a04',
+  danger: '#dc2626',
+  info: '#2563eb',
+};
+
+export function generateSemanticPalettes(): SemanticPalette {
+  return {
+    success: generateOklchScale(SEMANTIC_BASE.success),
+    warning: generateOklchScale(SEMANTIC_BASE.warning),
+    danger: generateOklchScale(SEMANTIC_BASE.danger),
+    info: generateOklchScale(SEMANTIC_BASE.info),
+  };
+}
+
+/** 深色模式：亮度轴反转并降低彩度。 */
+export function generateDarkScale(lightScale: ColorScale[]): ColorScale[] {
+  const reversed = [...lightScale].reverse();
+  return reversed.map((item, i) => {
+    const step = SCALE_STEPS[i];
+    const oklch: OKLCH = {
+      l: item.oklch.l,
+      c: item.oklch.c * 0.82,
+      h: item.oklch.h,
+    };
+    const hex = oklchToHex(oklch);
+    return {
+      step,
+      hex,
+      oklch,
+      contrastOnWhite: checkContrast(hex, '#ffffff'),
+      contrastOnBlack: checkContrast(hex, '#000000'),
+    };
+  });
+}
+
+export function exportCssVariables(
+  name: string,
+  scale: ColorScale[],
+  darkScale?: ColorScale[],
+): string {
+  const lines = scale.map((s) => `  --${name}-${s.step}: ${s.hex};`);
+  const dark =
+    darkScale?.map((s) => `    --${name}-${s.step}: ${s.hex};`).join('\n') ?? '';
+  return `:root {\n${lines.join('\n')}\n}\n\n.dark {\n${dark}\n}`;
+}
+
+export function exportTailwindConfig(name: string, scale: ColorScale[]): string {
+  const entries = scale.map((s) => `        ${s.step}: '${s.hex}',`).join('\n');
+  return `// tailwind.config 片段\nmodule.exports = {\n  theme: {\n    extend: {\n      colors: {\n        ${name}: {\n${entries}\n        },\n      },\n    },\n  },\n};`;
+}
+
+export function exportDesignTokens(name: string, scale: ColorScale[]): string {
+  const tokens = scale.map((s) => ({
+    name: `${name}.${s.step}`,
+    value: s.hex,
+    oklch: `oklch(${round(s.oklch.l * 100, 1)}% ${round(s.oklch.c, 3)} ${s.oklch.h})`,
+  }));
+  return JSON.stringify({ [name]: tokens }, null, 2);
+}
+
 /** HSL 空间线性插值，用于渐变中间色。 */
 export function mixColors(a: string, b: string, t: number): string {
   const ca = parseColor(a);

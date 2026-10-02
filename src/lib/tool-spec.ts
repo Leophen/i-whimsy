@@ -30,6 +30,11 @@ export interface ToolSpec {
   steps: string[];
   /** 已探明的坑 */
   pitfalls: string[];
+  /**
+   * 界面与交互规范 —— 本项目对「高级感」的硬要求，不是建议。
+   * 每条都要能被直接实现或逐条验收。
+   */
+  ui: string[];
   /** 验收标准 —— 做到什么程度算完成 */
   done: string[];
 }

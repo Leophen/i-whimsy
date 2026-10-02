@@ -50,7 +50,11 @@ export function ToolShell({
             {badges && <div className="mt-2.5 flex flex-wrap gap-1.5">{badges}</div>}
           </div>
         </div>
-        {actions && <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>}
+        {actions && (
+          <div className="flex w-full shrink-0 flex-wrap items-center gap-2 sm:ml-auto sm:w-auto sm:justify-end">
+            {actions}
+          </div>
+        )}
       </header>
 
       <div className="flex flex-col gap-4">{children}</div>
@@ -85,7 +89,7 @@ export function Panel({
   return (
     <div
       className={cn(
-        'overflow-hidden rounded-2xl border border-border bg-surface shadow-sm',
+        'overflow-clip rounded-2xl border border-border bg-surface shadow-sm',
         className,
       )}
     >
@@ -95,7 +99,11 @@ export function Panel({
             {title && (
               <h2 className="text-[13px] font-semibold tracking-tight text-foreground">{title}</h2>
             )}
-            {description && <p className="mt-0.5 text-xs text-muted-foreground">{description}</p>}
+            {description && (
+              <p className="mt-0.5 line-clamp-2 break-words text-xs text-muted-foreground">
+                {description}
+              </p>
+            )}
           </div>
           {actions && <div className="flex shrink-0 items-center gap-1.5">{actions}</div>}
         </div>
@@ -119,7 +127,12 @@ export interface ToolIOProps {
 
 export function ToolIO({ input, output, split = 'even', className, stacked = false }: ToolIOProps) {
   if (stacked) {
-    return <div className={cn('flex flex-col gap-4', className)}>{[input, output]}</div>;
+    return (
+      <div className={cn('flex flex-col gap-4', className)}>
+        <div className="min-w-0">{input}</div>
+        <div className="min-w-0">{output}</div>
+      </div>
+    );
   }
   const cols = {
     even: 'lg:grid-cols-2',
@@ -128,8 +141,8 @@ export function ToolIO({ input, output, split = 'even', className, stacked = fal
   }[split];
   return (
     <div className={cn('grid grid-cols-1 gap-4', cols, className)}>
-      {input}
-      {output}
+      <div className="min-w-0">{input}</div>
+      <div className="min-w-0">{output}</div>
     </div>
   );
 }

@@ -17,7 +17,7 @@ const SECTION_FEATURES = [
   {
     icon: ShieldCheck,
     title: '隐私优先',
-    body: '所有工具在浏览器本地计算。图片、密码、JWT、API Key 这类敏感内容，永远不会经过任何服务器。',
+    body: '所有工具在浏览器本地计算。照片、录音、视频与模型输入永远不会经过任何服务器。',
   },
   {
     icon: Gauge,
@@ -27,7 +27,7 @@ const SECTION_FEATURES = [
   {
     icon: Blocks,
     title: '为每个工具做了专门优化',
-    body: '不是套同一个表单模板：压缩有实时对比，Diff 有行/字符两档粒度，对比度按 WCAG 2.1 判定等级。',
+    body: '不是套同一个表单模板：抠图有前后对比滑块，模拟类默认自动运行动画，AI 推理带真实下载进度。',
   },
 ];
 
@@ -61,7 +61,7 @@ export default function HomePage() {
           <div>
             <h2 className="text-2xl font-semibold tracking-tight sm:text-[28px]">按分类浏览</h2>
             <p className="mt-1.5 text-sm text-muted-foreground">
-              {CATEGORIES.length} 大类工具，从写文案到调 SQL，覆盖前端日常的高频场景。
+              {CATEGORIES.length} 大类工具，从本地 AI 推理到物理模拟与设计流水线，覆盖高级创作场景。
             </p>
           </div>
           <Link
@@ -73,7 +73,7 @@ export default function HomePage() {
           </Link>
         </header>
 
-        <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {CATEGORIES.map((cat) => {
             const Icon = cat.icon;
             const count = toolsByCategory(cat.id).length;

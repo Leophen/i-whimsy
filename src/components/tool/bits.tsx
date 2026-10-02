@@ -102,6 +102,7 @@ export function CopyIconButton({
       className={cn(
         'grid size-7 shrink-0 place-items-center rounded-md text-muted-foreground',
         'transition-colors hover:bg-surface-2 hover:text-foreground',
+        'focus-visible:ring-[3px] focus-visible:ring-primary/25 focus-visible:outline-none',
         copied && 'text-success',
         className,
       )}
@@ -215,14 +216,19 @@ const TONE_CLASS: Record<NonNullable<StatItem['tone']>, string> = {
 
 export function Stat({ label, value, hint, tone = 'default' }: StatItem) {
   return (
-    <div className="rounded-xl border border-border bg-background px-3.5 py-3">
+    <div className="min-w-0 rounded-xl border border-border bg-background px-3.5 py-3">
       <div className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
         {label}
       </div>
-      <div className={cn('tabular mt-1 text-xl leading-tight font-semibold', TONE_CLASS[tone])}>
+      <div
+        className={cn(
+          'tabular mt-1 truncate text-xl leading-tight font-semibold',
+          TONE_CLASS[tone],
+        )}
+      >
         {value}
       </div>
-      {hint && <div className="mt-0.5 text-[11px] text-muted-foreground">{hint}</div>}
+      {hint && <div className="mt-0.5 truncate text-[11px] text-muted-foreground">{hint}</div>}
     </div>
   );
 }
@@ -244,7 +250,7 @@ export function StatGrid({
     6: 'sm:grid-cols-3 lg:grid-cols-6',
   }[columns];
   return (
-    <div className={cn('grid grid-cols-2 gap-2.5', cols, className)}>
+    <div className={cn('grid grid-cols-1 gap-2.5', cols, className)}>
       {items.map((item, i) => (
         <Stat key={i} {...item} />
       ))}
@@ -258,11 +264,52 @@ export function StatGrid({
 export function BusyOverlay({ show, label = '处理中…' }: { show: boolean; label?: string }) {
   if (!show) return null;
   return (
-    <div className="absolute inset-0 z-10 grid place-items-center rounded-xl bg-surface/60 backdrop-blur-[2px]">
-      <div className="flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 text-xs shadow-sm">
+    <div
+      className="absolute inset-0 z-10 grid place-items-center rounded-xl bg-surface/60 backdrop-blur-[2px]"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+    >
+      <div className="flex max-w-[min(100%,20rem)] items-center gap-2 truncate rounded-full border border-border bg-surface px-3 py-1.5 text-xs shadow-sm">
         <Loader2 className="size-3.5 animate-spin text-primary" />
         {label}
       </div>
+    </div>
+  );
+}
+
+/** 带真实百分比的进度遮罩（模型下载 / 推理 / 合成）。 */
+export function ProgressOverlay({
+  show,
+  label,
+  percent,
+}: {
+  show: boolean;
+  label?: string;
+  percent?: number;
+}) {
+  if (!show) return null;
+  const pct = percent === undefined ? undefined : Math.min(100, Math.max(0, percent));
+  return (
+    <div
+      className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-xl bg-surface/70 backdrop-blur-[2px]"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+    >
+      <div className="flex max-w-[min(100%,20rem)] items-center gap-2 truncate px-4 text-xs text-foreground">
+        <Loader2 className="size-3.5 animate-spin text-primary" />
+        {label ?? '处理中…'}
+        {pct !== undefined && <span className="tabular font-medium">{pct}%</span>}
+      </div>
+      {pct !== undefined && (
+        <div className="h-1.5 w-full max-w-48 overflow-hidden rounded-full bg-surface-3 px-4">
+          <div
+            className="h-full rounded-full bg-primary transition-[width] duration-200"
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+      )}
     </div>
   );
 }

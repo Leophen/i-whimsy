@@ -44,14 +44,10 @@
     0 0 0 1px oklch(0.545 0.245 285 / 0.18), 0 8px 32px -12px oklch(0.545 0.245 285 / 0.35);
 
   --cat-ai: oklch(0.58 0.24 305);
-  --cat-media: oklch(0.6 0.21 355);
-  --cat-document: oklch(0.6 0.17 232);
-  --cat-data: oklch(0.6 0.14 205);
-  --cat-imaging: oklch(0.6 0.19 258);
-  --cat-crypto: oklch(0.58 0.16 158);
-  --cat-code: oklch(0.58 0.15 145);
+  --cat-voice: oklch(0.6 0.16 190);
+  --cat-lab: oklch(0.58 0.18 150);
   --cat-design: oklch(0.62 0.2 20);
-  --cat-runtime: oklch(0.66 0.16 62);
+  --cat-media: oklch(0.6 0.21 355);
 }
 
 /* ------------------------------------------------------------------ *
@@ -92,14 +88,10 @@
   --shadow-5: 0 0 0 1px oklch(0.7 0.185 288 / 0.22), 0 8px 32px -12px oklch(0.7 0.185 288 / 0.4);
 
   --cat-ai: oklch(0.76 0.18 305);
-  --cat-media: oklch(0.74 0.17 355);
-  --cat-document: oklch(0.78 0.13 232);
-  --cat-data: oklch(0.76 0.12 205);
-  --cat-imaging: oklch(0.74 0.16 258);
-  --cat-crypto: oklch(0.74 0.14 158);
-  --cat-code: oklch(0.78 0.13 145);
+  --cat-voice: oklch(0.78 0.14 190);
+  --cat-lab: oklch(0.78 0.15 150);
   --cat-design: oklch(0.78 0.15 20);
-  --cat-runtime: oklch(0.82 0.14 62);
+  --cat-media: oklch(0.74 0.17 355);
 }
 
 /* ------------------------------------------------------------------ *
@@ -136,14 +128,10 @@
   --color-danger-subtle: var(--danger-subtle);
 
   --color-cat-ai: var(--cat-ai);
-  --color-cat-media: var(--cat-media);
-  --color-cat-document: var(--cat-document);
-  --color-cat-data: var(--cat-data);
-  --color-cat-imaging: var(--cat-imaging);
-  --color-cat-crypto: var(--cat-crypto);
-  --color-cat-code: var(--cat-code);
+  --color-cat-voice: var(--cat-voice);
+  --color-cat-lab: var(--cat-lab);
   --color-cat-design: var(--cat-design);
-  --color-cat-runtime: var(--cat-runtime);
+  --color-cat-media: var(--cat-media);
 
   --shadow-xs: var(--shadow-1);
   --shadow-sm: var(--shadow-2);
@@ -486,5 +474,16 @@
   .markdown-body img {
     max-width: 100%;
     border-radius: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

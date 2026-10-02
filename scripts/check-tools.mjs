@@ -76,7 +76,9 @@ for (const slug of registered.keys()) {
 
 /* ---------- 4. planned 必须有规格 ---------- */
 const specsSrc = read('src/config/tool-specs.ts');
-const specKeys = new Set([...specsSrc.matchAll(/^\s*'([a-z0-9-]+)':\s*\{/gm)].map((x) => x[1]));
+// 引号可有可无：prettier 会把纯字母的 key 去引号（ferrofluid:），
+// 但带连字符的必须保留（'bg-remover':），两种都要能匹配。
+const specKeys = new Set([...specsSrc.matchAll(/^\s*'?([a-z0-9-]+)'?:\s*\{/gm)].map((x) => x[1]));
 
 for (const t of tools.filter((x) => x.status === 'planned')) {
   if (!specKeys.has(t.slug)) {

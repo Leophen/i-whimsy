@@ -11,7 +11,10 @@ export interface Crumb {
 export function Breadcrumbs({ items, className }: { items: Crumb[]; className?: string }) {
   return (
     <>
-      <nav aria-label="面包屑导航" className={cn('flex items-center gap-1.5 text-xs', className)}>
+      <nav
+        aria-label="面包屑导航"
+        className={cn('flex min-w-0 flex-wrap items-center gap-1.5 overflow-hidden text-xs', className)}
+      >
         <Link
           href="/"
           aria-label="首页"

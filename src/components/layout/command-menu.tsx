@@ -163,7 +163,7 @@ export function CommandMenu() {
 
           <Command.List className="scrollbar-none max-h-[52vh] overflow-y-auto p-2">
             <Command.Empty className="px-4 py-10 text-center text-sm text-muted-foreground">
-              没有找到相关工具，试试「json」「base64」「图片」「时间戳」
+              没有找到相关工具，试试「抠图」「转写」「流场」「调色」「转码」
             </Command.Empty>
 
             {query.trim() && results.length > 0 && (

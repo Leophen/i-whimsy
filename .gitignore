@@ -35,6 +35,10 @@ pnpm-debug.log*
 .env.*
 !.env.example
 
+# agent / IDE session artifacts (not product source)
+.workbuddy/
+.cursor/
+
 # editors
 .idea/
 .vscode/*

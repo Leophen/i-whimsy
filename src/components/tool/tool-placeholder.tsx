@@ -1,6 +1,14 @@
 'use client';
 
-import { ArrowRight, CheckCircle2, Clock, Package, TriangleAlert, Workflow } from 'lucide-react';
+import {
+  ArrowRight,
+  CheckCircle2,
+  Clock,
+  Package,
+  Sparkles,
+  TriangleAlert,
+  Workflow,
+} from 'lucide-react';
 
 import { Panel, ToolIO } from '@/components/tool/shell';
 import { ToolView, useToolMeta, useTrackRecent } from '@/components/tool/tool-view';
@@ -116,6 +124,28 @@ export default function ToolPlaceholder({ slug }: { slug: string }) {
                   </Badge>
                 ))}
               </div>
+            </Panel>
+
+            <Panel
+              title={
+                <span className="inline-flex items-center gap-1.5">
+                  <Sparkles className="size-3.5" />
+                  界面与交互要求
+                </span>
+              }
+              description="本项目对「高级感」的硬要求，不是建议 —— 逐条实现，逐条验收"
+            >
+              <ul className="flex flex-col gap-2">
+                {spec.ui.map((u) => (
+                  <li
+                    key={u}
+                    className="flex gap-2.5 rounded-lg border border-border bg-background px-3 py-2.5"
+                  >
+                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                    <span className="text-[12px] leading-relaxed text-foreground/90">{u}</span>
+                  </li>
+                ))}
+              </ul>
             </Panel>
           </div>
         }

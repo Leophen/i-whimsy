@@ -131,7 +131,7 @@ export function SiteHeader() {
               </span>
             </button>
 
-            <ThemeToggle className="hidden sm:inline-flex" />
+            <ThemeToggle />
 
             <a
               href={siteConfig.github}

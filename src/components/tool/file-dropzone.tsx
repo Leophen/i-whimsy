@@ -107,6 +107,8 @@ export function FileDropzone({
     <div>
       <button
         type="button"
+        aria-label="选择或拖拽文件上传"
+        aria-describedby={error ? 'file-dropzone-error' : undefined}
         onClick={() => inputRef.current?.click()}
         onDragOver={(e) => {
           e.preventDefault();
@@ -156,7 +158,11 @@ export function FileDropzone({
         className="hidden"
         onChange={(e) => handleFiles(e.target.files)}
       />
-      {error && <p className="mt-2 text-xs text-danger">{error}</p>}
+      {error && (
+        <p id="file-dropzone-error" className="mt-2 text-xs text-danger" role="alert">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

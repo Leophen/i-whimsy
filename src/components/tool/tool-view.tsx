@@ -8,7 +8,6 @@ import { InfoTip } from '@/components/ui/tooltip';
 import { ToolShell } from '@/components/tool/shell';
 import { getCategory, getTool, type ToolMeta } from '@/config/tools';
 import { useToolStore } from '@/stores/use-tool-store';
-import { useHydrated } from '@/lib/hooks';
 import { cn } from '@/lib/utils';
 
 /* ------------------------------------------------------------------ *
@@ -28,8 +27,8 @@ export function useTrackRecent(slug: string) {
 export function FavoriteButton({ slug, name }: { slug: string; name: string }) {
   const favorites = useToolStore((s) => s.favorites);
   const toggleFavorite = useToolStore((s) => s.toggleFavorite);
-  // localStorage 里的收藏只有客户端知道，未 hydration 时一律按「未收藏」渲染
-  const isFav = useHydrated() && favorites.includes(slug);
+  const storeHydrated = useToolStore((s) => s.hydrated);
+  const isFav = storeHydrated && favorites.includes(slug);
 
   return (
     <button
